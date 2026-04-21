@@ -25,7 +25,7 @@ export const Hero = () => {
           </p>
           <p className="max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
             Um registro vivo das aulas de Cultura Digital, onde cada sexta-feira
-            é uma nova descoberta com Chromebooks, Scratch e muita criatividade.
+            é uma nova descoberta com tecnologia e muita criatividade.
             Documentando o caminho de alunos que se tornam protagonistas digitais.
           </p>
           <div className="flex flex-wrap gap-3 pt-2">
