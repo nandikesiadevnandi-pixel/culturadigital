@@ -1,5 +1,6 @@
 import heroImg from "@/assets/teacher-hero.png";
 import { Sparkles } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const Hero = () => {
   return (
@@ -29,18 +30,18 @@ export const Hero = () => {
             Documentando o caminho de alunos que se tornam protagonistas digitais.
           </p>
           <div className="flex flex-wrap gap-3 pt-2">
-            <a
-              href="#timeline"
+            <Link
+              to="/aulas"
               className="rounded-full gradient-purple px-6 py-3 font-bold text-primary-foreground shadow-glow transition-smooth hover:scale-105 hover:shadow-card"
             >
               Ver as aulas
-            </a>
-            <a
-              href="#about"
+            </Link>
+            <Link
+              to="/sobre"
               className="rounded-full bg-card px-6 py-3 font-bold text-foreground shadow-soft transition-smooth hover:scale-105"
             >
               Sobre a professora
-            </a>
+            </Link>
           </div>
         </div>
 
