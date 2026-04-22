@@ -38,48 +38,25 @@ export const weeks: Week[] = [
   },
   {
     number: 2,
-    date: "Sexta-feira",
-    title: "Criando contas Google",
+    date: "24/04 — Sexta-feira",
+    title: "Contas Google e primeiro contato com Scratch",
     emoji: "📧",
     color: "blue",
     objective:
-      "Compreender o conceito de conta digital, identidade online e criar uma conta Google de forma segura.",
+      "Dar acesso à identidade digital criando contas Google de forma segura e iniciar o pensamento computacional na prática, com o primeiro contato com programação em blocos no Scratch.",
     taught:
-      "O que é uma conta digital, importância de senhas seguras, dados pessoais, primeiros passos no Gmail e Drive.",
+      "O que é uma conta digital, importância de senhas seguras, cuidados com dados pessoais, primeiros passos no Gmail e no Drive. Em seguida: o que é programação em blocos, interface do Scratch, palco, sprites, eventos e o conceito de sequência aplicado de verdade.",
     activities: [
-      "Criação supervisionada da conta Google",
-      "Definição de senha segura",
-      "Envio do primeiro e-mail entre colegas",
-      "Exploração do Google Drive",
+      "Criação supervisionada da conta Google e definição de senha segura",
+      "Envio do primeiro e-mail entre colegas e exploração do Google Drive",
+      "Exploração da interface do Scratch e movimentação do gato pela tela",
+      "Criação da primeira animação com som e compartilhamento do projeto com a turma",
     ],
     results:
-      "Todos os alunos conseguiram criar suas contas. Trocaram e-mails entre si pela primeira vez — momento marcante.",
+      "Todos conseguiram criar suas contas e trocaram e-mails pela primeira vez — momento marcante. Logo depois, montaram pequenas animações no Scratch com muita risada e descoberta.",
     difficulties:
-      "Verificações de idade e número de telefone exigiram adaptações. Alguns alunos esqueceram a senha logo em seguida.",
+      "Verificações de idade e telefone exigiram adaptações na criação das contas. Alguns esqueceram a senha logo em seguida. No Scratch, encaixar os blocos na ordem certa foi o principal desafio.",
     reflection:
-      "A conta Google é mais que um login: é a porta de entrada para a cidadania digital. Trabalhar segurança desde o início é responsabilidade nossa.",
-  },
-  {
-    number: 3,
-    date: "Sexta-feira",
-    title: "Primeiro contato com Scratch",
-    emoji: "🐱",
-    color: "yellow",
-    objective:
-      "Apresentar o pensamento computacional por meio da programação visual em blocos no Scratch.",
-    taught:
-      "O que é programação, lógica de blocos, palco, sprites, eventos e movimento. Conceito de sequência.",
-    activities: [
-      "Exploração da interface do Scratch",
-      "Movimentar o gato pela tela",
-      "Criar a primeira animação com sons",
-      "Compartilhar o projeto com a turma",
-    ],
-    results:
-      "Alunos criaram pequenas animações com personagens em movimento. Risadas e descobertas tomaram conta da sala.",
-    difficulties:
-      "Encaixar blocos na ordem correta foi desafiador. Conexão com a internet oscilou em alguns momentos.",
-    reflection:
-      "Quando o aluno percebe que ele controla a máquina — e não o contrário — algo muda. O Scratch transforma consumidores em criadores.",
+      "Foi a aula da virada: saíram do 'usar' para o 'criar'. Ter conta própria e ver o personagem obedecer ao próprio código transforma a relação dos alunos com a tecnologia.",
   },
 ];
