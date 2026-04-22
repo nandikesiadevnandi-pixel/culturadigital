@@ -16,25 +16,25 @@ export const weeks: Week[] = [
   {
     number: 1,
     date: "Sexta-feira",
-    title: "Introdução ao Chromebook",
-    emoji: "💻",
+    title: "Introdução à lógica de programação — a receita do bolo",
+    emoji: "🎂",
     color: "purple",
     objective:
-      "Apresentar o Chromebook como ferramenta de aprendizagem e desenvolver familiaridade com o equipamento.",
+      "Apresentar a lógica de programação de forma lúdica, mostrando que programar é, antes de tudo, pensar em passos claros e na ordem certa.",
     taught:
-      "Partes do Chromebook, ligar/desligar, login, navegação básica, teclado e touchpad, cuidados com o equipamento.",
+      "O conceito de algoritmo, sequência de comandos, importância da ordem das instruções e como pequenas trocas mudam todo o resultado. Tudo sem computador — só com imaginação, papel e o corpo.",
     activities: [
-      "Exploração guiada do equipamento",
-      "Prática de digitação e navegação",
-      "Abertura e fechamento de abas no navegador",
-      "Identificação dos principais ícones do sistema",
+      "Aula da 'receita do bolo errada': apresentei os passos fora de ordem e perguntei o que aconteceria",
+      "Os alunos corrigiram a sequência da receita — todos acertaram com facilidade!",
+      "Brincadeira do aluno-robô: um aluno virou 'robô' e só obedecia comandos exatos da turma",
+      "Cada aluno escreveu em uma folha o que entendeu por lógica de programação, usando uma rotina do dia a dia (escovar os dentes, tomar banho, fazer um lanche) descrita passo a passo",
     ],
     results:
-      "A maioria dos alunos conseguiu realizar login e navegar pela interface ao final da aula. Engajamento alto pela curiosidade.",
+      "Engajamento altíssimo. A turma entendeu rapidinho que computador é literal e que precisamos ser claros. As rotinas escritas mostraram compreensão real do conceito de algoritmo.",
     difficulties:
-      "Alguns alunos tiveram dificuldade com o touchpad e com o conceito de senha. Diferentes ritmos exigiram acompanhamento individual.",
+      "No início alguns pulavam etapas óbvias (como 'pegar a escova' antes de 'escovar'). A brincadeira do robô ajudou a perceber esses 'buracos' no raciocínio.",
     reflection:
-      "Iniciar pelo concreto — tocar, explorar, errar — foi essencial. Perceber o brilho nos olhos ao ligar o próprio Chromebook reforça a importância da inclusão digital real.",
+      "Foi uma das aulas mais divertidas — risadas o tempo todo com o aluno-robô. Eles saíram entendendo que já pensam como programadores no dia a dia. Começar pelo concreto, sem tela, faz toda a diferença.",
   },
   {
     number: 2,
