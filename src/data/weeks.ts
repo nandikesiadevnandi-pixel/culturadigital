@@ -1,3 +1,4 @@
+import cakeLogic from "@/assets/week1/cake-logic.png";
 import classroom1 from "@/assets/week2/classroom-1.jpeg";
 import classroom2 from "@/assets/week2/classroom-2.jpeg";
 import video1 from "@/assets/week2/video-1.mp4";
@@ -49,6 +50,13 @@ export const weeks: Week[] = [
       "No início alguns pulavam etapas óbvias (como 'pegar a escova' antes de 'escovar'). A brincadeira do robô ajudou a perceber esses 'buracos' no raciocínio.",
     reflection:
       "Foi uma das aulas mais divertidas — risadas o tempo todo com o aluno-robô. Eles saíram entendendo que já pensam como programadores no dia a dia. Começar pelo concreto, sem tela, faz toda a diferença.",
+    media: [
+      {
+        type: "image",
+        src: cakeLogic,
+        caption: "Resumo visual da aula: a receita do bolo virou algoritmo 🎂✨",
+      },
+    ],
   },
   {
     number: 2,
