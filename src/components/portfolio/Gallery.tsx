@@ -73,6 +73,7 @@ export const Gallery = () => {
                           src={item.src}
                           className="aspect-[4/3] h-full w-full object-cover"
                           controls
+                          muted
                           playsInline
                           preload="metadata"
                         />
