@@ -1,3 +1,16 @@
+import classroom1 from "@/assets/week2/classroom-1.jpeg";
+import classroom2 from "@/assets/week2/classroom-2.jpeg";
+import video1 from "@/assets/week2/video-1.mp4";
+import video2 from "@/assets/week2/video-2.mp4";
+import video3 from "@/assets/week2/video-3.mp4";
+import video4 from "@/assets/week2/video-4.mp4";
+
+export type MediaItem = {
+  type: "image" | "video";
+  src: string;
+  caption?: string;
+};
+
 export type Week = {
   number: number;
   date: string;
@@ -10,6 +23,7 @@ export type Week = {
   results: string;
   difficulties: string;
   reflection: string;
+  media?: MediaItem[];
 };
 
 export const weeks: Week[] = [
@@ -40,23 +54,32 @@ export const weeks: Week[] = [
     number: 2,
     date: "24/04 — Sexta-feira",
     title: "Contas Google e primeiro contato com Scratch",
-    emoji: "📧",
+    emoji: "🎮",
     color: "blue",
     objective:
-      "Dar acesso à identidade digital criando contas Google de forma segura e iniciar o pensamento computacional na prática, com o primeiro contato com programação em blocos no Scratch.",
+      "Dar acesso à identidade digital criando contas Google de forma segura e dar o primeiro mergulho na lógica de programação na prática, construindo o primeirinho jogo no Scratch passo a passo.",
     taught:
-      "O que é uma conta digital, importância de senhas seguras, cuidados com dados pessoais, primeiros passos no Gmail e no Drive. Em seguida: o que é programação em blocos, interface do Scratch, palco, sprites, eventos e o conceito de sequência aplicado de verdade.",
+      "Criação de conta Google, senhas seguras e cuidados com dados pessoais. Em seguida, mergulhamos de cabeça na lógica de programação no Scratch: o que é programação em blocos, palco, sprites, eventos, sequência, repetição e como combinar blocos para dar vida a um personagem. Tudo aplicado na construção do primeiro jogo da turma, feito junto, comando por comando.",
     activities: [
-      "Criação supervisionada da conta Google e definição de senha segura",
-      "Envio do primeiro e-mail entre colegas e exploração do Google Drive",
-      "Exploração da interface do Scratch e movimentação do gato pela tela",
-      "Criação da primeira animação com som e compartilhamento do projeto com a turma",
+      "Criação supervisionada da conta Google e definição de senhas seguras",
+      "Primeiro e-mail entre colegas e exploração rápida do Google Drive",
+      "Tour pela interface do Scratch: palco, blocos, eventos e sprites",
+      "Construção do primeiro jogo seguindo orientações passo a passo — todos acompanhando juntos no telão",
+      "Cada aluno personalizou o próprio jogo no Chromebook, mudando cenário, personagem e movimentos",
     ],
     results:
-      "Todos conseguiram criar suas contas e trocaram e-mails pela primeira vez — momento marcante. Logo depois, montaram pequenas animações no Scratch com muita risada e descoberta.",
+      "Foi mágico! Cada Chromebook virou um mini estúdio de jogos. Seguindo o passo a passo, a turma inteira conseguiu rodar o primeiro jogo — e logo começaram a criar variações próprias, descobrindo na prática como a lógica de programação funciona.",
     difficulties:
-      "Verificações de idade e telefone exigiram adaptações na criação das contas. Alguns esqueceram a senha logo em seguida. No Scratch, encaixar os blocos na ordem certa foi o principal desafio.",
+      "Algumas contas precisaram de ajuste por causa da verificação de idade, e encaixar os blocos na ordem certa exigiu atenção. Mas o passo a passo no telão ajudou todo mundo a chegar junto no resultado.",
     reflection:
-      "Foi a aula da virada: saíram do 'usar' para o 'criar'. Ter conta própria e ver o personagem obedecer ao próprio código transforma a relação dos alunos com a tecnologia.",
+      "Essa foi a aula em que eles deixaram de só usar a tecnologia para começar a criar com ela. Ver a turma comemorando o próprio jogo rodando na tela é a prova de que a lógica de programação, quando bem guiada, vira diversão pura.",
+    media: [
+      { type: "image", src: classroom1, caption: "Turma inteira programando junto no Scratch 💻" },
+      { type: "image", src: classroom2, caption: "O primeiro jogo ganhando vida no telão 🎮" },
+      { type: "video", src: video1, caption: "Construindo o jogo passo a passo ✨" },
+      { type: "video", src: video2, caption: "Cada Chromebook, um mini estúdio de games 🎯" },
+      { type: "video", src: video3, caption: "Lógica de programação na prática 🧠" },
+      { type: "video", src: video4, caption: "A galera testando suas criações 🚀" },
+    ],
   },
 ];
