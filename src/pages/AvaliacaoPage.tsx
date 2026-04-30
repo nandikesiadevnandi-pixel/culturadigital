@@ -132,6 +132,7 @@ export default function AvaliacaoPage() {
           <Sparkles className="h-4 w-4" /> Simulado
         </div>
         <h1 className="mt-3 font-display text-4xl font-extrabold text-gradient">📝 Avaliação – Cultura Digital</h1>
+        <p className="mt-1 text-sm font-semibold text-primary">📅 30/04/2026</p>
         <p className="mt-2 text-muted-foreground">
           Pontuação máxima possível: <strong>{MAX_TOTAL_SCORE} pontos</strong>. Capriche! 💜
         </p>
