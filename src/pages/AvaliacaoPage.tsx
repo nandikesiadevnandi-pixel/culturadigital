@@ -54,7 +54,7 @@ export default function AvaliacaoPage() {
       const answerRows = quizQuestions.map((q) => {
         const text = answers[q.number].trim();
         if (q.type === "multiple_choice") {
-          const ok = text.toUpperCase() === q.correct;
+          const ok = q.acceptAll ? true : text.toUpperCase() === q.correct;
           if (ok) auto += 1;
           return {
             question_number: q.number,
