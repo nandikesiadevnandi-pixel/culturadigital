@@ -14,7 +14,80 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      answers: {
+        Row: {
+          answer_text: string
+          created_at: string
+          id: string
+          is_correct: boolean | null
+          manual_points: number
+          question_number: number
+          question_type: string
+          submission_id: string
+        }
+        Insert: {
+          answer_text: string
+          created_at?: string
+          id?: string
+          is_correct?: boolean | null
+          manual_points?: number
+          question_number: number
+          question_type: string
+          submission_id: string
+        }
+        Update: {
+          answer_text?: string
+          created_at?: string
+          id?: string
+          is_correct?: boolean | null
+          manual_points?: number
+          question_number?: number
+          question_type?: string
+          submission_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "answers_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      submissions: {
+        Row: {
+          auto_score: number
+          class_number: string
+          created_at: string
+          id: string
+          manual_score: number
+          student_name: string
+          total_score: number
+          updated_at: string
+        }
+        Insert: {
+          auto_score?: number
+          class_number: string
+          created_at?: string
+          id?: string
+          manual_score?: number
+          student_name: string
+          total_score?: number
+          updated_at?: string
+        }
+        Update: {
+          auto_score?: number
+          class_number?: string
+          created_at?: string
+          id?: string
+          manual_score?: number
+          student_name?: string
+          total_score?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
