@@ -49,6 +49,24 @@ export default function RankingPage() {
     return [...list].sort((a, b) => b.total_score - a.total_score || a.created_at.localeCompare(b.created_at));
   }, [subs, filterClass]);
 
+  // Group submissions by class, each list sorted by score
+  const byClass = useMemo(() => {
+    const map = new Map<string, Submission[]>();
+    subs.forEach((s) => {
+      const arr = map.get(s.class_number) || [];
+      arr.push(s);
+      map.set(s.class_number, arr);
+    });
+    return Array.from(map.entries())
+      .map(([cls, list]) => ({
+        cls,
+        list: [...list].sort(
+          (a, b) => b.total_score - a.total_score || a.created_at.localeCompare(b.created_at)
+        ),
+      }))
+      .sort((a, b) => a.cls.localeCompare(b.cls));
+  }, [subs]);
+
   const classStats = useMemo(() => {
     const map = new Map<string, { count: number; sum: number }>();
     subs.forEach((s) => {
@@ -69,6 +87,44 @@ export default function RankingPage() {
     return <span className="text-sm font-bold text-muted-foreground">#{i + 1}</span>;
   };
 
+  const renderTable = (list: Submission[]) => (
+    <table className="w-full">
+      <thead className="bg-muted/40">
+        <tr className="text-left text-xs uppercase tracking-wider text-muted-foreground">
+          <th className="px-4 py-3 w-12">#</th>
+          <th className="px-4 py-3">Aluno</th>
+          {filterClass === "all" && <th className="px-4 py-3">Turma</th>}
+          <th className="px-4 py-3 text-center">Múltipla</th>
+          <th className="px-4 py-3 text-center">Abertas</th>
+          <th className="px-4 py-3 text-right">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {list.map((s, i) => (
+          <tr
+            key={s.id}
+            className={`border-t transition-colors hover:bg-muted/30 ${
+              i < 3 ? "bg-primary/5" : ""
+            }`}
+          >
+            <td className="px-4 py-3">{medal(i)}</td>
+            <td className="px-4 py-3 font-semibold">{s.student_name}</td>
+            {filterClass === "all" && (
+              <td className="px-4 py-3 text-muted-foreground">{s.class_number}</td>
+            )}
+            <td className="px-4 py-3 text-center">
+              {s.auto_score}/{MAX_AUTO_SCORE}
+            </td>
+            <td className="px-4 py-3 text-center">{s.manual_score}</td>
+            <td className="px-4 py-3 text-right font-display text-lg font-extrabold text-primary">
+              {s.total_score}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+
   return (
     <div className="container max-w-5xl py-10">
       <header className="mb-8 text-center">
@@ -77,7 +133,7 @@ export default function RankingPage() {
         </div>
         <h1 className="mt-3 font-display text-4xl font-extrabold text-gradient">🏆 Ranking de Acertos</h1>
         <p className="mt-2 text-muted-foreground">
-          Atualiza automaticamente conforme as respostas chegam. Pontuação máxima: {MAX_TOTAL_SCORE} pts.
+          Cada turma tem seu próprio ranking. Pontuação máxima: {MAX_TOTAL_SCORE} pts.
         </p>
       </header>
 
@@ -92,7 +148,9 @@ export default function RankingPage() {
                   {i === 0 && <Trophy className="h-4 w-4 text-yellow-500" />}
                 </div>
                 <p className="mt-1 text-sm text-muted-foreground">{c.count} resposta(s)</p>
-                <p className="mt-2 text-2xl font-extrabold text-primary">{c.avg.toFixed(1)} <span className="text-sm font-normal text-muted-foreground">/ {MAX_TOTAL_SCORE}</span></p>
+                <p className="mt-2 text-2xl font-extrabold text-primary">
+                  {c.avg.toFixed(1)} <span className="text-sm font-normal text-muted-foreground">/ {MAX_TOTAL_SCORE}</span>
+                </p>
               </div>
             ))}
           </div>
@@ -106,7 +164,7 @@ export default function RankingPage() {
             filterClass === "all" ? "gradient-purple text-primary-foreground" : "bg-muted text-foreground/70 hover:bg-muted/70"
           }`}
         >
-          Todas
+          Todas as turmas
         </button>
         {classes.map((c) => (
           <button
@@ -121,42 +179,41 @@ export default function RankingPage() {
         ))}
       </div>
 
-      <div className="overflow-hidden rounded-2xl border bg-card shadow-soft">
-        {loading ? (
-          <div className="p-8 text-center text-muted-foreground">Carregando...</div>
-        ) : filtered.length === 0 ? (
-          <div className="p-8 text-center text-muted-foreground">Nenhuma resposta ainda. Compartilhe o link! 💜</div>
-        ) : (
-          <table className="w-full">
-            <thead className="bg-muted/40">
-              <tr className="text-left text-xs uppercase tracking-wider text-muted-foreground">
-                <th className="px-4 py-3 w-12">#</th>
-                <th className="px-4 py-3">Aluno</th>
-                <th className="px-4 py-3">Turma</th>
-                <th className="px-4 py-3 text-center">Múltipla</th>
-                <th className="px-4 py-3 text-center">Abertas</th>
-                <th className="px-4 py-3 text-right">Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((s, i) => (
-                <tr key={s.id} className="border-t transition-colors hover:bg-muted/30">
-                  <td className="px-4 py-3">{medal(i)}</td>
-                  <td className="px-4 py-3 font-semibold">{s.student_name}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{s.class_number}</td>
-                  <td className="px-4 py-3 text-center">
-                    {s.auto_score}/{MAX_AUTO_SCORE}
-                  </td>
-                  <td className="px-4 py-3 text-center">{s.manual_score}</td>
-                  <td className="px-4 py-3 text-right font-display text-lg font-extrabold text-primary">
-                    {s.total_score}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+      {loading ? (
+        <div className="rounded-2xl border bg-card p-8 text-center text-muted-foreground shadow-soft">
+          Carregando...
+        </div>
+      ) : subs.length === 0 ? (
+        <div className="rounded-2xl border bg-card p-8 text-center text-muted-foreground shadow-soft">
+          Nenhuma resposta ainda. Compartilhe o link! 💜
+        </div>
+      ) : filterClass === "all" ? (
+        <div className="space-y-8">
+          {byClass.map(({ cls, list }) => (
+            <section key={cls}>
+              <div className="mb-3 flex items-center justify-between">
+                <h2 className="font-display text-2xl font-extrabold text-gradient">
+                  🎒 Turma {cls}
+                </h2>
+                <span className="text-sm font-semibold text-muted-foreground">
+                  {list.length} aluno(s)
+                </span>
+              </div>
+              <div className="overflow-hidden rounded-2xl border bg-card shadow-soft">
+                {renderTable(list)}
+              </div>
+            </section>
+          ))}
+        </div>
+      ) : (
+        <div className="overflow-hidden rounded-2xl border bg-card shadow-soft">
+          {filtered.length === 0 ? (
+            <div className="p-8 text-center text-muted-foreground">Nenhuma resposta nessa turma ainda.</div>
+          ) : (
+            renderTable(filtered)
+          )}
+        </div>
+      )}
     </div>
   );
 }
