@@ -138,6 +138,8 @@ export default function AdminAvaliacaoPage() {
       setAiLoading(null);
     }
   };
+
+  if (!authed) {
     return (
       <div className="container max-w-md py-16">
         <form onSubmit={handleLogin} className="rounded-3xl border-2 border-primary/20 bg-card p-8 shadow-soft">
