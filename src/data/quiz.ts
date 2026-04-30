@@ -5,6 +5,7 @@ export type QuizQuestion =
       prompt: string;
       options: { key: "A" | "B" | "C" | "D"; text: string }[];
       correct: "A" | "B" | "C" | "D";
+      acceptAll?: boolean;
     }
   | {
       number: number;
@@ -25,6 +26,7 @@ export const quizQuestions: QuizQuestion[] = [
       { key: "D", text: "Um lápis de cor" },
     ],
     correct: "B",
+    acceptAll: true,
   },
   { number: 3, type: "open", prompt: "Explique o que é lógica de programação de forma simples." },
   {
