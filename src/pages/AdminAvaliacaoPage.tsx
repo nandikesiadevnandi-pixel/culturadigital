@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Lock, Trash2, Save, RefreshCw, Trophy } from "lucide-react";
+import { Lock, Trash2, Save, RefreshCw, Trophy, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,6 +36,8 @@ export default function AdminAvaliacaoPage() {
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [openId, setOpenId] = useState<string | null>(null);
   const [edits, setEdits] = useState<Record<string, number>>({});
+  const [aiFeedback, setAiFeedback] = useState<Record<string, Record<number, string>>>({});
+  const [aiLoading, setAiLoading] = useState<string | null>(null);
 
   const call = async (action: string, payload?: any) => {
     const { data, error } = await supabase.functions.invoke("admin-quiz", {
