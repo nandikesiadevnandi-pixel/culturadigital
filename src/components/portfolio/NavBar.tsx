@@ -9,6 +9,8 @@ const links = [
   { to: "/aulas", label: "Aulas", emoji: "📅" },
   { to: "/progresso", label: "Progresso", emoji: "📈" },
   { to: "/galeria", label: "Galeria", emoji: "📸" },
+  { to: "/avaliacao", label: "Avaliação", emoji: "📝" },
+  { to: "/ranking", label: "Ranking", emoji: "🏆" },
 ];
 
 export const NavBar = () => {
