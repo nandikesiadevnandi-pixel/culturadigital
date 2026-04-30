@@ -229,6 +229,12 @@ export default function AdminAvaliacaoPage() {
                               <p className="mt-2 whitespace-pre-wrap rounded-lg bg-muted/40 p-3 text-sm">
                                 {a.answer_text}
                               </p>
+                              {aiFeedback[s.id]?.[a.question_number] && (
+                                <p className="mt-2 flex items-start gap-2 rounded-lg bg-primary/5 p-3 text-xs italic text-primary">
+                                  <Sparkles className="mt-0.5 h-3 w-3 shrink-0" />
+                                  <span>{aiFeedback[s.id][a.question_number]}</span>
+                                </p>
+                              )}
                               <div className="mt-3 flex items-center gap-2">
                                 <Label className="text-xs">Nota (0-{MAX_MANUAL_POINTS_PER_OPEN}):</Label>
                                 {[0, 1, 2].map((n) => {
