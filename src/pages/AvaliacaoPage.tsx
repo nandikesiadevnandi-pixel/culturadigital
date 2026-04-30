@@ -108,7 +108,7 @@ export default function AvaliacaoPage() {
           </div>
           <h1 className="font-display text-3xl font-extrabold text-gradient">Resposta enviada! 🎉</h1>
           <p className="mt-3 text-muted-foreground">
-            Você acertou <strong>{done.auto}</strong> de <strong>{MAX_AUTO_SCORE}</strong> nas múltipla escolha. As questões abertas serão corrigidas pela professora.
+            Você acertou <strong>{done.auto}</strong> de <strong>{MAX_AUTO_SCORE}</strong> questões! 💜
           </p>
           <div className="mt-6 flex justify-center gap-3">
             <Button asChild variant="outline">
