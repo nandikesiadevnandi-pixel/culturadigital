@@ -262,13 +262,24 @@ export default function AdminAvaliacaoPage() {
                     })}
                   </div>
 
-                  <div className="mt-4 flex justify-between">
+                  <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
                     <Button variant="outline" size="sm" onClick={() => remove(s.id)}>
                       <Trash2 className="mr-1 h-4 w-4" /> Excluir
                     </Button>
-                    <Button size="sm" onClick={() => saveGrades(s.id)}>
-                      <Save className="mr-1 h-4 w-4" /> Salvar notas
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => aiGrade(s.id)}
+                        disabled={aiLoading === s.id}
+                      >
+                        <Sparkles className="mr-1 h-4 w-4" />
+                        {aiLoading === s.id ? "IA avaliando..." : "Avaliar com IA"}
+                      </Button>
+                      <Button size="sm" onClick={() => saveGrades(s.id)}>
+                        <Save className="mr-1 h-4 w-4" /> Salvar notas
+                      </Button>
+                    </div>
                   </div>
                 </div>
               )}
