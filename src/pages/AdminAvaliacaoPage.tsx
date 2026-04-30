@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Lock, Trash2, Save, RefreshCw, Trophy } from "lucide-react";
+import { Lock, Trash2, Save, RefreshCw, Trophy, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,6 +36,8 @@ export default function AdminAvaliacaoPage() {
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [openId, setOpenId] = useState<string | null>(null);
   const [edits, setEdits] = useState<Record<string, number>>({});
+  const [aiFeedback, setAiFeedback] = useState<Record<string, Record<number, string>>>({});
+  const [aiLoading, setAiLoading] = useState<string | null>(null);
 
   const call = async (action: string, payload?: any) => {
     const { data, error } = await supabase.functions.invoke("admin-quiz", {
@@ -111,6 +113,29 @@ export default function AdminAvaliacaoPage() {
       await load();
     } catch (e: any) {
       toast({ title: "Erro", description: e.message, variant: "destructive" });
+    }
+  };
+
+  const aiGrade = async (submissionId: string) => {
+    setAiLoading(submissionId);
+    try {
+      const data: any = await call("ai_grade", { submission_id: submissionId });
+      const fb: Record<number, string> = {};
+      const newEdits: Record<string, number> = { ...edits };
+      const subAnswers = answers.filter((a) => a.submission_id === submissionId);
+      (data.grades || []).forEach((g: any) => {
+        fb[g.question_number] = g.feedback;
+        const ans = subAnswers.find((a) => a.question_number === g.question_number);
+        if (ans) newEdits[ans.id] = g.points;
+      });
+      setAiFeedback((prev) => ({ ...prev, [submissionId]: fb }));
+      setEdits(newEdits);
+      toast({ title: "IA avaliou! ✨", description: `Sugestão: ${data.manual} pts nas abertas. Confira e salve.` });
+      await load();
+    } catch (e: any) {
+      toast({ title: "Erro da IA", description: e.message, variant: "destructive" });
+    } finally {
+      setAiLoading(null);
     }
   };
 
@@ -204,6 +229,12 @@ export default function AdminAvaliacaoPage() {
                               <p className="mt-2 whitespace-pre-wrap rounded-lg bg-muted/40 p-3 text-sm">
                                 {a.answer_text}
                               </p>
+                              {aiFeedback[s.id]?.[a.question_number] && (
+                                <p className="mt-2 flex items-start gap-2 rounded-lg bg-primary/5 p-3 text-xs italic text-primary">
+                                  <Sparkles className="mt-0.5 h-3 w-3 shrink-0" />
+                                  <span>{aiFeedback[s.id][a.question_number]}</span>
+                                </p>
+                              )}
                               <div className="mt-3 flex items-center gap-2">
                                 <Label className="text-xs">Nota (0-{MAX_MANUAL_POINTS_PER_OPEN}):</Label>
                                 {[0, 1, 2].map((n) => {
@@ -231,13 +262,24 @@ export default function AdminAvaliacaoPage() {
                     })}
                   </div>
 
-                  <div className="mt-4 flex justify-between">
+                  <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
                     <Button variant="outline" size="sm" onClick={() => remove(s.id)}>
                       <Trash2 className="mr-1 h-4 w-4" /> Excluir
                     </Button>
-                    <Button size="sm" onClick={() => saveGrades(s.id)}>
-                      <Save className="mr-1 h-4 w-4" /> Salvar notas
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => aiGrade(s.id)}
+                        disabled={aiLoading === s.id}
+                      >
+                        <Sparkles className="mr-1 h-4 w-4" />
+                        {aiLoading === s.id ? "IA avaliando..." : "Avaliar com IA"}
+                      </Button>
+                      <Button size="sm" onClick={() => saveGrades(s.id)}>
+                        <Save className="mr-1 h-4 w-4" /> Salvar notas
+                      </Button>
+                    </div>
                   </div>
                 </div>
               )}
