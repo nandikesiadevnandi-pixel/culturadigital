@@ -116,7 +116,28 @@ export default function AdminAvaliacaoPage() {
     }
   };
 
-  if (!authed) {
+  const aiGrade = async (submissionId: string) => {
+    setAiLoading(submissionId);
+    try {
+      const data: any = await call("ai_grade", { submission_id: submissionId });
+      const fb: Record<number, string> = {};
+      const newEdits: Record<string, number> = { ...edits };
+      const subAnswers = answers.filter((a) => a.submission_id === submissionId);
+      (data.grades || []).forEach((g: any) => {
+        fb[g.question_number] = g.feedback;
+        const ans = subAnswers.find((a) => a.question_number === g.question_number);
+        if (ans) newEdits[ans.id] = g.points;
+      });
+      setAiFeedback((prev) => ({ ...prev, [submissionId]: fb }));
+      setEdits(newEdits);
+      toast({ title: "IA avaliou! ✨", description: `Sugestão: ${data.manual} pts nas abertas. Confira e salve.` });
+      await load();
+    } catch (e: any) {
+      toast({ title: "Erro da IA", description: e.message, variant: "destructive" });
+    } finally {
+      setAiLoading(null);
+    }
+  };
     return (
       <div className="container max-w-md py-16">
         <form onSubmit={handleLogin} className="rounded-3xl border-2 border-primary/20 bg-card p-8 shadow-soft">
