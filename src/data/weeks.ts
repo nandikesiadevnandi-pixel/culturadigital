@@ -5,6 +5,7 @@ import video1 from "@/assets/week2/video-1.mp4";
 import video2 from "@/assets/week2/video-2.mp4";
 import video3 from "@/assets/week2/video-3.mp4";
 import video4 from "@/assets/week2/video-4.mp4";
+import week3Video1 from "@/assets/week3/avaliacao-1.mp4";
 
 export type MediaItem = {
   type: "image" | "video";
