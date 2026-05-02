@@ -1,5 +1,9 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
+import { BarChart3, Trophy, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { MAX_TOTAL_SCORE } from "@/data/quiz";
 
 type Skill = {
   label: string;
@@ -57,6 +61,36 @@ const Bar = ({ skill }: { skill: Skill }) => {
 };
 
 export const Progress = () => {
+  const [stats, setStats] = useState<{ count: number; avg: number; top: number } | null>(null);
+
+  useEffect(() => {
+    const load = async () => {
+      const { data } = await supabase.from("submissions").select("total_score");
+      if (!data || data.length === 0) {
+        setStats({ count: 0, avg: 0, top: 0 });
+        return;
+      }
+      const scores = data.map((d: any) => d.total_score as number);
+      const sum = scores.reduce((a, b) => a + b, 0);
+      setStats({
+        count: scores.length,
+        avg: sum / scores.length,
+        top: Math.max(...scores),
+      });
+    };
+    load();
+
+    const channel = supabase
+      .channel("progress-live")
+      .on("postgres_changes", { event: "*", schema: "public", table: "submissions" }, () => load())
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const avgPct = stats && stats.count > 0 ? Math.round((stats.avg / MAX_TOTAL_SCORE) * 100) : 0;
+
   return (
     <section id="progress" className="bg-muted/40 py-20 md:py-28">
       <div className="container">
@@ -76,6 +110,84 @@ export const Progress = () => {
           {skills.map((s) => (
             <Bar key={s.label} skill={s} />
           ))}
+        </div>
+
+        {/* Resultado real das avaliações */}
+        <div className="mt-10 overflow-hidden rounded-3xl border bg-card p-6 shadow-soft md:p-8">
+          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+            <div className="flex items-start gap-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl gradient-purple text-2xl shadow-soft">
+                <BarChart3 className="h-7 w-7 text-primary-foreground" />
+              </div>
+              <div>
+                <span className="inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
+                  Conhecimento da matéria
+                </span>
+                <h3 className="mt-2 font-display text-2xl font-extrabold md:text-3xl">
+                  Resultado das avaliações
+                </h3>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Dados reais coletados na avaliação de Cultura Digital.
+                </p>
+              </div>
+            </div>
+            <Link
+              to="/ranking"
+              className="inline-flex items-center justify-center gap-2 rounded-full gradient-purple px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-soft transition-smooth hover:-translate-y-0.5"
+            >
+              Ver ranking completo <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+
+          {stats && stats.count > 0 ? (
+            <>
+              <div className="mt-6 grid gap-4 sm:grid-cols-3">
+                <div className="rounded-2xl bg-muted/60 p-4">
+                  <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                    Alunos avaliados
+                  </p>
+                  <p className="mt-1 font-display text-3xl font-extrabold text-foreground">
+                    {stats.count}
+                  </p>
+                </div>
+                <div className="rounded-2xl bg-muted/60 p-4">
+                  <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                    Média da turma
+                  </p>
+                  <p className="mt-1 font-display text-3xl font-extrabold text-primary">
+                    {stats.avg.toFixed(1)}
+                    <span className="text-base font-bold text-muted-foreground"> / {MAX_TOTAL_SCORE}</span>
+                  </p>
+                </div>
+                <div className="rounded-2xl bg-muted/60 p-4">
+                  <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                    Maior nota
+                  </p>
+                  <p className="mt-1 flex items-center gap-2 font-display text-3xl font-extrabold text-foreground">
+                    <Trophy className="h-6 w-6 text-yellow-500" />
+                    {stats.top}/{MAX_TOTAL_SCORE}
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <div className="mb-2 flex items-center justify-between text-sm font-bold">
+                  <span>Aproveitamento médio</span>
+                  <span className="text-primary">{avgPct}%</span>
+                </div>
+                <div className="h-3 w-full overflow-hidden rounded-full bg-muted">
+                  <div
+                    className="h-full rounded-full gradient-purple transition-all duration-[1400ms] ease-out"
+                    style={{ width: `${avgPct}%` }}
+                  />
+                </div>
+              </div>
+            </>
+          ) : (
+            <p className="mt-6 text-center text-sm text-muted-foreground">
+              Os resultados aparecerão aqui assim que os alunos enviarem a avaliação.
+            </p>
+          )}
         </div>
       </div>
     </section>
