@@ -1,5 +1,9 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
+import { BarChart3, Trophy, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { MAX_TOTAL_SCORE } from "@/data/quiz";
 
 type Skill = {
   label: string;
