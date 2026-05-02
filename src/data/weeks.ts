@@ -5,6 +5,7 @@ import video1 from "@/assets/week2/video-1.mp4";
 import video2 from "@/assets/week2/video-2.mp4";
 import video3 from "@/assets/week2/video-3.mp4";
 import video4 from "@/assets/week2/video-4.mp4";
+import week3Video1 from "@/assets/week3/avaliacao-1.mp4";
 
 export type MediaItem = {
   type: "image" | "video";
@@ -113,5 +114,8 @@ export const weeks: Week[] = [
       "Algumas perguntas envolviam diferenciar 'tecnologia' de 'lógica' — conceitos próximos. As atividades de aquecimento foram essenciais para esclarecer essas dúvidas antes da prova.",
     reflection:
       "Foi gratificante ver na avaliação o quanto eles evoluíram desde a primeira aula. Eles entraram achando que 'tecnologia é só celular' e saíram entendendo que tecnologia é tudo que o ser humano cria para resolver problemas — e que lógica de programação está em cada passo do dia a dia.",
+    media: [
+      { type: "video", src: week3Video1, caption: "Turma concentrada durante a avaliação 📝" },
+    ],
   },
 ];
