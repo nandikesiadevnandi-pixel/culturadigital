@@ -90,4 +90,28 @@ export const weeks: Week[] = [
       { type: "video", src: video4, caption: "A galera testando suas criações 🚀" },
     ],
   },
+  {
+    number: 3,
+    date: "30/04 — Sexta-feira",
+    title: "Avaliação: o que aprenderam sobre tecnologia e lógica",
+    emoji: "📝",
+    color: "green",
+    objective:
+      "Revisar de forma divertida tudo o que vimos até aqui — receita do bolo, aluno-robô, Scratch — e aplicar uma avaliação para medir o que a turma realmente aprendeu sobre tecnologia e lógica de programação.",
+    taught:
+      "Retomamos a 'receita do bolo invertida', em que os alunos precisavam colocar os comandos na ordem certa para o resultado dar certo. Reforçamos a brincadeira do robô: um colega imitava um robô e só executava comandos exatos dados pela turma, mostrando na prática o que é lógica de programação. Também revisamos o Scratch — suas funções, blocos e como gerar resultados combinando comandos certos. Tudo isso caiu na avaliação: o que é tecnologia, o que é lógica, como funciona o Scratch e como pensar em passos.",
+    activities: [
+      "Aquecimento com a 'receita do bolo invertida' — turma reorganizando os passos na ordem correta",
+      "Rodada do aluno-robô: colegas davam comandos certos para o 'robô' chegar ao objetivo",
+      "Revisão rápida do Scratch: blocos, eventos e como combinar comandos para gerar resultados",
+      "Aplicação da avaliação online com 11 questões de múltipla escolha sobre tecnologia, lógica e Scratch",
+      "Resultado liberado na hora — cada aluno viu sua nota e a turma acompanhou o ranking ao vivo",
+    ],
+    results:
+      "A turma se saiu muito bem! As brincadeiras de aquecimento ajudaram a destravar o raciocínio e a maioria conseguiu boas notas. Os resultados estão registrados na página de Ranking e no card de Resultado das avaliações.",
+    difficulties:
+      "Algumas perguntas envolviam diferenciar 'tecnologia' de 'lógica' — conceitos próximos. As atividades de aquecimento foram essenciais para esclarecer essas dúvidas antes da prova.",
+    reflection:
+      "Foi gratificante ver na avaliação o quanto eles evoluíram desde a primeira aula. Eles entraram achando que 'tecnologia é só celular' e saíram entendendo que tecnologia é tudo que o ser humano cria para resolver problemas — e que lógica de programação está em cada passo do dia a dia.",
+  },
 ];
