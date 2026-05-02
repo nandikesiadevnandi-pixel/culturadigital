@@ -114,5 +114,8 @@ export const weeks: Week[] = [
       "Algumas perguntas envolviam diferenciar 'tecnologia' de 'lógica' — conceitos próximos. As atividades de aquecimento foram essenciais para esclarecer essas dúvidas antes da prova.",
     reflection:
       "Foi gratificante ver na avaliação o quanto eles evoluíram desde a primeira aula. Eles entraram achando que 'tecnologia é só celular' e saíram entendendo que tecnologia é tudo que o ser humano cria para resolver problemas — e que lógica de programação está em cada passo do dia a dia.",
+    media: [
+      { type: "video", src: week3Video1, caption: "Turma concentrada durante a avaliação 📝" },
+    ],
   },
 ];
