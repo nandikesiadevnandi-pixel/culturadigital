@@ -72,7 +72,8 @@ export const Gallery = () => {
                         <video
                           src={item.src}
                           className="aspect-[4/3] h-full w-full object-cover"
-                          controls
+                          autoPlay
+                          loop
                           muted
                           playsInline
                           preload="metadata"
