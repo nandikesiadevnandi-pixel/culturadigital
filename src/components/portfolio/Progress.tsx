@@ -129,6 +129,9 @@ export const Progress = () => {
                 <p className="mt-1 text-sm text-muted-foreground">
                   Dados reais coletados na avaliação de Cultura Digital.
                 </p>
+                <p className="mt-1 text-xs font-bold text-muted-foreground">
+                  📅 Avaliação aplicada em 30/04/2026
+                </p>
               </div>
             </div>
             <Link
