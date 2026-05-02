@@ -106,7 +106,7 @@ export const weeks: Week[] = [
       "Rodada do aluno-robô: colegas davam comandos certos para o 'robô' chegar ao objetivo",
       "Revisão rápida do Scratch: blocos, eventos e como combinar comandos para gerar resultados",
       "Aplicação da avaliação online com 11 questões de múltipla escolha sobre tecnologia, lógica e Scratch",
-      "Resultado liberado na hora — cada aluno viu sua nota e a turma acompanhou o ranking ao vivo",
+      "Resultado liberado na hora — cada aluno viu sua nota e a turma acompanhou o ranking ao vivo. Os 5 melhores ganharam chocolate da prof Késia como gratificação pelo empenho! 🍫",
     ],
     results:
       "A turma se saiu muito bem! As brincadeiras de aquecimento ajudaram a destravar o raciocínio e a maioria conseguiu boas notas. Os resultados estão registrados na página de Ranking e no card de Resultado das avaliações.",
