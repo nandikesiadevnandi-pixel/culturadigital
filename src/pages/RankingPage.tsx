@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { Trophy, Medal, Award, Sparkles } from "lucide-react";
+import { Trophy, Medal, Award, Sparkles, School as SchoolIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { MAX_TOTAL_SCORE, MAX_AUTO_SCORE } from "@/data/quiz";
+import { schools, getSchoolName } from "@/data/schools";
 
 type Submission = {
   id: string;
