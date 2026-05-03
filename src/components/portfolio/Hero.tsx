@@ -1,8 +1,11 @@
 import heroImg from "@/assets/teacher-hero.png";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
+import { usePlatform } from "@/contexts/PlatformContext";
 
 export const Hero = () => {
+  const { platform, platformId } = usePlatform();
+  const isCultura = platformId === "cultura";
   return (
     <header className="relative overflow-hidden gradient-soft">
       {/* Decorative blobs */}
@@ -14,20 +17,18 @@ export const Hero = () => {
         <div className="space-y-6 animate-fade-in">
           <span className="inline-flex items-center gap-2 rounded-full bg-card px-4 py-2 text-sm font-bold text-primary shadow-soft">
             <Sparkles className="h-4 w-4" />
-            Portfólio Docente · 2025
+            {platform.tagline}
           </span>
           <h1 className="font-display text-5xl font-extrabold leading-[1.05] md:text-6xl lg:text-7xl">
-            <span className="text-gradient">Cultura Digital</span>
+            <span className="text-gradient">{platform.name}</span>
             <br />
             <span className="text-foreground">em Ação</span>
           </h1>
           <p className="text-xl font-semibold text-foreground/80 md:text-2xl">
-            Escolas Bertholdo · Ernesto · Dante Bertoluci — Canela
+            {platform.heroSubtitle}
           </p>
           <p className="max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
-            Um registro vivo das aulas de Cultura Digital, onde cada encontro
-            é uma nova descoberta com tecnologia e muita criatividade.
-            Documentando o caminho de alunos que se tornam protagonistas digitais.
+            {platform.heroDescription}
           </p>
           <div className="flex flex-wrap gap-3 pt-2">
             <Link
