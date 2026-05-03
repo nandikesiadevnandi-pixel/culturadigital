@@ -8,13 +8,28 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
 import { quizQuestions, MAX_AUTO_SCORE, MAX_TOTAL_SCORE } from "@/data/quiz";
+import { usePlatform } from "@/contexts/PlatformContext";
 
 export default function AvaliacaoPage() {
+  const { platform, platformId } = usePlatform();
   const [name, setName] = useState("");
   const [classNumber, setClassNumber] = useState("");
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState<{ auto: number } | null>(null);
+
+  if (platformId !== "cultura") {
+    return (
+      <section className="container max-w-2xl py-20">
+        <div className="rounded-3xl border-2 border-dashed border-primary/30 bg-card p-10 text-center shadow-soft">
+          <h1 className="font-display text-3xl font-extrabold text-gradient">📝 Avaliação</h1>
+          <p className="mt-3 text-muted-foreground">
+            A avaliação da prof <strong>{platform.teacherName}</strong> ({platform.name}) será disponibilizada em breve. {platform.emoji}
+          </p>
+        </div>
+      </section>
+    );
+  }
 
   const setAns = (n: number, v: string) => setAnswers((a) => ({ ...a, [n]: v }));
 
