@@ -162,6 +162,29 @@ export default function RankingPage() {
         </p>
       </header>
 
+      <section className="mb-8 rounded-3xl border bg-card p-5 shadow-soft md:p-6">
+        <div className="mb-4 flex items-center gap-2">
+          <SchoolIcon className="h-5 w-5 text-primary" />
+          <h2 className="font-display text-lg font-extrabold">Escolas atendidas pela prof Késia</h2>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-3">
+          {schools.map((s) => (
+            <div key={s.id} className="rounded-2xl border bg-muted/40 p-4">
+              <div className={`mb-2 inline-flex h-9 w-9 items-center justify-center rounded-xl ${s.accent} text-primary-foreground shadow-soft`}>
+                <SchoolIcon className="h-4 w-4" />
+              </div>
+              <p className="font-display text-base font-extrabold leading-tight">{s.name}</p>
+              <p className="mt-1 text-xs font-bold text-primary">📅 {s.day}</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {s.classes.length > 0
+                  ? `Turmas: ${s.classes.join(", ")}`
+                  : "Turmas em breve"}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {classStats.length > 0 && (
         <section className="mb-8">
           <h2 className="mb-3 font-display text-xl font-bold">📊 Média por turma</h2>
@@ -259,7 +282,7 @@ export default function RankingPage() {
                 <div>
                   <h2 className="font-display text-xl font-extrabold">{school.name}</h2>
                   <p className="text-xs text-muted-foreground">
-                    {schoolClasses.length} turma(s)
+                    📅 {school.day} • {schoolClasses.length} turma(s)
                   </p>
                 </div>
               </div>

@@ -1,22 +1,42 @@
 // Mapeamento de turmas → escola.
-// Para adicionar uma nova escola, basta criar um novo objeto aqui
-// listando as turmas que pertencem a ela.
+// Para adicionar turmas a uma escola, basta incluir o número da turma
+// no array `classes` da escola correspondente.
 export type School = {
   id: string;
   name: string;
   short: string;
+  /** Dia da semana em que a prof Késia dá aula nessa escola */
+  day: string;
+  /** Cor de destaque (classe utilitária do design system) */
+  accent: string;
   classes: string[];
 };
 
 export const schools: School[] = [
   {
+    id: "bertholdo",
+    name: "Escola Bertholdo",
+    short: "Bertholdo",
+    day: "Segunda-feira",
+    accent: "gradient-blue",
+    classes: [], // adicione as turmas conforme forem começando
+  },
+  {
+    id: "ernesto",
+    name: "Escola Ernesto",
+    short: "Ernesto",
+    day: "Terça-feira",
+    accent: "gradient-green",
+    classes: [],
+  },
+  {
     id: "dante",
     name: "Escola Dante Bertoluci",
     short: "Dante Bertoluci",
+    day: "Sexta-feira",
+    accent: "gradient-purple",
     classes: ["141", "142", "151", "152"],
   },
-  // Exemplo para futuras escolas:
-  // { id: "outra", name: "Escola XYZ", short: "XYZ", classes: ["161", "162"] },
 ];
 
 export const getSchoolByClass = (classNumber: string): School | undefined =>
