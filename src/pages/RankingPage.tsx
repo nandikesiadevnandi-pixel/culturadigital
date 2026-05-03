@@ -185,6 +185,39 @@ export default function RankingPage() {
         </section>
       )}
 
+      {schools.length > 0 && (
+        <div className="mb-3 flex flex-wrap items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            <SchoolIcon className="h-3.5 w-3.5" /> Escola
+          </span>
+          <button
+            onClick={() => {
+              setFilterSchool("all");
+              setFilterClass("all");
+            }}
+            className={`rounded-full px-4 py-1.5 text-sm font-bold transition-smooth ${
+              filterSchool === "all" ? "gradient-purple text-primary-foreground" : "bg-muted text-foreground/70 hover:bg-muted/70"
+            }`}
+          >
+            Todas as escolas
+          </button>
+          {schools.map((s) => (
+            <button
+              key={s.id}
+              onClick={() => {
+                setFilterSchool(s.id);
+                setFilterClass("all");
+              }}
+              className={`rounded-full px-4 py-1.5 text-sm font-bold transition-smooth ${
+                filterSchool === s.id ? "gradient-purple text-primary-foreground" : "bg-muted text-foreground/70 hover:bg-muted/70"
+              }`}
+            >
+              {s.short}
+            </button>
+          ))}
+        </div>
+      )}
+
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <button
           onClick={() => setFilterClass("all")}
@@ -211,27 +244,68 @@ export default function RankingPage() {
         <div className="rounded-2xl border bg-card p-8 text-center text-muted-foreground shadow-soft">
           Carregando...
         </div>
-      ) : subs.length === 0 ? (
+      ) : schoolSubs.length === 0 ? (
         <div className="rounded-2xl border bg-card p-8 text-center text-muted-foreground shadow-soft">
           Nenhuma resposta ainda. Compartilhe o link! 💜
         </div>
       ) : filterClass === "all" ? (
-        <div className="space-y-8">
-          {byClass.map(({ cls, list }) => (
-            <section key={cls}>
-              <div className="mb-3 flex items-center justify-between">
-                <h2 className="font-display text-2xl font-extrabold text-gradient">
-                  🎒 Turma {cls}
-                </h2>
-                <span className="text-sm font-semibold text-muted-foreground">
-                  {list.length} aluno(s)
-                </span>
+        <div className="space-y-10">
+          {(filterSchool === "all" ? bySchool : bySchool.filter((g) => g.school.id === filterSchool)).map(({ school, classes: schoolClasses }) => (
+            <div key={school.id} className="space-y-6">
+              <div className="flex items-center gap-3 border-b pb-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl gradient-purple text-primary-foreground shadow-soft">
+                  <SchoolIcon className="h-5 w-5" />
+                </div>
+                <div>
+                  <h2 className="font-display text-xl font-extrabold">{school.name}</h2>
+                  <p className="text-xs text-muted-foreground">
+                    {schoolClasses.length} turma(s)
+                  </p>
+                </div>
               </div>
-              <div className="overflow-hidden rounded-2xl border bg-card shadow-soft">
-                {renderTable(list)}
-              </div>
-            </section>
+              {schoolClasses.map(({ cls, list }) => (
+                <section key={cls}>
+                  <div className="mb-3 flex items-center justify-between">
+                    <h3 className="font-display text-2xl font-extrabold text-gradient">
+                      🎒 Turma {cls}
+                    </h3>
+                    <span className="text-sm font-semibold text-muted-foreground">
+                      {list.length} aluno(s)
+                    </span>
+                  </div>
+                  <div className="overflow-hidden rounded-2xl border bg-card shadow-soft">
+                    {renderTable(list)}
+                  </div>
+                </section>
+              ))}
+            </div>
           ))}
+
+          {filterSchool === "all" && orphanClasses.length > 0 && (
+            <div className="space-y-6">
+              <div className="flex items-center gap-3 border-b pb-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted text-muted-foreground">
+                  <SchoolIcon className="h-5 w-5" />
+                </div>
+                <h2 className="font-display text-xl font-extrabold">Outras turmas</h2>
+              </div>
+              {orphanClasses.map(({ cls, list }) => (
+                <section key={cls}>
+                  <div className="mb-3 flex items-center justify-between">
+                    <h3 className="font-display text-2xl font-extrabold text-gradient">
+                      🎒 Turma {cls}
+                    </h3>
+                    <span className="text-sm font-semibold text-muted-foreground">
+                      {list.length} aluno(s)
+                    </span>
+                  </div>
+                  <div className="overflow-hidden rounded-2xl border bg-card shadow-soft">
+                    {renderTable(list)}
+                  </div>
+                </section>
+              ))}
+            </div>
+          )}
         </div>
       ) : (
         <div className="overflow-hidden rounded-2xl border bg-card shadow-soft">
