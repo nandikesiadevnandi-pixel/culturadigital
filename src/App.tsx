@@ -22,24 +22,25 @@ const App = () => (
     <PlatformProvider>
       <TooltipProvider>
         <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route element={<Layout />}>
-            <Route path="/" element={<Home />} />
-            <Route path="/sobre" element={<SobrePage />} />
-            <Route path="/aulas" element={<AulasPage />} />
-            <Route path="/progresso" element={<ProgressoPage />} />
-            <Route path="/galeria" element={<GaleriaPage />} />
-            <Route path="/avaliacao" element={<AvaliacaoPage />} />
-            <Route path="/ranking" element={<RankingPage />} />
-            <Route path="/admin" element={<AdminAvaliacaoPage />} />
-          </Route>
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route element={<Layout />}>
+              <Route path="/" element={<Home />} />
+              <Route path="/sobre" element={<SobrePage />} />
+              <Route path="/aulas" element={<AulasPage />} />
+              <Route path="/progresso" element={<ProgressoPage />} />
+              <Route path="/galeria" element={<GaleriaPage />} />
+              <Route path="/avaliacao" element={<AvaliacaoPage />} />
+              <Route path="/ranking" element={<RankingPage />} />
+              <Route path="/admin" element={<AdminAvaliacaoPage />} />
+            </Route>
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </PlatformProvider>
   </QueryClientProvider>
 );
 
