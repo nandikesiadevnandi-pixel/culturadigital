@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { Trophy, Medal, Award, Sparkles } from "lucide-react";
+import { Trophy, Medal, Award, Sparkles, School as SchoolIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { MAX_TOTAL_SCORE, MAX_AUTO_SCORE } from "@/data/quiz";
+import { schools, getSchoolName } from "@/data/schools";
 
 type Submission = {
   id: string;
@@ -16,6 +17,7 @@ type Submission = {
 export default function RankingPage() {
   const [subs, setSubs] = useState<Submission[]>([]);
   const [filterClass, setFilterClass] = useState<string>("all");
+  const [filterSchool, setFilterSchool] = useState<string>("all");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -39,20 +41,28 @@ export default function RankingPage() {
     };
   }, []);
 
+  // Filter by school first
+  const schoolSubs = useMemo(() => {
+    if (filterSchool === "all") return subs;
+    const school = schools.find((s) => s.id === filterSchool);
+    if (!school) return subs;
+    return subs.filter((s) => school.classes.includes(s.class_number));
+  }, [subs, filterSchool]);
+
   const classes = useMemo(() => {
-    const set = new Set(subs.map((s) => s.class_number));
+    const set = new Set(schoolSubs.map((s) => s.class_number));
     return Array.from(set).sort();
-  }, [subs]);
+  }, [schoolSubs]);
 
   const filtered = useMemo(() => {
-    const list = filterClass === "all" ? subs : subs.filter((s) => s.class_number === filterClass);
+    const list = filterClass === "all" ? schoolSubs : schoolSubs.filter((s) => s.class_number === filterClass);
     return [...list].sort((a, b) => b.total_score - a.total_score || a.created_at.localeCompare(b.created_at));
-  }, [subs, filterClass]);
+  }, [schoolSubs, filterClass]);
 
   // Group submissions by class, each list sorted by score
   const byClass = useMemo(() => {
     const map = new Map<string, Submission[]>();
-    subs.forEach((s) => {
+    schoolSubs.forEach((s) => {
       const arr = map.get(s.class_number) || [];
       arr.push(s);
       map.set(s.class_number, arr);
@@ -65,11 +75,11 @@ export default function RankingPage() {
         ),
       }))
       .sort((a, b) => a.cls.localeCompare(b.cls));
-  }, [subs]);
+  }, [schoolSubs]);
 
   const classStats = useMemo(() => {
     const map = new Map<string, { count: number; sum: number }>();
-    subs.forEach((s) => {
+    schoolSubs.forEach((s) => {
       const cur = map.get(s.class_number) || { count: 0, sum: 0 };
       cur.count++;
       cur.sum += s.total_score;
@@ -78,7 +88,22 @@ export default function RankingPage() {
     return Array.from(map.entries())
       .map(([cls, v]) => ({ cls, count: v.count, avg: v.sum / v.count }))
       .sort((a, b) => b.avg - a.avg);
-  }, [subs]);
+  }, [schoolSubs]);
+
+  // Group by school for the "all" view
+  const bySchool = useMemo(() => {
+    return schools
+      .map((school) => ({
+        school,
+        classes: byClass.filter((c) => school.classes.includes(c.cls)),
+      }))
+      .filter((g) => g.classes.length > 0);
+  }, [byClass]);
+
+  const orphanClasses = useMemo(
+    () => byClass.filter((c) => !schools.some((s) => s.classes.includes(c.cls))),
+    [byClass]
+  );
 
   const medal = (i: number) => {
     if (i === 0) return <Trophy className="h-5 w-5 text-yellow-500" />;
@@ -147,6 +172,9 @@ export default function RankingPage() {
                   <span className="font-display text-lg font-bold">Turma {c.cls}</span>
                   {i === 0 && <Trophy className="h-4 w-4 text-yellow-500" />}
                 </div>
+                <p className="text-xs font-semibold text-muted-foreground">
+                  {getSchoolName(c.cls)}
+                </p>
                 <p className="mt-1 text-sm text-muted-foreground">{c.count} resposta(s)</p>
                 <p className="mt-2 text-2xl font-extrabold text-primary">
                   {c.avg.toFixed(1)} <span className="text-sm font-normal text-muted-foreground">/ {MAX_TOTAL_SCORE}</span>
@@ -155,6 +183,39 @@ export default function RankingPage() {
             ))}
           </div>
         </section>
+      )}
+
+      {schools.length > 0 && (
+        <div className="mb-3 flex flex-wrap items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            <SchoolIcon className="h-3.5 w-3.5" /> Escola
+          </span>
+          <button
+            onClick={() => {
+              setFilterSchool("all");
+              setFilterClass("all");
+            }}
+            className={`rounded-full px-4 py-1.5 text-sm font-bold transition-smooth ${
+              filterSchool === "all" ? "gradient-purple text-primary-foreground" : "bg-muted text-foreground/70 hover:bg-muted/70"
+            }`}
+          >
+            Todas as escolas
+          </button>
+          {schools.map((s) => (
+            <button
+              key={s.id}
+              onClick={() => {
+                setFilterSchool(s.id);
+                setFilterClass("all");
+              }}
+              className={`rounded-full px-4 py-1.5 text-sm font-bold transition-smooth ${
+                filterSchool === s.id ? "gradient-purple text-primary-foreground" : "bg-muted text-foreground/70 hover:bg-muted/70"
+              }`}
+            >
+              {s.short}
+            </button>
+          ))}
+        </div>
       )}
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
@@ -183,27 +244,68 @@ export default function RankingPage() {
         <div className="rounded-2xl border bg-card p-8 text-center text-muted-foreground shadow-soft">
           Carregando...
         </div>
-      ) : subs.length === 0 ? (
+      ) : schoolSubs.length === 0 ? (
         <div className="rounded-2xl border bg-card p-8 text-center text-muted-foreground shadow-soft">
           Nenhuma resposta ainda. Compartilhe o link! 💜
         </div>
       ) : filterClass === "all" ? (
-        <div className="space-y-8">
-          {byClass.map(({ cls, list }) => (
-            <section key={cls}>
-              <div className="mb-3 flex items-center justify-between">
-                <h2 className="font-display text-2xl font-extrabold text-gradient">
-                  🎒 Turma {cls}
-                </h2>
-                <span className="text-sm font-semibold text-muted-foreground">
-                  {list.length} aluno(s)
-                </span>
+        <div className="space-y-10">
+          {(filterSchool === "all" ? bySchool : bySchool.filter((g) => g.school.id === filterSchool)).map(({ school, classes: schoolClasses }) => (
+            <div key={school.id} className="space-y-6">
+              <div className="flex items-center gap-3 border-b pb-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl gradient-purple text-primary-foreground shadow-soft">
+                  <SchoolIcon className="h-5 w-5" />
+                </div>
+                <div>
+                  <h2 className="font-display text-xl font-extrabold">{school.name}</h2>
+                  <p className="text-xs text-muted-foreground">
+                    {schoolClasses.length} turma(s)
+                  </p>
+                </div>
               </div>
-              <div className="overflow-hidden rounded-2xl border bg-card shadow-soft">
-                {renderTable(list)}
-              </div>
-            </section>
+              {schoolClasses.map(({ cls, list }) => (
+                <section key={cls}>
+                  <div className="mb-3 flex items-center justify-between">
+                    <h3 className="font-display text-2xl font-extrabold text-gradient">
+                      🎒 Turma {cls}
+                    </h3>
+                    <span className="text-sm font-semibold text-muted-foreground">
+                      {list.length} aluno(s)
+                    </span>
+                  </div>
+                  <div className="overflow-hidden rounded-2xl border bg-card shadow-soft">
+                    {renderTable(list)}
+                  </div>
+                </section>
+              ))}
+            </div>
           ))}
+
+          {filterSchool === "all" && orphanClasses.length > 0 && (
+            <div className="space-y-6">
+              <div className="flex items-center gap-3 border-b pb-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted text-muted-foreground">
+                  <SchoolIcon className="h-5 w-5" />
+                </div>
+                <h2 className="font-display text-xl font-extrabold">Outras turmas</h2>
+              </div>
+              {orphanClasses.map(({ cls, list }) => (
+                <section key={cls}>
+                  <div className="mb-3 flex items-center justify-between">
+                    <h3 className="font-display text-2xl font-extrabold text-gradient">
+                      🎒 Turma {cls}
+                    </h3>
+                    <span className="text-sm font-semibold text-muted-foreground">
+                      {list.length} aluno(s)
+                    </span>
+                  </div>
+                  <div className="overflow-hidden rounded-2xl border bg-card shadow-soft">
+                    {renderTable(list)}
+                  </div>
+                </section>
+              ))}
+            </div>
+          )}
         </div>
       ) : (
         <div className="overflow-hidden rounded-2xl border bg-card shadow-soft">
