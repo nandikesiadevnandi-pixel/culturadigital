@@ -62,12 +62,17 @@ const Bar = ({ skill }: { skill: Skill }) => {
 
 export const Progress = () => {
   const [stats, setStats] = useState<{ count: number; avg: number; top: number } | null>(null);
+  const [top5, setTop5] = useState<{ name: string; score: number; cls: string }[]>([]);
 
   useEffect(() => {
     const load = async () => {
-      const { data } = await supabase.from("submissions").select("total_score");
+      const { data } = await supabase
+        .from("submissions")
+        .select("student_name, class_number, total_score")
+        .order("total_score", { ascending: false });
       if (!data || data.length === 0) {
         setStats({ count: 0, avg: 0, top: 0 });
+        setTop5([]);
         return;
       }
       const scores = data.map((d: any) => d.total_score as number);
@@ -77,6 +82,13 @@ export const Progress = () => {
         avg: sum / scores.length,
         top: Math.max(...scores),
       });
+      setTop5(
+        data.slice(0, 5).map((d: any) => ({
+          name: d.student_name,
+          score: d.total_score,
+          cls: d.class_number,
+        }))
+      );
     };
     load();
 
