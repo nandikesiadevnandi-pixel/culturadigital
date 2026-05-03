@@ -54,6 +54,7 @@ export default function AvaliacaoPage() {
       const { data: existing } = await supabase
         .from("submissions")
         .select("id")
+        .eq("platform", platformId)
         .ilike("student_name", cleanName)
         .eq("class_number", cleanClass)
         .maybeSingle();
@@ -96,6 +97,7 @@ export default function AvaliacaoPage() {
           auto_score: auto,
           manual_score: 0,
           total_score: auto,
+          platform: platformId,
         })
         .select("id")
         .single();
