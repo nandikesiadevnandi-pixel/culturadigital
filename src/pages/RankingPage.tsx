@@ -43,7 +43,7 @@ export default function RankingPage() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [platformId]);
 
   // Filter by school first
   const schoolSubs = useMemo(() => {
