@@ -62,12 +62,17 @@ const Bar = ({ skill }: { skill: Skill }) => {
 
 export const Progress = () => {
   const [stats, setStats] = useState<{ count: number; avg: number; top: number } | null>(null);
+  const [top5, setTop5] = useState<{ name: string; score: number; cls: string }[]>([]);
 
   useEffect(() => {
     const load = async () => {
-      const { data } = await supabase.from("submissions").select("total_score");
+      const { data } = await supabase
+        .from("submissions")
+        .select("student_name, class_number, total_score")
+        .order("total_score", { ascending: false });
       if (!data || data.length === 0) {
         setStats({ count: 0, avg: 0, top: 0 });
+        setTop5([]);
         return;
       }
       const scores = data.map((d: any) => d.total_score as number);
@@ -77,6 +82,13 @@ export const Progress = () => {
         avg: sum / scores.length,
         top: Math.max(...scores),
       });
+      setTop5(
+        data.slice(0, 5).map((d: any) => ({
+          name: d.student_name,
+          score: d.total_score,
+          cls: d.class_number,
+        }))
+      );
     };
     load();
 
@@ -185,6 +197,38 @@ export const Progress = () => {
                   />
                 </div>
               </div>
+
+              {top5.length > 0 && (
+                <div className="mt-8">
+                  <div className="mb-4 flex items-center gap-2">
+                    <span className="text-2xl">🍫</span>
+                    <h4 className="font-display text-lg font-extrabold">
+                      Gratificação — Top 5 da prof Késia
+                    </h4>
+                  </div>
+                  <ul className="grid gap-2 sm:grid-cols-2">
+                    {top5.map((s, i) => (
+                      <li
+                        key={`${s.name}-${i}`}
+                        className="flex items-center justify-between gap-3 rounded-2xl border bg-muted/40 px-4 py-3"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="flex h-8 w-8 items-center justify-center rounded-full gradient-purple text-sm font-extrabold text-primary-foreground shadow-soft">
+                            {i + 1}º
+                          </span>
+                          <div>
+                            <p className="font-bold leading-tight">{s.name}</p>
+                            <p className="text-xs text-muted-foreground">Turma {s.cls}</p>
+                          </div>
+                        </div>
+                        <span className="inline-flex items-center gap-1 rounded-full bg-yellow-400/20 px-3 py-1 text-xs font-extrabold text-yellow-700 dark:text-yellow-400">
+                          🍫 Gratificação
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </>
           ) : (
             <p className="mt-6 text-center text-sm text-muted-foreground">
