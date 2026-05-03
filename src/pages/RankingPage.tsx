@@ -3,6 +3,7 @@ import { Trophy, Medal, Award, Sparkles, School as SchoolIcon } from "lucide-rea
 import { supabase } from "@/integrations/supabase/client";
 import { MAX_TOTAL_SCORE, MAX_AUTO_SCORE } from "@/data/quiz";
 import { schools, getSchoolName } from "@/data/schools";
+import { usePlatform } from "@/contexts/PlatformContext";
 
 type Submission = {
   id: string;
@@ -15,16 +16,19 @@ type Submission = {
 };
 
 export default function RankingPage() {
+  const { platform, platformId } = usePlatform();
   const [subs, setSubs] = useState<Submission[]>([]);
   const [filterClass, setFilterClass] = useState<string>("all");
   const [filterSchool, setFilterSchool] = useState<string>("all");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     const load = async () => {
       const { data } = await supabase
         .from("submissions")
         .select("*")
+        .eq("platform", platformId)
         .order("total_score", { ascending: false });
       setSubs((data as Submission[]) || []);
       setLoading(false);
