@@ -172,6 +172,9 @@ export default function RankingPage() {
                   <span className="font-display text-lg font-bold">Turma {c.cls}</span>
                   {i === 0 && <Trophy className="h-4 w-4 text-yellow-500" />}
                 </div>
+                <p className="text-xs font-semibold text-muted-foreground">
+                  {getSchoolName(c.cls)}
+                </p>
                 <p className="mt-1 text-sm text-muted-foreground">{c.count} resposta(s)</p>
                 <p className="mt-2 text-2xl font-extrabold text-primary">
                   {c.avg.toFixed(1)} <span className="text-sm font-normal text-muted-foreground">/ {MAX_TOTAL_SCORE}</span>
