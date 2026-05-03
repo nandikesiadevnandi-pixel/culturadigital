@@ -69,6 +69,7 @@ export const Progress = () => {
       const { data } = await supabase
         .from("submissions")
         .select("student_name, class_number, total_score")
+        .eq("platform", "cultura")
         .order("total_score", { ascending: false });
       if (!data || data.length === 0) {
         setStats({ count: 0, avg: 0, top: 0 });
