@@ -259,7 +259,7 @@ export default function RankingPage() {
                 <div>
                   <h2 className="font-display text-xl font-extrabold">{school.name}</h2>
                   <p className="text-xs text-muted-foreground">
-                    {schoolClasses.length} turma(s)
+                    📅 {school.day} • {schoolClasses.length} turma(s)
                   </p>
                 </div>
               </div>
