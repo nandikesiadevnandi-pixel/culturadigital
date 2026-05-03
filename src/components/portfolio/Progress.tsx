@@ -15,11 +15,11 @@ type Skill = {
 };
 
 const skills: Skill[] = [
-  { label: "Uso do Chromebook",      from: "Nunca usaram", to: "Autonomia básica", value: 85, color: "gradient-purple", emoji: "💻" },
-  { label: "Conta Google e e-mail",  from: "Sem conta",    to: "Trocando e-mails", value: 75, color: "gradient-blue",   emoji: "📧" },
-  { label: "Lógica de programação",  from: "Conceito novo", to: "Animações no Scratch", value: 60, color: "gradient-yellow", emoji: "🧩" },
-  { label: "Confiança digital",      from: "Insegurança",   to: "Protagonismo",    value: 70, color: "gradient-green",  emoji: "🚀" },
-  { label: "Trabalho colaborativo",  from: "Individual",   to: "Compartilham projetos", value: 65, color: "gradient-pink", emoji: "🤝" },
+  { label: "Uso do Chromebook",      from: "Nunca usaram", to: "Autonomia básica", value: 100, color: "gradient-purple", emoji: "💻" },
+  { label: "Conta Google e e-mail",  from: "Sem conta",    to: "Trocando e-mails", value: 90, color: "gradient-blue",   emoji: "📧" },
+  { label: "Lógica de programação",  from: "Conceito novo", to: "Animações no Scratch", value: 85, color: "gradient-yellow", emoji: "🧩" },
+  { label: "Confiança digital",      from: "Insegurança",   to: "Protagonismo",    value: 85, color: "gradient-green",  emoji: "🚀" },
+  { label: "Trabalho colaborativo",  from: "Individual",   to: "Compartilham projetos", value: 90, color: "gradient-pink", emoji: "🤝" },
 ];
 
 const Bar = ({ skill }: { skill: Skill }) => {
