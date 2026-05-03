@@ -22,10 +22,10 @@ export const Hero = () => {
             <span className="text-foreground">em Ação</span>
           </h1>
           <p className="text-xl font-semibold text-foreground/80 md:text-2xl">
-            Escola Dande Bertoluci · Canela
+            Escolas Bertholdo · Ernesto · Dante Bertoluci — Canela
           </p>
           <p className="max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
-            Um registro vivo das aulas de Cultura Digital, onde cada sexta-feira
+            Um registro vivo das aulas de Cultura Digital, onde cada encontro
             é uma nova descoberta com tecnologia e muita criatividade.
             Documentando o caminho de alunos que se tornam protagonistas digitais.
           </p>
