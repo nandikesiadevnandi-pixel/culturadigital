@@ -49,32 +49,40 @@ export const Hero = () => {
         <div className="relative animate-scale-in">
           <div className="absolute inset-0 -z-10 mx-auto h-[90%] w-[90%] rounded-[40%] gradient-hero opacity-20 blur-2xl" />
           <div className="relative mx-auto max-w-md animate-float">
-            <img
-              src={heroImg}
-              alt="Professora de Cultura Digital com Chromebook"
-              width={1024}
-              height={1024}
-              className="h-auto w-full drop-shadow-2xl"
-            />
+            {isCultura ? (
+              <img
+                src={heroImg}
+                alt={`Professora ${platform.teacherName}`}
+                width={1024}
+                height={1024}
+                className="h-auto w-full drop-shadow-2xl"
+              />
+            ) : (
+              <div className="aspect-square w-full rounded-[3rem] gradient-hero shadow-glow flex items-center justify-center text-9xl">
+                <Heart className="h-40 w-40 text-primary-foreground" fill="currentColor" />
+              </div>
+            )}
           </div>
           {/* Floating badges */}
           <div className="absolute left-2 top-10 hidden rounded-2xl bg-card px-4 py-3 shadow-card md:block animate-float" style={{ animationDelay: "1s" }}>
             <div className="flex items-center gap-2">
-              <span className="text-2xl">🐱</span>
+              <span className="text-2xl">{isCultura ? "🐱" : "🛎️"}</span>
               <div>
-                <p className="text-xs font-bold text-muted-foreground">Scratch</p>
-                <p className="text-sm font-extrabold">Programando!</p>
+                <p className="text-xs font-bold text-muted-foreground">{isCultura ? "Scratch" : "Acolher"}</p>
+                <p className="text-sm font-extrabold">{isCultura ? "Programando!" : "Com afeto"}</p>
               </div>
             </div>
           </div>
           <div className="absolute -bottom-2 right-0 hidden rounded-2xl bg-card px-4 py-3 shadow-card md:block animate-float" style={{ animationDelay: "2s" }}>
             <div className="flex items-center gap-2">
-              <span className="text-2xl">💡</span>
+              <span className="text-2xl">{isCultura ? "💡" : "☕"}</span>
               <div>
-                <p className="text-xs font-bold text-muted-foreground">Inclusão</p>
-                <p className="text-sm font-extrabold">Digital real</p>
+                <p className="text-xs font-bold text-muted-foreground">{isCultura ? "Inclusão" : "Servir"}</p>
+                <p className="text-sm font-extrabold">{isCultura ? "Digital real" : "Com cuidado"}</p>
               </div>
             </div>
+          </div>
+        </div>
           </div>
         </div>
       </div>
