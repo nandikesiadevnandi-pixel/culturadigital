@@ -62,7 +62,7 @@ export default function RankingPage() {
   // Group submissions by class, each list sorted by score
   const byClass = useMemo(() => {
     const map = new Map<string, Submission[]>();
-    subs.forEach((s) => {
+    schoolSubs.forEach((s) => {
       const arr = map.get(s.class_number) || [];
       arr.push(s);
       map.set(s.class_number, arr);
@@ -75,11 +75,11 @@ export default function RankingPage() {
         ),
       }))
       .sort((a, b) => a.cls.localeCompare(b.cls));
-  }, [subs]);
+  }, [schoolSubs]);
 
   const classStats = useMemo(() => {
     const map = new Map<string, { count: number; sum: number }>();
-    subs.forEach((s) => {
+    schoolSubs.forEach((s) => {
       const cur = map.get(s.class_number) || { count: 0, sum: 0 };
       cur.count++;
       cur.sum += s.total_score;
@@ -88,7 +88,22 @@ export default function RankingPage() {
     return Array.from(map.entries())
       .map(([cls, v]) => ({ cls, count: v.count, avg: v.sum / v.count }))
       .sort((a, b) => b.avg - a.avg);
-  }, [subs]);
+  }, [schoolSubs]);
+
+  // Group by school for the "all" view
+  const bySchool = useMemo(() => {
+    return schools
+      .map((school) => ({
+        school,
+        classes: byClass.filter((c) => school.classes.includes(c.cls)),
+      }))
+      .filter((g) => g.classes.length > 0);
+  }, [byClass]);
+
+  const orphanClasses = useMemo(
+    () => byClass.filter((c) => !schools.some((s) => s.classes.includes(c.cls))),
+    [byClass]
+  );
 
   const medal = (i: number) => {
     if (i === 0) return <Trophy className="h-5 w-5 text-yellow-500" />;
