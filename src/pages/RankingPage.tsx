@@ -17,6 +17,7 @@ type Submission = {
 export default function RankingPage() {
   const [subs, setSubs] = useState<Submission[]>([]);
   const [filterClass, setFilterClass] = useState<string>("all");
+  const [filterSchool, setFilterSchool] = useState<string>("all");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
