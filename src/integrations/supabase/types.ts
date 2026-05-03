@@ -62,6 +62,7 @@ export type Database = {
           created_at: string
           id: string
           manual_score: number
+          platform: string
           student_name: string
           total_score: number
           updated_at: string
@@ -72,6 +73,7 @@ export type Database = {
           created_at?: string
           id?: string
           manual_score?: number
+          platform?: string
           student_name: string
           total_score?: number
           updated_at?: string
@@ -82,6 +84,7 @@ export type Database = {
           created_at?: string
           id?: string
           manual_score?: number
+          platform?: string
           student_name?: string
           total_score?: number
           updated_at?: string

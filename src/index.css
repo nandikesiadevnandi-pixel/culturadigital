@@ -77,6 +77,60 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
+  /* Hospitality platform - laranja & creme fofo */
+  [data-platform="hospitalidade"] {
+    --background: 35 60% 97%;
+    --foreground: 20 35% 20%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 20 35% 20%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 20 35% 20%;
+
+    /* Brand: laranja quente */
+    --primary: 22 90% 58%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 28 95% 70%;
+
+    /* Coral suave */
+    --secondary: 12 85% 65%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 35 50% 94%;
+    --muted-foreground: 25 20% 45%;
+
+    /* Creme dourado */
+    --accent: 40 90% 70%;
+    --accent-foreground: 25 40% 20%;
+
+    --success: 150 55% 50%;
+    --success-foreground: 0 0% 100%;
+
+    --pink: 350 80% 72%;
+    --pink-foreground: 0 0% 100%;
+
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 30 50% 88%;
+    --input: 30 50% 88%;
+    --ring: 22 90% 58%;
+
+    --gradient-hero: linear-gradient(135deg, hsl(22 90% 60%) 0%, hsl(35 95% 65%) 50%, hsl(45 90% 70%) 100%);
+    --gradient-purple: linear-gradient(135deg, hsl(22 90% 58%), hsl(12 85% 65%));
+    --gradient-blue: linear-gradient(135deg, hsl(35 95% 65%), hsl(45 90% 65%));
+    --gradient-yellow: linear-gradient(135deg, hsl(45 95% 65%), hsl(38 90% 60%));
+    --gradient-green: linear-gradient(135deg, hsl(150 55% 55%), hsl(165 50% 55%));
+    --gradient-pink: linear-gradient(135deg, hsl(350 85% 72%), hsl(335 80% 70%));
+    --gradient-soft: linear-gradient(180deg, hsl(35 70% 98%), hsl(30 60% 94%));
+
+    --shadow-soft: 0 4px 20px -4px hsl(22 70% 50% / 0.15);
+    --shadow-card: 0 10px 30px -8px hsl(22 70% 50% / 0.20);
+    --shadow-glow: 0 10px 40px -10px hsl(28 95% 65% / 0.50);
+    --shadow-yellow: 0 10px 30px -8px hsl(40 95% 55% / 0.40);
+  }
+
   .dark {
     --background: 252 30% 8%;
     --foreground: 250 30% 96%;

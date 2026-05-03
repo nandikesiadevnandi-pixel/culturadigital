@@ -1,6 +1,8 @@
 import { Heart } from "lucide-react";
+import { usePlatform } from "@/contexts/PlatformContext";
 
 export const Footer = () => {
+  const { platform } = usePlatform();
   return (
     <footer className="relative overflow-hidden gradient-hero text-primary-foreground">
       <div className="pointer-events-none absolute -top-32 -left-20 h-96 w-96 rounded-full bg-white/10 blur-3xl" />
@@ -11,16 +13,15 @@ export const Footer = () => {
           <Heart className="h-7 w-7" fill="currentColor" />
         </div>
         <p className="mx-auto mt-6 max-w-3xl font-display text-3xl font-extrabold leading-tight md:text-4xl lg:text-5xl">
-          “Educar com tecnologia é abrir portas que nunca se fecham — é dar a cada aluno
-          a chance de criar o próprio futuro digital.”
+          “{platform.footerQuote}”
         </p>
         <p className="mt-6 text-sm font-bold uppercase tracking-[0.2em] text-primary-foreground/80">
-          Késia Nandi · Cultura Digital em Ação
+          {platform.teacherName} · {platform.name} em Ação
         </p>
 
         <div className="mt-12 flex flex-col items-center gap-2 text-sm text-primary-foreground/80">
-          <p className="font-bold">Escola Dande Bertoluci · Canela / RS</p>
-          <p>© {new Date().getFullYear()} · Portfólio docente · NandiDev 💜</p>
+          <p className="font-bold">{platform.footerLocation}</p>
+          <p>© {new Date().getFullYear()} · Portfólio docente · {platform.brandTag}</p>
         </div>
       </div>
     </footer>

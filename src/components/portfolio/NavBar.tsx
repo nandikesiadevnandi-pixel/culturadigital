@@ -1,7 +1,8 @@
 import { NavLink, Link } from "react-router-dom";
-import { Sparkles, Menu, X } from "lucide-react";
+import { Sparkles, Menu, X, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { usePlatform, PLATFORMS, PlatformId } from "@/contexts/PlatformContext";
 
 const links = [
   { to: "/", label: "Início", emoji: "🏠" },
@@ -13,17 +14,72 @@ const links = [
   { to: "/ranking", label: "Ranking", emoji: "🏆" },
 ];
 
-export const NavBar = () => {
+const PlatformSwitcher = () => {
+  const { platform, platformId, setPlatform } = usePlatform();
   const [open, setOpen] = useState(false);
 
   return (
+    <div className="relative">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-2 rounded-full bg-card px-3 py-1.5 text-xs font-bold shadow-soft transition-smooth hover:shadow-card"
+        aria-label="Trocar plataforma"
+      >
+        <span>{platform.emoji}</span>
+        <span className="hidden sm:inline">{platform.shortName}</span>
+        <ChevronDown className={cn("h-3 w-3 transition-transform", open && "rotate-180")} />
+      </button>
+      {open && (
+        <>
+          <button
+            className="fixed inset-0 z-40 cursor-default"
+            onClick={() => setOpen(false)}
+            aria-hidden
+          />
+          <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-2xl border bg-card shadow-card">
+            {(Object.keys(PLATFORMS) as PlatformId[]).map((id) => {
+              const p = PLATFORMS[id];
+              const active = id === platformId;
+              return (
+                <button
+                  key={id}
+                  onClick={() => {
+                    setPlatform(id);
+                    setOpen(false);
+                  }}
+                  className={cn(
+                    "flex w-full items-center gap-3 px-4 py-3 text-left text-sm transition-colors hover:bg-muted",
+                    active && "bg-muted"
+                  )}
+                >
+                  <span className="text-xl">{p.emoji}</span>
+                  <div className="min-w-0 flex-1">
+                    <div className="font-extrabold">{p.shortName}</div>
+                    <div className="truncate text-xs text-muted-foreground">{p.teacherName}</div>
+                  </div>
+                  {active && <span className="text-xs font-bold text-primary">●</span>}
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
+export const NavBar = () => {
+  const [open, setOpen] = useState(false);
+  const { platform } = usePlatform();
+
+  return (
     <nav className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-lg">
-      <div className="container flex items-center justify-between py-3">
+      <div className="container flex items-center justify-between gap-3 py-3">
         <Link to="/" className="flex items-center gap-2 font-display text-lg font-extrabold">
           <span className="inline-flex h-9 w-9 items-center justify-center rounded-full gradient-purple text-primary-foreground shadow-glow">
             <Sparkles className="h-4 w-4" />
           </span>
-          <span className="text-gradient">Cultura Digital</span>
+          <span className="text-gradient">{platform.shortName}</span>
         </Link>
 
         <div className="hidden items-center gap-1 md:flex">
@@ -34,7 +90,7 @@ export const NavBar = () => {
               end={l.to === "/"}
               className={({ isActive }) =>
                 cn(
-                  "rounded-full px-4 py-2 text-sm font-bold transition-smooth",
+                  "rounded-full px-3 py-2 text-sm font-bold transition-smooth",
                   isActive
                     ? "gradient-purple text-primary-foreground shadow-soft"
                     : "text-foreground/70 hover:bg-muted hover:text-foreground",
@@ -47,13 +103,16 @@ export const NavBar = () => {
           ))}
         </div>
 
-        <button
-          className="rounded-full bg-card p-2 shadow-soft md:hidden"
-          onClick={() => setOpen((v) => !v)}
-          aria-label="Abrir menu"
-        >
-          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
+        <div className="flex items-center gap-2">
+          <PlatformSwitcher />
+          <button
+            className="rounded-full bg-card p-2 shadow-soft md:hidden"
+            onClick={() => setOpen((v) => !v)}
+            aria-label="Abrir menu"
+          >
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
       </div>
 
       {open && (
