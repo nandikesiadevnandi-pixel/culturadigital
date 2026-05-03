@@ -41,15 +41,23 @@ export default function RankingPage() {
     };
   }, []);
 
+  // Filter by school first
+  const schoolSubs = useMemo(() => {
+    if (filterSchool === "all") return subs;
+    const school = schools.find((s) => s.id === filterSchool);
+    if (!school) return subs;
+    return subs.filter((s) => school.classes.includes(s.class_number));
+  }, [subs, filterSchool]);
+
   const classes = useMemo(() => {
-    const set = new Set(subs.map((s) => s.class_number));
+    const set = new Set(schoolSubs.map((s) => s.class_number));
     return Array.from(set).sort();
-  }, [subs]);
+  }, [schoolSubs]);
 
   const filtered = useMemo(() => {
-    const list = filterClass === "all" ? subs : subs.filter((s) => s.class_number === filterClass);
+    const list = filterClass === "all" ? schoolSubs : schoolSubs.filter((s) => s.class_number === filterClass);
     return [...list].sort((a, b) => b.total_score - a.total_score || a.created_at.localeCompare(b.created_at));
-  }, [subs, filterClass]);
+  }, [schoolSubs, filterClass]);
 
   // Group submissions by class, each list sorted by score
   const byClass = useMemo(() => {
