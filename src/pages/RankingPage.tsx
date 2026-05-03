@@ -169,7 +169,7 @@ export default function RankingPage() {
       <section className="mb-8 rounded-3xl border bg-card p-5 shadow-soft md:p-6">
         <div className="mb-4 flex items-center gap-2">
           <SchoolIcon className="h-5 w-5 text-primary" />
-          <h2 className="font-display text-lg font-extrabold">Escolas atendidas pela prof Késia</h2>
+          <h2 className="font-display text-lg font-extrabold">{platform.rankingSchoolsLabel}</h2>
         </div>
         <div className="grid gap-3 sm:grid-cols-3">
           {schools.map((s) => (
