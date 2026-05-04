@@ -66,7 +66,7 @@ const initialFolhas: Folha[] = [
         atividade:
           "Reconhecimento da escola, da equipe pedagógica e das turmas. Organização do calendário das aulas (definidas para todas as sextas-feiras).",
         turma: "141, 142, 151, 152",
-        alunos: "",
+        alunos: "118",
       },
       {
         dia: "17",
@@ -75,7 +75,7 @@ const initialFolhas: Folha[] = [
         atividade:
           "Semana 1 — Introdução à lógica de programação: a receita do bolo. Primeiros conceitos de algoritmo e sequência de comandos.",
         turma: "141, 142, 151, 152",
-        alunos: "",
+        alunos: "118",
       },
       {
         dia: "24",
@@ -84,7 +84,7 @@ const initialFolhas: Folha[] = [
         atividade:
           "Semana 2 — Criação/uso da conta Google e primeiro contato com o Scratch: construção de um primeiro jogo seguindo comandos simples.",
         turma: "141, 142, 151, 152",
-        alunos: "",
+        alunos: "118",
       },
       {
         dia: "30",
@@ -93,7 +93,7 @@ const initialFolhas: Folha[] = [
         atividade:
           "Semana 3 (aula antecipada de quinta-feira por conta do feriado de sexta) — Retomada dos conteúdos aplicados e avaliação: o que aprenderam sobre tecnologia e lógica de programação.",
         turma: "141, 142, 151, 152",
-        alunos: "",
+        alunos: "118",
       },
     ],
   },
