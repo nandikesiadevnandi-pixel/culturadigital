@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Printer, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import brasaoCanela from "@/assets/brasao-canela.png";
 
 type Row = {
   dia: string;
@@ -214,9 +215,7 @@ function FolhaSheet({
     <div className="folha bg-white text-black rounded-md shadow-soft p-8 print:p-4 print:shadow-none">
       {/* Header */}
       <div className="text-center mb-4">
-        <div className="mx-auto mb-1 flex h-14 w-14 items-center justify-center rounded-full border-2 border-blue-900 text-[10px] font-bold text-blue-900">
-          BRASÃO
-        </div>
+        <img src={brasaoCanela} alt="Brasão Prefeitura Municipal de Canela" className="mx-auto mb-1 h-16 w-16 object-contain" />
         <div className="font-extrabold tracking-widest text-blue-900 text-lg">SMEEL</div>
         <div className="font-bold text-base mt-1">FOLHA DE REGISTRO DE ATIVIDADES</div>
         <div className="text-xs text-gray-600">{folha.escola}</div>
