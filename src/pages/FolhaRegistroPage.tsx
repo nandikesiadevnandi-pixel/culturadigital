@@ -186,6 +186,13 @@ export default function FolhaRegistroPage() {
             onChangeRow={(ri, field, val) => updateRow(fi, ri, field, val)}
             onAddRow={() => addRow(fi)}
             onRemoveRow={(ri) => removeRow(fi, ri)}
+            onChangeHeader={(field, val) =>
+              setFolhas((prev) => {
+                const next = structuredClone(prev);
+                (next[fi] as any)[field] = val;
+                return next;
+              })
+            }
           />
         ))}
       </div>
@@ -198,11 +205,13 @@ function FolhaSheet({
   onChangeRow,
   onAddRow,
   onRemoveRow,
+  onChangeHeader,
 }: {
   folha: Folha;
   onChangeRow: (ri: number, field: keyof Row, val: string) => void;
   onAddRow: () => void;
   onRemoveRow: (ri: number) => void;
+  onChangeHeader: (field: "oficina" | "oficineiro" | "escola", val: string) => void;
 }) {
   // Pad rows to at least 10 for printed look
   const printRows = useMemo(() => {
