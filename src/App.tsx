@@ -13,6 +13,7 @@ import GaleriaPage from "./pages/GaleriaPage.tsx";
 import AvaliacaoPage from "./pages/AvaliacaoPage.tsx";
 import RankingPage from "./pages/RankingPage.tsx";
 import AdminAvaliacaoPage from "./pages/AdminAvaliacaoPage.tsx";
+import FolhaRegistroPage from "./pages/FolhaRegistroPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
               <Route path="/avaliacao" element={<AvaliacaoPage />} />
               <Route path="/ranking" element={<RankingPage />} />
               <Route path="/admin" element={<AdminAvaliacaoPage />} />
+              <Route path="/admin/folha-registro" element={<FolhaRegistroPage />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
