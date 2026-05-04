@@ -218,18 +218,30 @@ function FolhaSheet({
         <img src={brasaoCanela} alt="Brasão Prefeitura Municipal de Canela" className="mx-auto mb-1 h-16 w-16 object-contain" />
         <div className="font-extrabold tracking-widest text-blue-900 text-lg">SMEEL</div>
         <div className="font-bold text-base mt-1">FOLHA DE REGISTRO DE ATIVIDADES</div>
-        <div className="text-xs text-gray-600">{folha.escola}</div>
+        <input
+          className="text-xs text-gray-600 text-center bg-transparent outline-none w-full"
+          value={folha.escola}
+          onChange={(e) => onChangeHeader("escola", e.target.value)}
+        />
       </div>
 
       {/* Top fields */}
       <div className="space-y-1 text-sm mb-3">
         <div className="flex gap-2 items-baseline border-b border-black pb-0.5">
           <span className="font-bold">Oficina:</span>
-          <span>{folha.oficina}</span>
+          <input
+            className="flex-1 bg-transparent outline-none"
+            value={folha.oficina}
+            onChange={(e) => onChangeHeader("oficina", e.target.value)}
+          />
         </div>
         <div className="flex gap-2 items-baseline border-b border-black pb-0.5">
           <span className="font-bold">Nome do Oficineiro:</span>
-          <span>{folha.oficineiro}</span>
+          <input
+            className="flex-1 bg-transparent outline-none"
+            value={folha.oficineiro}
+            onChange={(e) => onChangeHeader("oficineiro", e.target.value)}
+          />
         </div>
       </div>
 
