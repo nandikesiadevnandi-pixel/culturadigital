@@ -32,7 +32,7 @@ const initialFolhas: Folha[] = [
         ano: "2026",
         atividade:
           "Despertar o interesse sobre lógica de programação. O que é tecnologia e para que serve. Introdução à lógica de programação usando o exemplo da receita do bolo.",
-        turma: "7A, 7B, 8A, 8B",
+        turma: "6B, 7A, 7B, 8A, 8B",
         alunos: "108",
       },
       {
@@ -41,7 +41,7 @@ const initialFolhas: Folha[] = [
         ano: "2026",
         atividade:
           "Apoio à instalação e configuração dos 10 Chromebooks recém-chegados à escola (sem internet e sem software instalado). Aguardo da equipe de TI da Secretaria para configuração da rede e dos softwares necessários para iniciar as aulas.",
-        turma: "7A, 7B, 8A, 8B",
+        turma: "6B, 7A, 7B, 8A, 8B",
         alunos: "108",
       },
       {
