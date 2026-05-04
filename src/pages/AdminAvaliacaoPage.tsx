@@ -169,9 +169,17 @@ export default function AdminAvaliacaoPage() {
             {submissions.length} resposta(s). Cada questão aberta vale 0–{MAX_MANUAL_POINTS_PER_OPEN} pontos.
           </p>
         </div>
-        <Button variant="outline" size="sm" onClick={load} disabled={loading}>
-          <RefreshCw className="mr-1 h-4 w-4" /> Atualizar
-        </Button>
+        <div className="flex gap-2">
+          <a
+            href="/admin/folha-registro"
+            className="inline-flex items-center rounded-md border px-3 py-1.5 text-sm font-bold hover:bg-muted"
+          >
+            📄 Folha de Registro
+          </a>
+          <Button variant="outline" size="sm" onClick={load} disabled={loading}>
+            <RefreshCw className="mr-1 h-4 w-4" /> Atualizar
+          </Button>
+        </div>
       </header>
 
       <div className="space-y-3">
