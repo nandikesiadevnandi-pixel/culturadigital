@@ -32,7 +32,7 @@ const initialFolhas: Folha[] = [
         ano: "2026",
         atividade:
           "Despertar o interesse sobre lógica de programação. O que é tecnologia e para que serve. Introdução à lógica de programação usando o exemplo da receita do bolo.",
-        turma: "7A, 7B, 8A, 8B",
+        turma: "6B, 7A, 7B, 8A, 8B",
         alunos: "108",
       },
       {
@@ -41,7 +41,7 @@ const initialFolhas: Folha[] = [
         ano: "2026",
         atividade:
           "Apoio à instalação e configuração dos 10 Chromebooks recém-chegados à escola (sem internet e sem software instalado). Aguardo da equipe de TI da Secretaria para configuração da rede e dos softwares necessários para iniciar as aulas.",
-        turma: "7A, 7B, 8A, 8B",
+        turma: "6B, 7A, 7B, 8A, 8B",
         alunos: "108",
       },
       {
@@ -186,6 +186,13 @@ export default function FolhaRegistroPage() {
             onChangeRow={(ri, field, val) => updateRow(fi, ri, field, val)}
             onAddRow={() => addRow(fi)}
             onRemoveRow={(ri) => removeRow(fi, ri)}
+            onChangeHeader={(field, val) =>
+              setFolhas((prev) => {
+                const next = structuredClone(prev);
+                (next[fi] as any)[field] = val;
+                return next;
+              })
+            }
           />
         ))}
       </div>
@@ -198,11 +205,13 @@ function FolhaSheet({
   onChangeRow,
   onAddRow,
   onRemoveRow,
+  onChangeHeader,
 }: {
   folha: Folha;
   onChangeRow: (ri: number, field: keyof Row, val: string) => void;
   onAddRow: () => void;
   onRemoveRow: (ri: number) => void;
+  onChangeHeader: (field: "oficina" | "oficineiro" | "escola", val: string) => void;
 }) {
   // Pad rows to at least 10 for printed look
   const printRows = useMemo(() => {
@@ -218,18 +227,30 @@ function FolhaSheet({
         <img src={brasaoCanela} alt="Brasão Prefeitura Municipal de Canela" className="mx-auto mb-1 h-16 w-16 object-contain" />
         <div className="font-extrabold tracking-widest text-blue-900 text-lg">SMEEL</div>
         <div className="font-bold text-base mt-1">FOLHA DE REGISTRO DE ATIVIDADES</div>
-        <div className="text-xs text-gray-600">{folha.escola}</div>
+        <input
+          className="text-xs text-gray-600 text-center bg-transparent outline-none w-full"
+          value={folha.escola}
+          onChange={(e) => onChangeHeader("escola", e.target.value)}
+        />
       </div>
 
       {/* Top fields */}
       <div className="space-y-1 text-sm mb-3">
         <div className="flex gap-2 items-baseline border-b border-black pb-0.5">
           <span className="font-bold">Oficina:</span>
-          <span>{folha.oficina}</span>
+          <input
+            className="flex-1 bg-transparent outline-none"
+            value={folha.oficina}
+            onChange={(e) => onChangeHeader("oficina", e.target.value)}
+          />
         </div>
         <div className="flex gap-2 items-baseline border-b border-black pb-0.5">
           <span className="font-bold">Nome do Oficineiro:</span>
-          <span>{folha.oficineiro}</span>
+          <input
+            className="flex-1 bg-transparent outline-none"
+            value={folha.oficineiro}
+            onChange={(e) => onChangeHeader("oficineiro", e.target.value)}
+          />
         </div>
       </div>
 
