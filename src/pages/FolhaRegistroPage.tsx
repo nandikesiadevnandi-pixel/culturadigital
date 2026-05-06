@@ -384,7 +384,7 @@ export default function FolhaRegistroPage() {
                 ["Credenciada", "credenciada"],
                 ["CNPJ", "cnpj"],
                 ["Contrato", "contrato"],
-                ["Oficina", "oficina"],
+                ["Cód. da Oficina", "oficina"],
                 ["Oficineira", "oficineira"],
                 ["Período", "periodo"],
                 ["Carga horária e temática desenvolvida no mês", "cargaTema"],
