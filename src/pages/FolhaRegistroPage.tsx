@@ -49,11 +49,10 @@ const initial: Relatorio = {
   escolasAtendidas: "Escolas atendidas: EMEF Bertholdo Oppitz e EMEF Dante Bertoluci",
   credenciada: "Interação Comunicação e Marketing Ltda",
   cnpj: "40.949.328/0001-73",
-  contrato: "50/2026",
-  oficina: "Cod. 22535 - Cultura Digital",
+  contrato: "4397",
+  oficina: "22535",
   oficineira: "Késia Weige Nandi",
-  cargaTema:
-    "35h aula - alfabetização digital, lógica de programação, conta Google e introdução ao Scratch",
+  cargaTema: "50h aula",
   introducao:
     "O presente relatório sistematiza as atividades desenvolvidas nas Oficinas de Cultura Digital realizadas no contraturno escolar, ao longo do mês de abril de 2026, nas escolas municipais Bertholdo Oppitz e Dante Bertoluci, no município de Canela/RS. No período, o trabalho concentrou-se na organização inicial da oferta, no reconhecimento das condições técnicas de atendimento, na alfabetização digital introdutória, na abordagem de noções básicas de lógica de programação e no primeiro contato dos estudantes com ferramentas como conta Google e Scratch, com ajustes metodológicos e operacionais definidos em diálogo com cada escola.",
   objetivos:
@@ -385,7 +384,7 @@ export default function FolhaRegistroPage() {
                 ["Credenciada", "credenciada"],
                 ["CNPJ", "cnpj"],
                 ["Contrato", "contrato"],
-                ["Oficina", "oficina"],
+                ["Cód. da Oficina", "oficina"],
                 ["Oficineira", "oficineira"],
                 ["Período", "periodo"],
                 ["Carga horária e temática desenvolvida no mês", "cargaTema"],
