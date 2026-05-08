@@ -122,4 +122,58 @@ export const weeks: Week[] = [
       { type: "video", src: week3Video1, caption: "Turma concentrada durante a avaliação 📝" },
     ],
   },
+  {
+    number: 4,
+    date: "05/05 — Segunda-feira",
+    title: "Ernesto Dorneles: cuidados com o notebook e segurança digital",
+    emoji: "💻",
+    color: "yellow",
+    objective:
+      "Iniciar o ciclo na EMEF Ernesto Dorneles construindo, com 5º, 6º, 7º e 8º anos, uma cultura de cuidado com os equipamentos e os primeiros conceitos de segurança no uso da tecnologia.",
+    taught:
+      "Como funciona um notebook (ligar/desligar, área de trabalho, teclado, touchpad e navegador), protocolo de responsabilidade — cada aluno recebeu um número fixo e ficará sempre com o mesmo notebook — e o conceito de segurança digital: senhas fortes, dados pessoais, links suspeitos e contatos desconhecidos.",
+    activities: [
+      "Entrega dos notebooks e atribuição de um número fixo para cada estudante (sempre responsável pelo mesmo equipamento)",
+      "Combinados de transporte, abertura, guarda e limpeza dos aparelhos",
+      "Reconhecimento prático das funções básicas do notebook",
+      "Roda de conversa: o que é segurança quando estamos usando tecnologia?",
+      "Trabalho em grupos sobre segurança digital — cada grupo construiu suas próprias dicas para se proteger online",
+    ],
+    results:
+      "A turma assumiu o cuidado com o equipamento como algo deles — o número virou identidade. Nos grupos, surgiram ótimas reflexões sobre senhas, golpes e o que NÃO compartilhar na internet.",
+    difficulties:
+      "Por ser a primeira aula, foi preciso bastante tempo para combinados e para todos se familiarizarem com o notebook antes de partir para a parte conceitual.",
+    reflection:
+      "Começar pelo cuidado e pela segurança é começar pelo respeito — ao equipamento, a si mesmo e aos colegas. A turma se mostrou super responsável e curiosa, base perfeita para as próximas oficinas.",
+    media: [
+      { type: "image", src: ernesto1, caption: "Turma toda na ativa nos primeiros notebooks 💻" },
+      { type: "image", src: ernesto2, caption: "Acompanhando de perto cada grupo 👩‍🏫" },
+      { type: "image", src: ernesto3, caption: "Explorando juntos as funções do notebook 🔍" },
+      { type: "image", src: ernesto4, caption: "Trabalho em grupo sobre segurança digital 🛡️" },
+    ],
+  },
+  {
+    number: 5,
+    date: "07/05 — Quinta-feira",
+    title: "Dante Bertoluci: entrada, saída e SE… ENTÃO no Scratch (Jogo da Maçã)",
+    emoji: "🍎",
+    color: "pink",
+    objective:
+      "Aprofundar a lógica de programação no Scratch trabalhando blocos de entrada e saída e introduzindo a estrutura condicional 'SE… ENTÃO', que permite ao programa tomar decisões.",
+    taught:
+      "Eventos de entrada (teclado e mouse) e respostas do palco como saída; condição como uma pergunta que o programa faz; e como o bloco 'SE… ENTÃO' executa uma ação só quando a condição é verdadeira. Tudo aplicado na construção do Jogo da Maçã.",
+    activities: [
+      "Revisão rápida de palco, sprites e blocos de eventos",
+      "Apresentação dos blocos de entrada (setas do teclado) e de saída (movimento, som, pontuação)",
+      "Explicação da estrutura SE… ENTÃO com exemplos do dia a dia ('SE chover, ENTÃO levo guarda-chuva')",
+      "Construção guiada do Jogo da Maçã: o cesto se move com as setas (entrada) e, SE tocar na maçã, ENTÃO ela some, soma 1 ponto e reaparece em posição aleatória (saída)",
+      "Cada aluno personalizou seu jogo — trocou personagens, cenário e regras de pontuação",
+    ],
+    results:
+      "A galera entendeu na prática que programar é ensinar o computador a decidir. O Jogo da Maçã rodando na tela com a pontuação aumentando foi a 'virada de chave' — todos viram a condição funcionando.",
+    difficulties:
+      "No começo confundiam onde encaixar o bloco SE… ENTÃO dentro do 'sempre'. Resolvemos passo a passo, mostrando que a condição precisa ser checada o tempo todo.",
+    reflection:
+      "Quando o jogo deles começa a reagir sozinho às ações, eles percebem o poder da lógica. Saímos da aula com a turma já pensando em novas condições para criar — exatamente o pensamento computacional acontecendo.",
+  },
 ];
