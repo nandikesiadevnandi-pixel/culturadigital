@@ -46,7 +46,7 @@ type Relatorio = {
 const initial: Relatorio = {
   titulo: "RELATÓRIO DE ATIVIDADES\nOFICINAS DE CULTURA DIGITAL – ABRIL/2026",
   periodo: "Abril de 2026",
-  escolasAtendidas: "Escolas atendidas: EMEF Bertholdo Oppitz e EMEF Dante Bertoluci",
+  escolasAtendidas: "Escolas atendidas: EMEF Bertholdo Oppitz, EMEF Ernesto Dorneles e EMEF Dante Bertoluci",
   credenciada: "Interação Comunicação e Marketing Ltda",
   cnpj: "40.949.328/0001-73",
   contrato: "4397",
@@ -83,6 +83,18 @@ const initial: Relatorio = {
         { turma: "151", alunos: "" },
         { turma: "152", alunos: "" },
         { turma: "Total", alunos: "118" },
+      ],
+    },
+    {
+      nome: "EMEF Ernesto Dorneles",
+      diaSemana: "Segunda-feira",
+      observacao:
+        "Início do atendimento em maio de 2026. Cada estudante recebeu um número fixo, ficando responsável sempre pelo mesmo notebook ao longo das oficinas.",
+      turmas: [
+        { turma: "5º ano", alunos: "" },
+        { turma: "6º ano", alunos: "" },
+        { turma: "7º ano", alunos: "" },
+        { turma: "8º ano", alunos: "" },
       ],
     },
   ],
@@ -142,6 +154,13 @@ const initial: Relatorio = {
       turmas: "141, 142, 151 e 152",
       atividades:
         "Aula prática no Scratch com aprofundamento em estruturas de programação: trabalho com os blocos de entrada e saída (eventos de teclado/mouse e respostas do palco) e introdução à estrutura condicional 'SE... ENTÃO', que permite ao programa tomar decisões a partir de uma condição. A lógica foi explicada por meio da dinâmica do Jogo da Maçã: o personagem (cesto) se move com as setas do teclado (entrada) e, sempre que toca a maçã que cai do céu (condição), o programa executa a ação 'SE tocar na maçã, ENTÃO some a maçã, soma 1 ponto e reaparece em posição aleatória' (saída). Esse exemplo ajudou os estudantes a visualizarem, na prática, como combinar entrada de comandos, verificação de condições e respostas do programa, consolidando a noção de que programar é ensinar o computador a decidir o que fazer em cada situação.",
+    },
+    {
+      data: "05/05",
+      escola: "EMEF Ernesto Dorneles",
+      turmas: "5º, 6º, 7º e 8º ano",
+      atividades:
+        "Primeira aula na escola. Conversa inicial sobre o cuidado com os notebooks recém-recebidos: cada estudante recebeu um número fixo e ficará sempre responsável pelo mesmo equipamento, com orientações sobre transporte, abertura, guarda e limpeza. Reconhecimento das principais funções do notebook (ligar/desligar, área de trabalho, teclado, touchpad, navegador e contas de usuário). Em seguida, aula sobre Segurança Digital: o que é segurança no uso da tecnologia, cuidados com senhas, dados pessoais, links e contatos desconhecidos. A turma foi organizada em grupos para a realização de trabalhos colaborativos sobre o tema, estimulando troca de ideias e construção coletiva do conceito de segurança digital.",
     },
   ],
   consideracoes:
