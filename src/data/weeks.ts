@@ -6,6 +6,10 @@ import video2 from "@/assets/week2/video-2.mp4";
 import video3 from "@/assets/week2/video-3.mp4";
 import video4 from "@/assets/week2/video-4.mp4";
 import week3Video1 from "@/assets/week3/avaliacao-1.mp4";
+import ernesto1 from "@/assets/week5/ernesto-1.png";
+import ernesto2 from "@/assets/week5/ernesto-2.png";
+import ernesto3 from "@/assets/week5/ernesto-3.png";
+import ernesto4 from "@/assets/week5/ernesto-4.png";
 
 export type MediaItem = {
   type: "image" | "video";
