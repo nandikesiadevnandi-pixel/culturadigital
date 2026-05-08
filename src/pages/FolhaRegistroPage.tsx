@@ -136,20 +136,6 @@ const initial: Relatorio = {
       atividades:
         "Semana 3, antecipada para quinta-feira em função do feriado. Retomada dos conteúdos das semanas anteriores e atividade de revisão/avaliação diagnóstica sobre o que os estudantes aprenderam de tecnologia, lógica de programação, comandos e uso inicial das ferramentas digitais.",
     },
-    {
-      data: "07/05",
-      escola: "EMEF Dante Bertoluci",
-      turmas: "141, 142, 151 e 152",
-      atividades:
-        "Aula prática no Scratch com aprofundamento em estruturas de programação: trabalho com os blocos de entrada e saída (eventos de teclado/mouse e respostas do palco) e introdução à estrutura condicional 'SE... ENTÃO', que permite ao programa tomar decisões a partir de uma condição. A lógica foi explicada por meio da dinâmica do Jogo da Maçã: o personagem (cesto) se move com as setas do teclado (entrada) e, sempre que toca a maçã que cai do céu (condição), o programa executa a ação 'SE tocar na maçã, ENTÃO some a maçã, soma 1 ponto e reaparece em posição aleatória' (saída). Esse exemplo ajudou os estudantes a visualizarem, na prática, como combinar entrada de comandos, verificação de condições e respostas do programa, consolidando a noção de que programar é ensinar o computador a decidir o que fazer em cada situação.",
-    },
-    {
-      data: "05/05",
-      escola: "EMEF Ernesto Dorneles",
-      turmas: "5º, 6º, 7º e 8º ano",
-      atividades:
-        "Primeira aula na escola. Conversa inicial sobre o cuidado com os notebooks recém-recebidos: cada estudante recebeu um número fixo e ficará sempre responsável pelo mesmo equipamento, com orientações sobre transporte, abertura, guarda e limpeza. Reconhecimento das principais funções do notebook (ligar/desligar, área de trabalho, teclado, touchpad, navegador e contas de usuário). Em seguida, aula sobre Segurança Digital: o que é segurança no uso da tecnologia, cuidados com senhas, dados pessoais, links e contatos desconhecidos. A turma foi organizada em grupos para a realização de trabalhos colaborativos sobre o tema, estimulando troca de ideias e construção coletiva do conceito de segurança digital.",
-    },
   ],
   consideracoes:
     "O trabalho desenvolvido em abril demonstrou a relevância da oficina de Cultura Digital como espaço de iniciação tecnológica e pensamento computacional no contraturno escolar. Mesmo em um cenário inicial de implantação, com necessidade de ajustes de agenda e de infraestrutura, foi possível estabelecer bases pedagógicas consistentes para a continuidade do trabalho nas duas escolas atendidas. O mês teve forte componente de organização institucional e técnica, especialmente em função da chegada dos novos equipamentos, da ausência de drivers de conectividade e da necessidade de pactuar protocolos de uso e divisão do laboratório.",
