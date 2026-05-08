@@ -85,6 +85,18 @@ const initial: Relatorio = {
         { turma: "Total", alunos: "118" },
       ],
     },
+    {
+      nome: "EMEF Ernesto Dorneles",
+      diaSemana: "Segunda-feira",
+      observacao:
+        "Início do atendimento em maio de 2026. Cada estudante recebeu um número fixo, ficando responsável sempre pelo mesmo notebook ao longo das oficinas.",
+      turmas: [
+        { turma: "5º ano", alunos: "" },
+        { turma: "6º ano", alunos: "" },
+        { turma: "7º ano", alunos: "" },
+        { turma: "8º ano", alunos: "" },
+      ],
+    },
   ],
   activities: [
     {
