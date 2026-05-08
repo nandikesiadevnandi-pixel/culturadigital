@@ -46,7 +46,7 @@ type Relatorio = {
 const initial: Relatorio = {
   titulo: "RELATÓRIO DE ATIVIDADES\nOFICINAS DE CULTURA DIGITAL – ABRIL/2026",
   periodo: "Abril de 2026",
-  escolasAtendidas: "Escolas atendidas: EMEF Bertholdo Oppitz e EMEF Dante Bertoluci",
+  escolasAtendidas: "Escolas atendidas: EMEF Bertholdo Oppitz, EMEF Ernesto Dorneles e EMEF Dante Bertoluci",
   credenciada: "Interação Comunicação e Marketing Ltda",
   cnpj: "40.949.328/0001-73",
   contrato: "4397",
