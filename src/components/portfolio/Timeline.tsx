@@ -46,9 +46,8 @@ const WeekCard = ({ week, index }: { week: Week; index: number }) => {
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-extrabold", c.chip)}>
-                Semana {week.number}
+                {week.date}
               </span>
-              <span className="text-xs font-bold text-muted-foreground">{week.date}</span>
             </div>
             <h3 className="mt-1 font-display text-xl font-extrabold leading-tight md:text-2xl">
               {week.title}
