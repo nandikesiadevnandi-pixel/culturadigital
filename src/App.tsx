@@ -14,6 +14,8 @@ import AvaliacaoPage from "./pages/AvaliacaoPage.tsx";
 import RankingPage from "./pages/RankingPage.tsx";
 import AdminAvaliacaoPage from "./pages/AdminAvaliacaoPage.tsx";
 import FolhaRegistroPage from "./pages/FolhaRegistroPage.tsx";
+import RelatoriosArchivePage from "./pages/RelatoriosArchivePage.tsx";
+import AuthPage from "./pages/AuthPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
