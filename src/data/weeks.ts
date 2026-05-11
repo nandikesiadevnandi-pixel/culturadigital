@@ -10,6 +10,8 @@ import ernesto1 from "@/assets/week5/ernesto-1.png";
 import ernesto2 from "@/assets/week5/ernesto-2.png";
 import ernesto3 from "@/assets/week5/ernesto-3.png";
 import ernesto4 from "@/assets/week5/ernesto-4.png";
+import dante1 from "@/assets/week5/dante-1.mp4";
+import dante2 from "@/assets/week5/dante-2.mp4";
 
 export type MediaItem = {
   type: "image" | "video";
@@ -175,5 +177,9 @@ export const weeks: Week[] = [
       "No começo confundiam onde encaixar o bloco SE… ENTÃO dentro do 'sempre'. Resolvemos passo a passo, mostrando que a condição precisa ser checada o tempo todo.",
     reflection:
       "Quando o jogo deles começa a reagir sozinho às ações, eles percebem o poder da lógica. Saímos da aula com a turma já pensando em novas condições para criar — exatamente o pensamento computacional acontecendo.",
+    media: [
+      { type: "video", src: dante1, caption: "Turma construindo o Jogo da Maçã no Scratch 🍎" },
+      { type: "video", src: dante2, caption: "SE tocar na maçã, ENTÃO soma ponto! 🎯" },
+    ],
   },
 ];
