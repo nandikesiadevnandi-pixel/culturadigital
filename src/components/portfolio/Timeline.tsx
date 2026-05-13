@@ -106,10 +106,10 @@ export const Timeline = () => {
             Linha do tempo
           </span>
           <h2 className="mt-4 font-display text-4xl font-extrabold md:text-5xl">
-            Cada sexta-feira, <span className="text-gradient">uma nova descoberta</span>
+            Toda segunda, terça e sexta-feira, <span className="text-gradient">uma nova descoberta</span>
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">
-            Clique em cada semana para ver objetivos, atividades, resultados e reflexões.
+            Clique em cada aula para ver objetivos, atividades, resultados e reflexões.
           </p>
         </div>
 
