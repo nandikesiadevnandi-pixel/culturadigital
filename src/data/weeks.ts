@@ -17,6 +17,14 @@ import week6_2 from "@/assets/week6/aula-2.jpeg";
 import week6_3 from "@/assets/week6/aula-3.jpeg";
 import week6_4 from "@/assets/week6/aula-4.jpeg";
 import week6_5 from "@/assets/week6/aula-5.jpeg";
+import week7_1 from "@/assets/week7/aula-1.jpeg";
+import week7_2 from "@/assets/week7/aula-2.jpeg";
+import week7_3 from "@/assets/week7/aula-3.jpeg";
+import week7_4 from "@/assets/week7/aula-4.jpeg";
+import week7_5 from "@/assets/week7/aula-5.jpeg";
+import week7_6 from "@/assets/week7/aula-6.jpeg";
+import week7_7 from "@/assets/week7/aula-7.jpeg";
+import week7_8 from "@/assets/week7/aula-8.jpeg";
 
 export type MediaItem = {
   type: "image" | "video";
@@ -216,6 +224,41 @@ export const weeks: Week[] = [
       { type: "image", src: week6_3, caption: "Turma concentrada — cada um no seu projeto 🧠" },
       { type: "image", src: week6_4, caption: "Sala inteira produzindo Tecnologia da Informação ✨" },
       { type: "image", src: week6_5, caption: "Trabalho em dupla, trocando ideias sobre os jogos 🤝" },
+    ],
+  },
+  {
+    number: 7,
+    date: "12/05 — Terça-feira",
+    title: "Ernesto Dorneles: primeiros passos em HTML, CSS e JS no CodePen",
+    emoji: "🌐",
+    color: "purple",
+    objective:
+      "Mostrar para as turmas de 6º, 7º e 8º ano do Ernesto Dorneles como nasce um site de verdade — apresentando HTML, CSS e JavaScript e deixando cada um sentir o gostinho de construir a primeira página da vida no CodePen.",
+    taught:
+      "O que é a web e como um site é feito por três 'idiomas' que conversam: HTML (a estrutura — os ossos), CSS (o estilo — a roupa) e JavaScript (o comportamento — o cérebro). Apresentei o CodePen como um editor online onde dá pra escrever os três e ver o resultado na hora, sem instalar nada. Mostramos tags básicas (h1, p, button), propriedades simples de CSS (cor, fundo, fonte) e uma pitada de JS reagindo a cliques.",
+    activities: [
+      "Abertura: 'como vocês acham que um site é feito?' — chuva de palpites no quadro",
+      "Demonstração ao vivo no CodePen: HTML, CSS e JS lado a lado, com a prévia atualizando em tempo real",
+      "Cada aluno criou seu próprio Pen e escreveu o primeiro <h1> com o nome dele",
+      "Estilização guiada: trocaram cor de fundo, cor da fonte e tamanho do texto no CSS",
+      "Primeira interação em JS: um botão que muda o texto ou a cor da página ao ser clicado",
+      "Tempo livre para personalizar — cada um deixou a página com a sua cara",
+    ],
+    results:
+      "Foi 'uau' atrás de 'uau' na sala. Quando viram a página mudando ao vivo conforme escreviam o código, muitos disseram 'então é assim que faz site, prof?!'. Saíram com a primeira página de verdade salva no CodePen.",
+    difficulties:
+      "No começo confundiam onde escrever cada coisa (HTML x CSS x JS) e esqueciam de fechar tags. Resolvi mostrando vários exemplos pequenos antes de soltar para a personalização livre.",
+    reflection:
+      "Adoro essa aula porque ela quebra um mito. Eles acham que site é coisa de gênio — e descobrem que, com três blocos de código simples, já estão construindo o seu. Esse 'então eu também consigo' é o que abre a porta para todo o resto.",
+    media: [
+      { type: "image", src: week7_1, caption: "Primeira página no CodePen: <h1>voar</h1> 🚀" },
+      { type: "image", src: week7_2, caption: "Sala inteira mergulhada no HTML, CSS e JS 💻" },
+      { type: "image", src: week7_3, caption: "Aprendendo o que é Tecnologia da Informação na prática 🌐" },
+      { type: "image", src: week7_4, caption: "Turma do Ernesto construindo seus primeiros sites ✨" },
+      { type: "image", src: week7_5, caption: "Cada notebook, uma página nascendo do zero 🧑‍💻" },
+      { type: "image", src: week7_6, caption: "Trabalho em grupo: descobrindo as tags juntos 🤝" },
+      { type: "image", src: week7_7, caption: "Foco total no CodePen — vendo o site ganhar vida 🎨" },
+      { type: "image", src: week7_8, caption: "Os pequenos devs do Ernesto em ação 💙" },
     ],
   },
 ];
