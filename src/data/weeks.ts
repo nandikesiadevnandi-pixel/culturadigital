@@ -12,6 +12,11 @@ import ernesto3 from "@/assets/week5/ernesto-3.png";
 import ernesto4 from "@/assets/week5/ernesto-4.png";
 import dante1 from "@/assets/week5/dante-1.mp4";
 import dante2 from "@/assets/week5/dante-2.mp4";
+import week6_1 from "@/assets/week6/aula-1.jpeg";
+import week6_2 from "@/assets/week6/aula-2.jpeg";
+import week6_3 from "@/assets/week6/aula-3.jpeg";
+import week6_4 from "@/assets/week6/aula-4.jpeg";
+import week6_5 from "@/assets/week6/aula-5.jpeg";
 
 export type MediaItem = {
   type: "image" | "video";
@@ -180,6 +185,37 @@ export const weeks: Week[] = [
     media: [
       { type: "video", src: dante1, caption: "Turma construindo o Jogo da Maçã no Scratch 🍎" },
       { type: "video", src: dante2, caption: "SE tocar na maçã, ENTÃO soma ponto! 🎯" },
+    ],
+  },
+  {
+    number: 6,
+    date: "11/05 — Segunda-feira",
+    title: "O que é Tecnologia da Informação + Scratch na prática",
+    emoji: "🧠",
+    color: "blue",
+    objective:
+      "Construir o conceito de Tecnologia da Informação (TI) e mostrar, na prática, como ela aparece no Scratch quando criamos jogos que recebem dados, processam e devolvem um resultado na tela.",
+    taught:
+      "O que é Tecnologia da Informação: o conjunto de recursos (hardware, software e pessoas) usado para coletar, armazenar, processar e transmitir informação. Diferença entre dado e informação, exemplos do dia a dia (WhatsApp, Google, jogos, escola) e como o Scratch é, ele mesmo, uma ferramenta de TI: a gente dá uma entrada (tecla, clique), ele processa (blocos de lógica) e devolve uma saída (movimento, som, pontuação).",
+    activities: [
+      "Roda de conversa: 'o que vocês acham que é Tecnologia da Informação?' — quadro cheio de exemplos da turma",
+      "Explicação com exemplos reais: a escola usa TI no diário online, no WhatsApp dos pais, no Google de pesquisa",
+      "Diferenciação prática entre dado (37) e informação (37 °C de febre)",
+      "Volta ao Scratch: cada aluno abriu seu projeto e identificou onde está a entrada, o processamento e a saída",
+      "Continuação dos jogos pessoais no Scratch — alguns evoluindo o Jogo da Maçã, outros criando novos projetos com o que aprenderam",
+    ],
+    results:
+      "A turma percebeu que TI não é 'coisa de empresa grande' — está em tudo que eles já usam. E, ao olhar o próprio projeto Scratch com esse olhar, entenderam que já estão produzindo Tecnologia da Informação, não só consumindo.",
+    difficulties:
+      "A diferença entre dado e informação confundiu alguns no início. Resolvemos com vários exemplos do cotidiano até a ficha cair de vez.",
+    reflection:
+      "Foi lindo ver eles conectarem o conceito ao que já fazem no Scratch. Quando entendem que o jogo deles é TI de verdade, mudam a postura: passam de usuários para criadores. É exatamente isso que eu quero plantar.",
+    media: [
+      { type: "image", src: week6_1, caption: "Galera no Scratch aplicando o conceito de TI 💻" },
+      { type: "image", src: week6_2, caption: "Entrada, processamento e saída acontecendo na tela 🎮" },
+      { type: "image", src: week6_3, caption: "Turma concentrada — cada um no seu projeto 🧠" },
+      { type: "image", src: week6_4, caption: "Sala inteira produzindo Tecnologia da Informação ✨" },
+      { type: "image", src: week6_5, caption: "Trabalho em dupla, trocando ideias sobre os jogos 🤝" },
     ],
   },
 ];
