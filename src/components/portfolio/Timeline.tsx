@@ -125,7 +125,7 @@ export const Timeline = () => {
 
           <div className="mt-8 rounded-3xl border-2 border-dashed border-border p-8 text-center">
             <p className="font-display text-lg font-bold text-muted-foreground">
-              ✨ Mais semanas em breve — esse portfólio cresce a cada sexta-feira.
+              ✨ Mais aulas em breve — esse portfólio cresce toda segunda, terça e sexta-feira.
             </p>
           </div>
         </div>
