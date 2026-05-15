@@ -1,8 +1,9 @@
 import { NavLink, Link } from "react-router-dom";
-import { Sparkles, Menu, X, ChevronDown } from "lucide-react";
+import { Sparkles, Menu, X, ChevronDown, User, LogIn } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { usePlatform, PLATFORMS, PlatformId } from "@/contexts/PlatformContext";
+import { useAuth } from "@/hooks/useAuth";
 
 const links = [
   { to: "/", label: "Início", emoji: "🏠" },
@@ -104,6 +105,7 @@ export const NavBar = () => {
         </div>
 
         <div className="flex items-center gap-2">
+          <AuthButton />
           <PlatformSwitcher />
           <button
             className="rounded-full bg-card p-2 shadow-soft md:hidden"
