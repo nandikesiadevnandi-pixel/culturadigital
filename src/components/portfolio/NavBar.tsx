@@ -69,6 +69,30 @@ const PlatformSwitcher = () => {
   );
 };
 
+const AuthButton = () => {
+  const { user, isAdmin } = useAuth();
+  if (!user) {
+    return (
+      <Link
+        to="/entrar"
+        className="hidden sm:flex items-center gap-1.5 rounded-full bg-gradient-to-r from-violet-500 to-cyan-400 px-3 py-1.5 text-xs font-extrabold text-white shadow-[0_0_15px_rgba(167,139,250,0.4)] transition-transform hover:scale-105"
+      >
+        <LogIn className="h-3 w-3" />
+        Entrar
+      </Link>
+    );
+  }
+  return (
+    <Link
+      to={isAdmin ? "/admin" : "/aluno"}
+      className="hidden sm:flex items-center gap-1.5 rounded-full bg-card px-3 py-1.5 text-xs font-bold shadow-soft hover:shadow-card"
+    >
+      <User className="h-3 w-3" />
+      {isAdmin ? "ADM" : "Meu painel"}
+    </Link>
+  );
+};
+
 export const NavBar = () => {
   const [open, setOpen] = useState(false);
   const { platform } = usePlatform();
