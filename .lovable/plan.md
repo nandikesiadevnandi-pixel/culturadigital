@@ -1,58 +1,123 @@
-Vou criar um sistema de **arquivo histórico de relatórios mensais** com login, banco de dados e visualização em grade por ano.
+# Cultura Digital Educacional 🚀
 
-## O que será criado
+Plataforma educacional completa, vibe **tech jovem (dark + neon)**, onde alunos do 4º ao 8º ano se cadastram livremente, seguem trilhas, jogam, ganham XP — e você comanda tudo de um painel ADM.
 
-### 1. Login real (Lovable Cloud)
-- Página `/auth` com login por **email/senha + Google**
-- Substitui o "password" simples atual da Folha de Registro
-- Só você (logada) consegue ver/editar relatórios
-- Redirecionamento automático se não estiver logada
+---
 
-### 2. Banco de dados
-Nova tabela `monthly_reports` na nuvem guardando:
-- `user_id` — quem é dona do relatório
-- `period_key` — identificador do mês (ex: `2026-04`)
-- `data` — todo o conteúdo do relatório (JSON editável)
-- datas de criação/atualização
+## 🎯 O que vamos construir (Fase 1 / MVP)
 
-Regras de acesso (RLS): cada usuária só vê e edita os próprios relatórios.
+### Para o aluno
+1. **Cadastro livre** com: nome, turma (ex: 7ºA), escola (dropdown das suas escolas), email + senha → entra direto
+2. **Perfil personalizado** — avatar (gerado), nome, escola, turma, nível, XP total, medalhas
+3. **Trilha do ano dele** — só vê conteúdo do 4º, 5º, 6º, 7º ou 8º (filtro automático)
+4. **Aulas** — texto + vídeo + imagens, marca como concluída → ganha XP
+5. **Quizzes** (reaproveita o sistema atual!) — agora vinculados ao aluno logado
+6. **1 mini-jogo de estreia** — "Caça-Bug" (lógica visual, funciona para todos os anos) ou "Robô que Anda" (sequência de comandos, mais fácil)
+7. **Galeria personalizada** — só fotos da escola/turma dele
+8. **Página de evolução** — gráfico de XP ao longo do tempo, medalhas conquistadas, % da trilha
+9. **Ranking** — da turma dele + da escola dele
 
-### 3. Nova página `/admin/relatorios` — Arquivo de Relatórios
-Visual em **grade por ano**:
+### Para você (ADM)
+1. **Dashboard** — total de alunos, ativos hoje, novos cadastros da semana, gráfico por escola/turma
+2. **Lista de alunos** filtrável (escola → turma → ano), busca por nome
+3. **Perfil do aluno** — vê tudo: progresso, quizzes feitos, jogos, XP — e pode dar XP/medalha manual
+4. **Editor de aulas** — cria/edita aulas direto na interface (sem código): título, ano-alvo, conteúdo rico, imagens, vídeo (YouTube)
+5. **Editor de quizzes** — monta quiz com perguntas, alternativas, ano-alvo
+6. **Mensagens** — manda recado pra uma turma inteira ou escola inteira
+7. **Relatórios mensais** — continua o que já tem, mas agora puxa dados reais (alunos ativos, médias, etc) automaticamente
+
+---
+
+## 🎨 Visual — "Tech jovem dark/neon"
+
+- Fundo **dark navy** (#0a0a1a → #141432), acentos **neon roxo/ciano** (#a78bfa, #67e8f9)
+- Tipografia: **Space Grotesk** (títulos) + **Inter** (corpo) — moderna, monoespaçada quando precisa
+- Cards com **glow sutil** nas bordas, animações suaves de hover
+- Barras de XP estilo videogame, medalhas com brilho, "níveis" com nomes legais (Iniciante → Codificador → Hacker → Mestre Digital)
+- Mantém o switcher de plataforma atual (Cultura Digital ↔ Hospitalidade)
+
+A área ADM continua mais clean (a que você já tem), só ganha as novas seções.
+
+---
+
+## 🗄️ Estrutura técnica
+
+### Banco de dados (novas tabelas)
 
 ```text
-            2026
- ┌──────┬──────┬──────┬──────┐
- │ Jan  │ Fev  │ Mar  │ Abr ✓│
- ├──────┼──────┼──────┼──────┤
- │ Mai  │ Jun  │ Jul  │ Ago  │
- ├──────┼──────┼──────┼──────┤
- │ Set  │ Out  │ Nov  │ Dez  │
- └──────┴──────┴──────┴──────┘
+profiles            → 1 por aluno: nome, turma, escola, ano_escolar, avatar, xp, nivel
+user_roles          → quem é "admin" (você) vs "student" (alunos)
+lessons             → aulas: titulo, conteudo, ano_escolar, ordem, xp_recompensa
+lesson_completions  → aluno X concluiu aula Y (+ data + xp ganho)
+quizzes_v2          → quizzes vinculados a ano escolar (evolui o atual)
+quiz_attempts       → tentativas do aluno no quiz (score, data)
+games               → catálogo de jogos disponíveis
+game_scores         → pontuação do aluno em cada jogo
+badges              → medalhas disponíveis (nome, ícone, condição)
+user_badges         → quais medalhas cada aluno conquistou
+xp_events           → histórico de XP (vem de quiz, aula, jogo, ou manual da prof)
+class_messages      → recados que você manda pra turmas
 ```
 
-- Meses **com relatório salvo** aparecem destacados (cor + ✓)
-- Meses **vazios** aparecem cinza com botão "Criar"
-- Seletor de ano (← 2025 | 2026 | 2027 →)
-- Ao clicar num mês: abre a Folha de Registro daquele mês
+Tudo com **RLS forte**:
+- Aluno só vê/edita o próprio perfil e progresso
+- Aluno vê aulas/quizzes/jogos do **ano dele**
+- Você (admin) vê e edita tudo via função `has_role(user_id, 'admin')`
 
-### 4. Folha de Registro adaptada
-- Vira `/admin/relatorios/:periodKey` (ex: `/admin/relatorios/2026-04`)
-- Carrega do banco quando abre; se não existir, usa template em branco já com mês/ano preenchidos
-- Botão **"Salvar na nuvem"** novo (ao lado de Salvar PDF/Imagem)
-- Auto-preenche o título com o mês/ano selecionado
-- Mantém todas funções atuais: editar tudo, exportar PDF, imagem, imprimir, anexar assinatura
+### Rotas novas
 
-### 5. Migração do relatório de Abril/2026 atual
-O relatório que você já tem (Abril/2026) será inserido automaticamente no banco quando você logar pela primeira vez e abrir esse mês — sem perder nada.
+```text
+/cadastro                        → criar conta de aluno
+/entrar                          → login (renomeia /auth)
+/aluno                           → dashboard do aluno (perfil + atalhos)
+/aluno/trilha                    → trilha do ano dele
+/aluno/aula/:id                  → ler aula + marcar concluída
+/aluno/jogos                     → lista de mini-jogos
+/aluno/jogo/caca-bug             → primeiro jogo
+/aluno/evolucao                  → gráfico de progresso
+/aluno/medalhas                  → coleção de badges
 
-## Detalhes técnicos
+/admin                           → vira dashboard geral (não só avaliação)
+/admin/alunos                    → lista de alunos com filtros
+/admin/alunos/:id                → perfil completo do aluno
+/admin/aulas                     → editor de aulas
+/admin/quizzes                   → editor de quizzes (evolui o atual)
+/admin/mensagens                 → enviar recado pra turma
+/admin/relatorios                → continua igual, mas com dados reais
+```
 
-- Tabela `monthly_reports` com `UNIQUE(user_id, period_key)` para garantir 1 relatório por mês por usuária
-- Trigger `update_updated_at_column` para manter `updated_at` atualizado
-- Auth com `onAuthStateChange` + `getSession`, persistência via Supabase
-- Auto-confirm de email **desativado** (precisa verificar email no signup) — posso ativar se preferir entrar direto sem verificar
-- O grid usa shadcn `Card` + tokens semânticos do design system
+---
 
-## Próximo passo
-Se aprovar, começo aplicando a migração do banco e em seguida construo as telas de auth, grade e adapto a folha. Depois te aviso pra você criar sua conta e abrir Abril/2026.
+## 🛠️ Como vamos atacar (ordem de construção, mesmo que tudo seja Fase 1)
+
+1. **Fundação** — tabelas + RLS + roles (você vira admin automaticamente quando logar com seu email)
+2. **Auth do aluno** — cadastro com nome/turma/escola, login, perfil
+3. **Layout dark/neon** — novo tema visual aplicado nas áreas de aluno
+4. **Trilha + aulas** — editor pra você + visualização pro aluno + completar aula = XP
+5. **Quizzes** — adapta o sistema atual pra vincular ao aluno logado e dar XP
+6. **Jogo "Caça-Bug"** — primeiro mini-jogo (escolho um simples e visual pra começar bonito)
+7. **XP, níveis e medalhas** — sistema de progressão + 5 medalhas iniciais
+8. **Dashboard ADM** — visão geral com números reais
+9. **Lista + perfil de aluno no ADM** — você consegue ver e ajustar tudo
+10. **Galeria e ranking personalizados** — filtra por escola/turma do aluno
+11. **Mensagens pra turma**
+12. **Relatórios automáticos** — puxa dados reais
+
+---
+
+## ⚠️ Pontos importantes pra você saber
+
+- **É um projeto grande** — vou entregar em várias mensagens. A cada etapa você testa e a gente ajusta.
+- **Cadastro livre = qualquer um pode entrar.** Você escolheu isso. Se aparecer abuso, a gente adiciona um "código de turma" depois (fácil).
+- **Email não precisa ser verificado** (pra alunos não travarem). Posso mudar se preferir.
+- **Você precisa criar sua conta admin primeiro** — vou deixar um email seu já marcado como admin no banco assim que me passar (ou eu adiciono manualmente depois do primeiro login seu).
+- **As contas/quizzes atuais** continuam funcionando. A galeria e o ranking públicos continuam visíveis pra todos (visitantes), só ganham camada extra pra alunos logados.
+- A vibe **tech jovem dark/neon** vai ficar nas áreas do aluno. Áreas públicas (home, sobre) e o ADM mantêm o visual atual pra não quebrar identidade.
+
+---
+
+## ✅ Próximo passo
+
+Se aprovar esse plano, eu começo pela **fundação (tabelas + roles + auth do aluno)** e te aviso pra criar sua conta. A partir daí, construímos camada por camada — você testa cada uma antes de avançar.
+
+Quer ajustar algo (tirar/incluir feature, mudar ordem, mudar nome de algo) ou posso começar?
