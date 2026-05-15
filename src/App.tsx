@@ -5,6 +5,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Layout } from "@/components/portfolio/Layout";
 import { PlatformProvider } from "@/contexts/PlatformContext";
+import { AuthProvider } from "@/hooks/useAuth";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Home from "./pages/Home.tsx";
 import SobrePage from "./pages/SobrePage.tsx";
 import AulasPage from "./pages/AulasPage.tsx";
@@ -16,6 +18,8 @@ import AdminAvaliacaoPage from "./pages/AdminAvaliacaoPage.tsx";
 import FolhaRegistroPage from "./pages/FolhaRegistroPage.tsx";
 import RelatoriosArchivePage from "./pages/RelatoriosArchivePage.tsx";
 import AuthPage from "./pages/AuthPage.tsx";
+import CadastroPage from "./pages/CadastroPage.tsx";
+import AlunoDashboardPage from "./pages/AlunoDashboardPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -27,24 +31,69 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Routes>
-            <Route element={<Layout />}>
-              <Route path="/" element={<Home />} />
-              <Route path="/sobre" element={<SobrePage />} />
-              <Route path="/aulas" element={<AulasPage />} />
-              <Route path="/progresso" element={<ProgressoPage />} />
-              <Route path="/galeria" element={<GaleriaPage />} />
-              <Route path="/avaliacao" element={<AvaliacaoPage />} />
-              <Route path="/ranking" element={<RankingPage />} />
-              <Route path="/admin" element={<AdminAvaliacaoPage />} />
-              <Route path="/auth" element={<AuthPage />} />
-              <Route path="/admin/relatorios" element={<RelatoriosArchivePage />} />
-              <Route path="/admin/relatorios/:periodKey" element={<FolhaRegistroPage />} />
-              <Route path="/admin/folha-registro" element={<FolhaRegistroPage />} />
-            </Route>
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <AuthProvider>
+            <Routes>
+              <Route element={<Layout />}>
+                <Route path="/" element={<Home />} />
+                <Route path="/sobre" element={<SobrePage />} />
+                <Route path="/aulas" element={<AulasPage />} />
+                <Route path="/progresso" element={<ProgressoPage />} />
+                <Route path="/galeria" element={<GaleriaPage />} />
+                <Route path="/avaliacao" element={<AvaliacaoPage />} />
+                <Route path="/ranking" element={<RankingPage />} />
+
+                {/* Auth */}
+                <Route path="/entrar" element={<AuthPage />} />
+                <Route path="/auth" element={<AuthPage />} />
+                <Route path="/cadastro" element={<CadastroPage />} />
+
+                {/* Aluno */}
+                <Route
+                  path="/aluno"
+                  element={
+                    <ProtectedRoute>
+                      <AlunoDashboardPage />
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* Admin */}
+                <Route
+                  path="/admin"
+                  element={
+                    <ProtectedRoute requireAdmin>
+                      <AdminAvaliacaoPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/relatorios"
+                  element={
+                    <ProtectedRoute requireAdmin>
+                      <RelatoriosArchivePage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/relatorios/:periodKey"
+                  element={
+                    <ProtectedRoute requireAdmin>
+                      <FolhaRegistroPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/folha-registro"
+                  element={
+                    <ProtectedRoute requireAdmin>
+                      <FolhaRegistroPage />
+                    </ProtectedRoute>
+                  }
+                />
+              </Route>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
     </PlatformProvider>
