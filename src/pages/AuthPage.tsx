@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import { Sparkles } from "lucide-react";
 
 export default function AuthPage() {
   const navigate = useNavigate();
@@ -15,11 +14,24 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      if (session) navigate("/admin/relatorios", { replace: true });
+    const { data: sub } = supabase.auth.onAuthStateChange(async (_e, session) => {
+      if (!session) return;
+      // Redirect based on role
+      const { data: roles } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", session.user.id);
+      const isAdmin = (roles ?? []).some((r) => r.role === "admin");
+      navigate(isAdmin ? "/admin" : "/aluno", { replace: true });
     });
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate("/admin/relatorios", { replace: true });
+    supabase.auth.getSession().then(async ({ data }) => {
+      if (!data.session) return;
+      const { data: roles } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", data.session.user.id);
+      const isAdmin = (roles ?? []).some((r) => r.role === "admin");
+      navigate(isAdmin ? "/admin" : "/aluno", { replace: true });
     });
     return () => sub.subscription.unsubscribe();
   }, [navigate]);
@@ -30,82 +42,59 @@ export default function AuthPage() {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) toast.error(error.message);
-    else toast.success("Bem-vinda!");
-  };
-
-  const signUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { emailRedirectTo: `${window.location.origin}/admin/relatorios` },
-    });
-    setLoading(false);
-    if (error) toast.error(error.message);
-    else toast.success("Conta criada! Verifique seu email.");
-  };
-
-  const google = async () => {
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: `${window.location.origin}/admin/relatorios`,
-    });
-    if (result.error) toast.error("Erro ao entrar com Google");
+    else toast.success("Bem-vindx de volta! 🚀");
   };
 
   return (
-    <div className="container max-w-md py-16">
-      <h1 className="font-display text-3xl font-extrabold mb-2">Acesso restrito</h1>
-      <p className="text-muted-foreground mb-6">
-        Entre para acessar e arquivar seus relatórios mensais.
-      </p>
+    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-[#0a0a1a] via-[#141432] to-[#0a0a1a] py-12">
+      <div className="container max-w-md">
+        <div className="mb-8 text-center">
+          <div className="mx-auto mb-3 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-cyan-400 shadow-[0_0_30px_rgba(167,139,250,0.5)]">
+            <Sparkles className="h-6 w-6 text-white" />
+          </div>
+          <h1 className="font-display text-3xl font-extrabold text-white">Entrar</h1>
+          <p className="mt-2 text-sm text-violet-200/70">
+            Cultura Digital Educacional
+          </p>
+        </div>
 
-      <Tabs defaultValue="login">
-        <TabsList className="grid grid-cols-2 w-full">
-          <TabsTrigger value="login">Entrar</TabsTrigger>
-          <TabsTrigger value="signup">Criar conta</TabsTrigger>
-        </TabsList>
+        <form onSubmit={signIn} className="space-y-4 rounded-3xl border border-violet-500/20 bg-[#0f0f24]/80 p-6 backdrop-blur-xl shadow-[0_0_60px_rgba(99,102,241,0.15)]">
+          <div>
+            <Label className="text-violet-200">Email</Label>
+            <Input
+              type="email"
+              className="mt-1 border-violet-500/30 bg-[#0a0a1a] text-white"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <Label className="text-violet-200">Senha</Label>
+            <Input
+              type="password"
+              className="mt-1 border-violet-500/30 bg-[#0a0a1a] text-white"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          <Button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-gradient-to-r from-violet-500 to-cyan-400 text-white font-bold shadow-[0_0_20px_rgba(167,139,250,0.4)] hover:opacity-90"
+          >
+            {loading ? "Entrando..." : "Entrar"}
+          </Button>
 
-        <TabsContent value="login">
-          <form onSubmit={signIn} className="space-y-3 mt-4">
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-            </div>
-            <div>
-              <Label htmlFor="password">Senha</Label>
-              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-            </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Entrando..." : "Entrar"}
-            </Button>
-          </form>
-        </TabsContent>
-
-        <TabsContent value="signup">
-          <form onSubmit={signUp} className="space-y-3 mt-4">
-            <div>
-              <Label htmlFor="email2">Email</Label>
-              <Input id="email2" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-            </div>
-            <div>
-              <Label htmlFor="password2">Senha</Label>
-              <Input id="password2" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />
-            </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Criando..." : "Criar conta"}
-            </Button>
-          </form>
-        </TabsContent>
-      </Tabs>
-
-      <div className="my-6 flex items-center gap-3 text-xs text-muted-foreground">
-        <div className="h-px bg-border flex-1" /> ou <div className="h-px bg-border flex-1" />
+          <p className="text-center text-xs text-violet-200/60">
+            Ainda não tem conta?{" "}
+            <Link to="/cadastro" className="text-cyan-300 font-bold hover:underline">
+              Criar conta
+            </Link>
+          </p>
+        </form>
       </div>
-
-      <Button variant="outline" className="w-full" onClick={google}>
-        Continuar com Google
-      </Button>
     </div>
   );
 }
