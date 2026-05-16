@@ -14,7 +14,7 @@ const ADMIN_EMAIL = "nandikesiadevnandi@gmail.com";
 
 const schema = z.object({
   full_name: z.string().trim().min(2, "Diga seu nome completo").max(80),
-  school: z.string().min(1, "Escolha sua escola"),
+  school: z.string().optional().or(z.literal("")),
   class_name: z.string().trim().max(20).optional().or(z.literal("")),
   grade_year: z.number().int().min(4).max(8).optional().nullable(),
   email: z.string().trim().email("Email inválido").max(255),
