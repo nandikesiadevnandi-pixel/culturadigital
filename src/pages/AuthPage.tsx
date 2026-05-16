@@ -14,24 +14,22 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange(async (_e, session) => {
+    const redirectByRole = async (uid: string) => {
+      const { data: roles } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", uid);
+      const isAdmin = (roles ?? []).some((r) => r.role === "admin");
+      navigate(isAdmin ? "/admin" : "/aluno", { replace: true });
+    };
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
       if (!session) return;
-      // Redirect based on role
-      const { data: roles } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", session.user.id);
-      const isAdmin = (roles ?? []).some((r) => r.role === "admin");
-      navigate(isAdmin ? "/admin" : "/aluno", { replace: true });
+      // defer to avoid deadlock inside auth callback
+      setTimeout(() => redirectByRole(session.user.id), 0);
     });
-    supabase.auth.getSession().then(async ({ data }) => {
-      if (!data.session) return;
-      const { data: roles } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", data.session.user.id);
-      const isAdmin = (roles ?? []).some((r) => r.role === "admin");
-      navigate(isAdmin ? "/admin" : "/aluno", { replace: true });
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) redirectByRole(data.session.user.id);
     });
     return () => sub.subscription.unsubscribe();
   }, [navigate]);
