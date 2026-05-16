@@ -48,6 +48,7 @@ export default function CadastroPage() {
     const payload = {
       ...form,
       is_teacher: isTeacherMode,
+      school: isTeacherMode ? "Todas as escolas" : form.school,
       class_name: isTeacherMode ? "" : form.class_name,
       grade_year: isTeacherMode ? null : form.grade_year,
     };
@@ -56,8 +57,8 @@ export default function CadastroPage() {
       toast.error(parsed.error.issues[0].message);
       return;
     }
-    if (!isTeacherMode && (!parsed.data.class_name || !parsed.data.grade_year)) {
-      toast.error("Diga sua turma e ano");
+    if (!isTeacherMode && (!parsed.data.school || !parsed.data.class_name || !parsed.data.grade_year)) {
+      toast.error("Diga sua escola, turma e ano");
       return;
     }
     setLoading(true);
