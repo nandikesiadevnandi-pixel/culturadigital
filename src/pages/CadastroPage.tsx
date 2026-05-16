@@ -14,7 +14,7 @@ const ADMIN_EMAIL = "nandikesiadevnandi@gmail.com";
 
 const schema = z.object({
   full_name: z.string().trim().min(2, "Diga seu nome completo").max(80),
-  school: z.string().min(1, "Escolha sua escola"),
+  school: z.string().optional().or(z.literal("")),
   class_name: z.string().trim().max(20).optional().or(z.literal("")),
   grade_year: z.number().int().min(4).max(8).optional().nullable(),
   email: z.string().trim().email("Email inválido").max(255),
@@ -48,6 +48,7 @@ export default function CadastroPage() {
     const payload = {
       ...form,
       is_teacher: isTeacherMode,
+      school: isTeacherMode ? "Todas as escolas" : form.school,
       class_name: isTeacherMode ? "" : form.class_name,
       grade_year: isTeacherMode ? null : form.grade_year,
     };
@@ -56,8 +57,8 @@ export default function CadastroPage() {
       toast.error(parsed.error.issues[0].message);
       return;
     }
-    if (!isTeacherMode && (!parsed.data.class_name || !parsed.data.grade_year)) {
-      toast.error("Diga sua turma e ano");
+    if (!isTeacherMode && (!parsed.data.school || !parsed.data.class_name || !parsed.data.grade_year)) {
+      toast.error("Diga sua escola, turma e ano");
       return;
     }
     setLoading(true);
@@ -155,20 +156,22 @@ export default function CadastroPage() {
             </div>
           )}
 
-          <div>
-            <Label className="text-violet-200">Sua escola</Label>
-            <Select value={form.school} onValueChange={(v) => set("school", v)}>
-              <SelectTrigger className="mt-1 border-violet-500/30 bg-[#0a0a1a] text-white">
-                <SelectValue placeholder="Escolha..." />
-              </SelectTrigger>
-              <SelectContent>
-                {schools.map((s) => (
-                  <SelectItem key={s.id} value={s.name}>{s.name}</SelectItem>
-                ))}
-                <SelectItem value="Outra">Outra escola</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          {!isTeacherMode && (
+            <div>
+              <Label className="text-violet-200">Sua escola</Label>
+              <Select value={form.school} onValueChange={(v) => set("school", v)}>
+                <SelectTrigger className="mt-1 border-violet-500/30 bg-[#0a0a1a] text-white">
+                  <SelectValue placeholder="Escolha..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {schools.map((s) => (
+                    <SelectItem key={s.id} value={s.name}>{s.name}</SelectItem>
+                  ))}
+                  <SelectItem value="Outra">Outra escola</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div>
             <Label className="text-violet-200">Email</Label>
