@@ -114,32 +114,46 @@ export default function CadastroPage() {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label className="text-violet-200">Ano</Label>
-              <Select value={String(form.grade_year)} onValueChange={(v) => set("grade_year", Number(v))}>
-                <SelectTrigger className="mt-1 border-violet-500/30 bg-[#0a0a1a] text-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {[4, 5, 6, 7, 8].map((y) => (
-                    <SelectItem key={y} value={String(y)}>{y}º ano</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label className="text-violet-200">Turma</Label>
-              <Input
-                className="mt-1 border-violet-500/30 bg-[#0a0a1a] text-white placeholder:text-violet-300/30"
-                placeholder="Ex: 7A, 142"
-                value={form.class_name}
-                onChange={(e) => set("class_name", e.target.value)}
-                required
-                maxLength={20}
-              />
-            </div>
+          <div className="flex items-center gap-2 rounded-xl border border-violet-500/20 bg-[#0a0a1a] px-3 py-2">
+            <input
+              id="is_teacher"
+              type="checkbox"
+              checked={form.is_teacher}
+              onChange={(e) => set("is_teacher", e.target.checked)}
+              className="h-4 w-4 accent-cyan-400"
+            />
+            <Label htmlFor="is_teacher" className="cursor-pointer text-violet-100">
+              Sou professora (não tenho turma)
+            </Label>
           </div>
+
+          {!isTeacherMode && (
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-violet-200">Ano</Label>
+                <Select value={String(form.grade_year ?? 6)} onValueChange={(v) => set("grade_year", Number(v))}>
+                  <SelectTrigger className="mt-1 border-violet-500/30 bg-[#0a0a1a] text-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[4, 5, 6, 7, 8].map((y) => (
+                      <SelectItem key={y} value={String(y)}>{y}º ano</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-violet-200">Turma</Label>
+                <Input
+                  className="mt-1 border-violet-500/30 bg-[#0a0a1a] text-white placeholder:text-violet-300/30"
+                  placeholder="Ex: 7A, 142"
+                  value={form.class_name}
+                  onChange={(e) => set("class_name", e.target.value)}
+                  maxLength={20}
+                />
+              </div>
+            </div>
+          )}
 
           <div>
             <Label className="text-violet-200">Sua escola</Label>
