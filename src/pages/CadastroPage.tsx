@@ -29,9 +29,10 @@ export default function CadastroPage() {
     full_name: "",
     school: "",
     class_name: "",
-    grade_year: 6,
+    grade_year: 6 as number | null,
     email: "",
     password: "",
+    is_teacher: false,
   });
 
   useEffect(() => {
@@ -40,11 +41,23 @@ export default function CadastroPage() {
     });
   }, [navigate]);
 
+  const isTeacherMode = form.is_teacher || form.email.trim().toLowerCase() === ADMIN_EMAIL;
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const parsed = schema.safeParse(form);
+    const payload = {
+      ...form,
+      is_teacher: isTeacherMode,
+      class_name: isTeacherMode ? "" : form.class_name,
+      grade_year: isTeacherMode ? null : form.grade_year,
+    };
+    const parsed = schema.safeParse(payload);
     if (!parsed.success) {
       toast.error(parsed.error.issues[0].message);
+      return;
+    }
+    if (!isTeacherMode && (!parsed.data.class_name || !parsed.data.grade_year)) {
+      toast.error("Diga sua turma e ano");
       return;
     }
     setLoading(true);
@@ -56,8 +69,8 @@ export default function CadastroPage() {
         data: {
           full_name: parsed.data.full_name,
           school: parsed.data.school,
-          class_name: parsed.data.class_name,
-          grade_year: String(parsed.data.grade_year),
+          class_name: parsed.data.class_name ?? "",
+          grade_year: parsed.data.grade_year ? String(parsed.data.grade_year) : "",
         },
       },
     });
@@ -67,7 +80,7 @@ export default function CadastroPage() {
       return;
     }
     toast.success(`Bem-vindx, ${parsed.data.full_name.split(" ")[0]}! 🚀`);
-    navigate("/aluno", { replace: true });
+    navigate(isTeacherMode ? "/admin" : "/aluno", { replace: true });
   };
 
   const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) =>
