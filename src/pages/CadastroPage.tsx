@@ -156,20 +156,22 @@ export default function CadastroPage() {
             </div>
           )}
 
-          <div>
-            <Label className="text-violet-200">Sua escola</Label>
-            <Select value={form.school} onValueChange={(v) => set("school", v)}>
-              <SelectTrigger className="mt-1 border-violet-500/30 bg-[#0a0a1a] text-white">
-                <SelectValue placeholder="Escolha..." />
-              </SelectTrigger>
-              <SelectContent>
-                {schools.map((s) => (
-                  <SelectItem key={s.id} value={s.name}>{s.name}</SelectItem>
-                ))}
-                <SelectItem value="Outra">Outra escola</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          {!isTeacherMode && (
+            <div>
+              <Label className="text-violet-200">Sua escola</Label>
+              <Select value={form.school} onValueChange={(v) => set("school", v)}>
+                <SelectTrigger className="mt-1 border-violet-500/30 bg-[#0a0a1a] text-white">
+                  <SelectValue placeholder="Escolha..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {schools.map((s) => (
+                    <SelectItem key={s.id} value={s.name}>{s.name}</SelectItem>
+                  ))}
+                  <SelectItem value="Outra">Outra escola</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div>
             <Label className="text-violet-200">Email</Label>
