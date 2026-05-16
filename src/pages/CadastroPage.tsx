@@ -10,13 +10,16 @@ import { schools } from "@/data/schools";
 import { toast } from "sonner";
 import { Sparkles } from "lucide-react";
 
+const ADMIN_EMAIL = "nandikesiadevnandi@gmail.com";
+
 const schema = z.object({
   full_name: z.string().trim().min(2, "Diga seu nome completo").max(80),
   school: z.string().min(1, "Escolha sua escola"),
-  class_name: z.string().trim().min(1, "Diga sua turma").max(20),
-  grade_year: z.number().int().min(4).max(8),
+  class_name: z.string().trim().max(20).optional().or(z.literal("")),
+  grade_year: z.number().int().min(4).max(8).optional().nullable(),
   email: z.string().trim().email("Email inválido").max(255),
   password: z.string().min(6, "Mínimo 6 caracteres").max(72),
+  is_teacher: z.boolean(),
 });
 
 export default function CadastroPage() {
@@ -26,9 +29,10 @@ export default function CadastroPage() {
     full_name: "",
     school: "",
     class_name: "",
-    grade_year: 6,
+    grade_year: 6 as number | null,
     email: "",
     password: "",
+    is_teacher: false,
   });
 
   useEffect(() => {
@@ -37,11 +41,23 @@ export default function CadastroPage() {
     });
   }, [navigate]);
 
+  const isTeacherMode = form.is_teacher || form.email.trim().toLowerCase() === ADMIN_EMAIL;
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const parsed = schema.safeParse(form);
+    const payload = {
+      ...form,
+      is_teacher: isTeacherMode,
+      class_name: isTeacherMode ? "" : form.class_name,
+      grade_year: isTeacherMode ? null : form.grade_year,
+    };
+    const parsed = schema.safeParse(payload);
     if (!parsed.success) {
       toast.error(parsed.error.issues[0].message);
+      return;
+    }
+    if (!isTeacherMode && (!parsed.data.class_name || !parsed.data.grade_year)) {
+      toast.error("Diga sua turma e ano");
       return;
     }
     setLoading(true);
@@ -53,8 +69,8 @@ export default function CadastroPage() {
         data: {
           full_name: parsed.data.full_name,
           school: parsed.data.school,
-          class_name: parsed.data.class_name,
-          grade_year: String(parsed.data.grade_year),
+          class_name: parsed.data.class_name ?? "",
+          grade_year: parsed.data.grade_year ? String(parsed.data.grade_year) : "",
         },
       },
     });
@@ -64,7 +80,7 @@ export default function CadastroPage() {
       return;
     }
     toast.success(`Bem-vindx, ${parsed.data.full_name.split(" ")[0]}! 🚀`);
-    navigate("/aluno", { replace: true });
+    navigate(isTeacherMode ? "/admin" : "/aluno", { replace: true });
   };
 
   const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) =>
@@ -98,32 +114,46 @@ export default function CadastroPage() {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label className="text-violet-200">Ano</Label>
-              <Select value={String(form.grade_year)} onValueChange={(v) => set("grade_year", Number(v))}>
-                <SelectTrigger className="mt-1 border-violet-500/30 bg-[#0a0a1a] text-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {[4, 5, 6, 7, 8].map((y) => (
-                    <SelectItem key={y} value={String(y)}>{y}º ano</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label className="text-violet-200">Turma</Label>
-              <Input
-                className="mt-1 border-violet-500/30 bg-[#0a0a1a] text-white placeholder:text-violet-300/30"
-                placeholder="Ex: 7A, 142"
-                value={form.class_name}
-                onChange={(e) => set("class_name", e.target.value)}
-                required
-                maxLength={20}
-              />
-            </div>
+          <div className="flex items-center gap-2 rounded-xl border border-violet-500/20 bg-[#0a0a1a] px-3 py-2">
+            <input
+              id="is_teacher"
+              type="checkbox"
+              checked={form.is_teacher}
+              onChange={(e) => set("is_teacher", e.target.checked)}
+              className="h-4 w-4 accent-cyan-400"
+            />
+            <Label htmlFor="is_teacher" className="cursor-pointer text-violet-100">
+              Sou professora (não tenho turma)
+            </Label>
           </div>
+
+          {!isTeacherMode && (
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-violet-200">Ano</Label>
+                <Select value={String(form.grade_year ?? 6)} onValueChange={(v) => set("grade_year", Number(v))}>
+                  <SelectTrigger className="mt-1 border-violet-500/30 bg-[#0a0a1a] text-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[4, 5, 6, 7, 8].map((y) => (
+                      <SelectItem key={y} value={String(y)}>{y}º ano</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-violet-200">Turma</Label>
+                <Input
+                  className="mt-1 border-violet-500/30 bg-[#0a0a1a] text-white placeholder:text-violet-300/30"
+                  placeholder="Ex: 7A, 142"
+                  value={form.class_name}
+                  onChange={(e) => set("class_name", e.target.value)}
+                  maxLength={20}
+                />
+              </div>
+            </div>
+          )}
 
           <div>
             <Label className="text-violet-200">Sua escola</Label>
