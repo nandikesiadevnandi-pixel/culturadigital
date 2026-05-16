@@ -10,13 +10,16 @@ import { schools } from "@/data/schools";
 import { toast } from "sonner";
 import { Sparkles } from "lucide-react";
 
+const ADMIN_EMAIL = "nandikesiadevnandi@gmail.com";
+
 const schema = z.object({
   full_name: z.string().trim().min(2, "Diga seu nome completo").max(80),
   school: z.string().min(1, "Escolha sua escola"),
-  class_name: z.string().trim().min(1, "Diga sua turma").max(20),
-  grade_year: z.number().int().min(4).max(8),
+  class_name: z.string().trim().max(20).optional().or(z.literal("")),
+  grade_year: z.number().int().min(4).max(8).optional().nullable(),
   email: z.string().trim().email("Email inválido").max(255),
   password: z.string().min(6, "Mínimo 6 caracteres").max(72),
+  is_teacher: z.boolean(),
 });
 
 export default function CadastroPage() {
