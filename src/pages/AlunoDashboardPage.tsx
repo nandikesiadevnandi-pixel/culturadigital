@@ -2,7 +2,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { BookOpen, Gamepad2, Trophy, TrendingUp, Award, LogOut } from "lucide-react";
+import { BookOpen, Gamepad2, Trophy, TrendingUp, Award, LogOut, Code2 } from "lucide-react";
 
 const LEVEL_NAMES = ["Iniciante", "Aprendiz", "Codificador", "Hacker", "Mestre Digital"];
 
@@ -20,6 +20,7 @@ export default function AlunoDashboardPage() {
   const levelName = LEVEL_NAMES[Math.min(profile.level - 1, LEVEL_NAMES.length - 1)];
 
   const tiles = [
+    { to: "/aluno/codar", icon: Code2, title: "Aprendendo a Codar", desc: "HTML, CSS e JS · cria teus sites", color: "from-orange-500 via-pink-500 to-violet-600" },
     { to: "/aluno/trilha", icon: BookOpen, title: "Minha trilha", desc: `Aulas do ${profile.grade_year}º ano`, color: "from-violet-500 to-purple-600" },
     { to: "/aluno/jogos", icon: Gamepad2, title: "Jogos", desc: "Desafios e mini-games", color: "from-cyan-400 to-blue-500" },
     { to: "/avaliacao", icon: Trophy, title: "Quizzes", desc: "Mostre o que sabe", color: "from-pink-500 to-rose-500" },

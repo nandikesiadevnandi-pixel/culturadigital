@@ -20,6 +20,7 @@ import RelatoriosArchivePage from "./pages/RelatoriosArchivePage.tsx";
 import AuthPage from "./pages/AuthPage.tsx";
 import CadastroPage from "./pages/CadastroPage.tsx";
 import AlunoDashboardPage from "./pages/AlunoDashboardPage.tsx";
+import CodarHubPage from "./pages/CodarHubPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -53,6 +54,14 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <AlunoDashboardPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/aluno/codar"
+                  element={
+                    <ProtectedRoute>
+                      <CodarHubPage />
                     </ProtectedRoute>
                   }
                 />
