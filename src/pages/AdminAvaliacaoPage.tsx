@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { Lock, Trash2, Save, RefreshCw, Trophy, Sparkles } from "lucide-react";
+import { Trash2, Save, RefreshCw, Trophy, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { quizQuestions, MAX_TOTAL_SCORE, MAX_MANUAL_POINTS_PER_OPEN } from "@/data/quiz";
@@ -26,11 +25,8 @@ type Answer = {
   manual_points: number;
 };
 
-const PASS_KEY = "cd_admin_pass";
 
 export default function AdminAvaliacaoPage() {
-  const [password, setPassword] = useState(sessionStorage.getItem(PASS_KEY) || "");
-  const [authed, setAuthed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [answers, setAnswers] = useState<Answer[]>([]);
@@ -41,7 +37,7 @@ export default function AdminAvaliacaoPage() {
 
   const call = async (action: string, payload?: any) => {
     const { data, error } = await supabase.functions.invoke("admin-quiz", {
-      body: { password, action, payload },
+      body: { action, payload },
     });
     if (error) throw error;
     if ((data as any)?.error) throw new Error((data as any).error);
@@ -61,33 +57,8 @@ export default function AdminAvaliacaoPage() {
     }
   };
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      await call("verify");
-      sessionStorage.setItem(PASS_KEY, password);
-      setAuthed(true);
-      await load();
-    } catch (e: any) {
-      toast({ title: "Senha incorreta", variant: "destructive" });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    if (sessionStorage.getItem(PASS_KEY)) {
-      (async () => {
-        try {
-          await call("verify");
-          setAuthed(true);
-          await load();
-        } catch {
-          sessionStorage.removeItem(PASS_KEY);
-        }
-      })();
-    }
+    load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -138,27 +109,6 @@ export default function AdminAvaliacaoPage() {
       setAiLoading(null);
     }
   };
-
-  if (!authed) {
-    return (
-      <div className="container max-w-md py-16">
-        <form onSubmit={handleLogin} className="rounded-3xl border-2 border-primary/20 bg-card p-8 shadow-soft">
-          <div className="mb-6 text-center">
-            <div className="mx-auto mb-3 inline-flex h-16 w-16 items-center justify-center rounded-full gradient-purple text-primary-foreground shadow-glow">
-              <Lock className="h-7 w-7" />
-            </div>
-            <h1 className="font-display text-2xl font-extrabold text-gradient">Painel da Professora</h1>
-            <p className="mt-1 text-sm text-muted-foreground">Digite a senha para acessar</p>
-          </div>
-          <Label htmlFor="pass">Senha</Label>
-          <Input id="pass" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-          <Button type="submit" className="mt-4 w-full" disabled={loading}>
-            {loading ? "Verificando..." : "Entrar"}
-          </Button>
-        </form>
-      </div>
-    );
-  }
 
   return (
     <div className="container max-w-5xl py-10">
