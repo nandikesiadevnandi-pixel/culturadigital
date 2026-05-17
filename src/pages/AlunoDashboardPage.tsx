@@ -23,7 +23,7 @@ export default function AlunoDashboardPage() {
     { to: "/aluno/codar", icon: Code2, title: "Aprendendo a Codar", desc: "HTML, CSS e JS · cria teus sites", color: "from-orange-500 via-pink-500 to-violet-600" },
     { to: "/aluno/trilha", icon: BookOpen, title: "Minha trilha", desc: `Aulas do ${profile.grade_year}º ano`, color: "from-violet-500 to-purple-600" },
     { to: "/aluno/jogos", icon: Gamepad2, title: "Jogos", desc: "Desafios e mini-games", color: "from-cyan-400 to-blue-500" },
-    { to: "/avaliacao", icon: Trophy, title: "Quizzes", desc: "Mostre o que sabe", color: "from-pink-500 to-rose-500" },
+    { to: "/aluno/quizzes", icon: Trophy, title: "Quizzes", desc: "Mostre o que sabe", color: "from-pink-500 to-rose-500" },
     { to: "/aluno/evolucao", icon: TrendingUp, title: "Minha evolução", desc: "Veja seu progresso", color: "from-emerald-400 to-cyan-500" },
     { to: "/aluno/medalhas", icon: Award, title: "Medalhas", desc: "Suas conquistas", color: "from-amber-400 to-orange-500" },
     { to: "/galeria", icon: BookOpen, title: "Galeria", desc: "Fotos das aulas", color: "from-fuchsia-500 to-violet-500" },
