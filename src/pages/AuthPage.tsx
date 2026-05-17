@@ -4,18 +4,24 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { schools } from "@/data/schools";
+import { studentLoginEmail } from "@/lib/studentEmail";
 import { toast } from "sonner";
 import { Sparkles } from "lucide-react";
 
 export default function AuthPage() {
   const navigate = useNavigate();
+  const [isTeacher, setIsTeacher] = useState(false);
+  const [fullName, setFullName] = useState("");
+  const [school, setSchool] = useState("");
+  const [className, setClassName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const goHome = () => navigate("/", { replace: true });
-
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
       if (!session) return;
       setTimeout(goHome, 0);
@@ -28,10 +34,15 @@ export default function AuthPage() {
 
   const signIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    const finalEmail = isTeacher ? email.trim() : studentLoginEmail(fullName, className, school);
+    if (!isTeacher && (!fullName.trim() || !className.trim() || !school.trim())) {
+      toast.error("Preencha nome, turma e escola");
+      return;
+    }
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({ email: finalEmail, password });
     setLoading(false);
-    if (error) toast.error(error.message);
+    if (error) toast.error("Dados incorretos. Confira nome, turma, escola e senha.");
     else toast.success("Bem-vindx de volta! 🚀");
   };
 
@@ -43,22 +54,73 @@ export default function AuthPage() {
             <Sparkles className="h-6 w-6 text-white" />
           </div>
           <h1 className="font-display text-3xl font-extrabold text-white">Entrar</h1>
-          <p className="mt-2 text-sm text-violet-200/70">
-            Cultura Digital Educacional
-          </p>
+          <p className="mt-2 text-sm text-violet-200/70">Cultura Digital Educacional</p>
         </div>
 
         <form onSubmit={signIn} className="space-y-4 rounded-3xl border border-violet-500/20 bg-[#0f0f24]/80 p-6 backdrop-blur-xl shadow-[0_0_60px_rgba(99,102,241,0.15)]">
-          <div>
-            <Label className="text-violet-200">Email</Label>
-            <Input
-              type="email"
-              className="mt-1 border-violet-500/30 bg-[#0a0a1a] text-white"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
+          <div className="flex items-center gap-2 rounded-xl border border-violet-500/20 bg-[#0a0a1a] px-3 py-2">
+            <input
+              id="is_teacher"
+              type="checkbox"
+              checked={isTeacher}
+              onChange={(e) => setIsTeacher(e.target.checked)}
+              className="h-4 w-4 accent-cyan-400"
             />
+            <Label htmlFor="is_teacher" className="cursor-pointer text-violet-100">
+              Sou professora (entro com email)
+            </Label>
           </div>
+
+          {!isTeacher ? (
+            <>
+              <div>
+                <Label className="text-violet-200">Nome completo</Label>
+                <Input
+                  className="mt-1 border-violet-500/30 bg-[#0a0a1a] text-white"
+                  placeholder="Ex: Maria da Silva"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <Label className="text-violet-200">Turma</Label>
+                <Input
+                  className="mt-1 border-violet-500/30 bg-[#0a0a1a] text-white"
+                  placeholder="Ex: 7A, 142"
+                  value={className}
+                  onChange={(e) => setClassName(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <Label className="text-violet-200">Escola</Label>
+                <Select value={school} onValueChange={setSchool}>
+                  <SelectTrigger className="mt-1 border-violet-500/30 bg-[#0a0a1a] text-white">
+                    <SelectValue placeholder="Escolha..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {schools.map((s) => (
+                      <SelectItem key={s.id} value={s.name}>{s.name}</SelectItem>
+                    ))}
+                    <SelectItem value="Outra">Outra escola</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </>
+          ) : (
+            <div>
+              <Label className="text-violet-200">Email</Label>
+              <Input
+                type="email"
+                className="mt-1 border-violet-500/30 bg-[#0a0a1a] text-white"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+          )}
+
           <div>
             <Label className="text-violet-200">Senha</Label>
             <Input
@@ -69,6 +131,7 @@ export default function AuthPage() {
               required
             />
           </div>
+
           <Button
             type="submit"
             disabled={loading}
