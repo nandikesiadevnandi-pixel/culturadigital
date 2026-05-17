@@ -55,6 +55,63 @@ export type Database = {
           },
         ]
       }
+      code_challenge_progress: {
+        Row: {
+          challenge_id: string
+          completed_at: string
+          id: string
+          stars: number
+          user_id: string
+        }
+        Insert: {
+          challenge_id: string
+          completed_at?: string
+          id?: string
+          stars?: number
+          user_id: string
+        }
+        Update: {
+          challenge_id?: string
+          completed_at?: string
+          id?: string
+          stars?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      code_projects: {
+        Row: {
+          created_at: string
+          css: string
+          html: string
+          id: string
+          js: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          css?: string
+          html?: string
+          id?: string
+          js?: string
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          css?: string
+          html?: string
+          id?: string
+          js?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       monthly_reports: {
         Row: {
           created_at: string
