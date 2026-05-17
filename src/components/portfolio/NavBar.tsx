@@ -1,5 +1,5 @@
 import { NavLink, Link } from "react-router-dom";
-import { Sparkles, Menu, X, ChevronDown, User, LogIn } from "lucide-react";
+import { Sparkles, Menu, X, ChevronDown, User, LogIn, LogOut } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { usePlatform, PLATFORMS, PlatformId } from "@/contexts/PlatformContext";
@@ -70,7 +70,7 @@ const PlatformSwitcher = () => {
 };
 
 const AuthButton = () => {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, signOut } = useAuth();
   if (!user) {
     return (
       <Link
@@ -83,13 +83,26 @@ const AuthButton = () => {
     );
   }
   return (
-    <Link
-      to={isAdmin ? "/admin" : "/aluno"}
-      className="hidden sm:flex items-center gap-1.5 rounded-full bg-card px-3 py-1.5 text-xs font-bold shadow-soft hover:shadow-card"
-    >
-      <User className="h-3 w-3" />
-      {isAdmin ? "ADM" : "Meu painel"}
-    </Link>
+    <div className="hidden sm:flex items-center gap-1.5">
+      <Link
+        to={isAdmin ? "/admin" : "/aluno"}
+        className="flex items-center gap-1.5 rounded-full bg-card px-3 py-1.5 text-xs font-bold shadow-soft hover:shadow-card"
+      >
+        <User className="h-3 w-3" />
+        {isAdmin ? "ADM" : "Meu painel"}
+      </Link>
+      <button
+        onClick={async () => {
+          await signOut();
+          window.location.href = "/entrar";
+        }}
+        title="Sair"
+        className="flex items-center gap-1 rounded-full bg-card px-3 py-1.5 text-xs font-bold text-pink-600 shadow-soft hover:bg-pink-50 hover:shadow-card"
+      >
+        <LogOut className="h-3 w-3" />
+        Sair
+      </button>
+    </div>
   );
 };
 
