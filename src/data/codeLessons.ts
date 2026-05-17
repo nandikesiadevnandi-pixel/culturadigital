@@ -144,6 +144,259 @@ export const CHALLENGES: Challenge[] = [
       { description: "Muda style.color", test: ({ js }) => /style\.color/i.test(js) },
     ],
   },
+  // ===== MÓDULO A — HTML =====
+  {
+    id: "ch-html-apresentacao",
+    emoji: "👤",
+    title: "Minha Apresentação Digital",
+    brief: "Complete a página de apresentação pessoal — o código está 75% pronto, você preenche o conteúdo.",
+    xp: 40,
+    starter: {
+      html: `<!DOCTYPE html>
+<html>
+  <head>
+    <title>[SEU NOME]</title>
+  </head>
+  <body>
+    <h1>[SEU NOME AQUI]</h1>
+
+    <h2>Sobre mim</h2>
+    <p>Tenho [IDADE] anos e moro em [CIDADE].</p>
+    <p>Eu gosto muito de <strong>[ALGO QUE VOCÊ GOSTA]</strong>
+    e também de <em>[OUTRA COISA]</em>.</p>
+
+    <h2>Meu Lugar Favorito</h2>
+    <p>[ESCREVA SOBRE SEU LUGAR FAVORITO NO BRASIL]</p>
+
+    <h2>Uma Coisa que Quero Aprender</h2>
+    <p>[O QUE VOCÊ QUER APRENDER]</p>
+  </body>
+</html>`,
+      css: "",
+      js: "",
+    },
+    checks: [
+      { description: "Tem h1 com conteúdo real", test: ({ html }) => /<h1[^>]*>[^<[]+<\/h1>/i.test(html) },
+      { description: "Tem pelo menos 3 seções h2", test: ({ html }) => (html.match(/<h2/gi) || []).length >= 3 },
+      { description: "Usa <strong> para destaque", test: ({ html }) => /<strong[^>]*>[^<]+<\/strong>/i.test(html) },
+      { description: "Usa <em> para itálico", test: ({ html }) => /<em[^>]*>[^<]+<\/em>/i.test(html) },
+    ],
+  },
+  {
+    id: "ch-html-receita",
+    emoji: "🍳",
+    title: "Página de Receita Brasileira",
+    brief: "Crie uma página de receita de um prato brasileiro com: título, ingredientes, modo de preparo e dica especial.",
+    xp: 50,
+    starter: {
+      html: `<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+  </head>
+  <body>
+    <h1></h1>
+
+    <h2>Ingredientes</h2>
+    <p></p>
+
+    <h2>Modo de Preparo</h2>
+
+
+    <h3></h3>
+    <p></p>
+  </body>
+</html>`,
+      css: "",
+      js: "",
+    },
+    checks: [
+      { description: "Tem h1 com nome do prato", test: ({ html }) => /<h1[^>]*>[^<]+<\/h1>/i.test(html) },
+      { description: "Tem seção Ingredientes", test: ({ html }) => /ingredientes/i.test(html) },
+      { description: "Tem seção Modo de Preparo", test: ({ html }) => /preparo|preparo|modo/i.test(html) },
+      { description: "Usa <strong> nos ingredientes", test: ({ html }) => /<strong[^>]*>[^<]+<\/strong>/i.test(html) },
+      { description: "Tem h3 (subseção)", test: ({ html }) => /<h3/i.test(html) },
+    ],
+  },
+  // ===== MÓDULO B — CSS =====
+  {
+    id: "ch-css-paleta-bairro",
+    emoji: "🌈",
+    title: "Paleta de Cores do Meu Bairro",
+    brief: "Crie uma página com 4 elementos do seu bairro, cada um com uma cor diferente usando CSS.",
+    xp: 40,
+    starter: {
+      html: `<!DOCTYPE html>
+<html>
+  <head>
+    <title>Cores do Meu Bairro</title>
+    <style>
+
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background-color: /* SUA COR */;
+      }
+
+      h1 {
+        color: /* SUA COR */;
+        text-align: center;
+      }
+
+      .elemento-1 { color: /* COR */; background-color: /* COR */; padding: 12px; margin-bottom: 10px; }
+      .elemento-2 { color: /* COR */; background-color: /* COR */; padding: 12px; margin-bottom: 10px; }
+      .elemento-3 { color: /* COR */; background-color: /* COR */; padding: 12px; margin-bottom: 10px; }
+      .elemento-4 { color: /* COR */; background-color: /* COR */; padding: 12px; margin-bottom: 10px; }
+
+    </style>
+  </head>
+  <body>
+    <h1>Cores do Bairro [SEU BAIRRO OU CIDADE]</h1>
+    <p class="elemento-1"><strong>A Praça:</strong> [DESCREVA]</p>
+    <p class="elemento-2"><strong>A Escola:</strong> [DESCREVA]</p>
+    <p class="elemento-3"><strong>A Padaria:</strong> [DESCREVA]</p>
+    <p class="elemento-4"><strong>O Parque:</strong> [DESCREVA]</p>
+  </body>
+</html>`,
+      css: "",
+      js: "",
+    },
+    checks: [
+      { description: "Tem 4 classes de elementos", test: ({ html }) => (html.match(/class="elemento-[1-4]"/g) || []).length >= 4 },
+      { description: "CSS tem background-color em pelo menos 2 classes", test: ({ html }) => (html.match(/background-color\s*:/g) || []).length >= 2 },
+      { description: "Tem conteúdo real (não placeholder)", test: ({ html }) => !/\[DESCREVA\]|\[SUA COR\]|\[COR\]/.test(html) },
+    ],
+  },
+  {
+    id: "ch-css-card-atleta",
+    emoji: "🏅",
+    title: "Card de Atleta Brasileiro",
+    brief: "Crie um card de perfil de um atleta brasileiro com: fundo escuro, card com borda colorida, cantos arredondados e nome em destaque.",
+    xp: 55,
+    starter: {
+      html: `<!DOCTYPE html>
+<html>
+  <head>
+    <title>Card de Atleta</title>
+    <style>
+
+      body {
+        background-color: ;
+        font-family: Arial, sans-serif;
+        padding: 40px;
+      }
+
+      .card {
+        width: px;
+        background-color: ;
+        border: px solid ;
+        border-radius: px;
+        padding: px;
+      }
+
+      .card h2 {
+        color: ;
+        font-size: px;
+        margin-bottom: px;
+      }
+
+      .esporte {
+        font-style: italic;
+        color: ;
+        margin-bottom: px;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h2></h2>
+      <p class="esporte"></p>
+      <p></p>
+    </div>
+  </body>
+</html>`,
+      css: "",
+      js: "",
+    },
+    checks: [
+      { description: "Tem .card com width definida", test: ({ html }) => /\.card\s*\{[^}]*width\s*:\s*\d+px/i.test(html) },
+      { description: "Tem border-radius no card", test: ({ html }) => /\.card\s*\{[^}]*border-radius\s*:/i.test(html) },
+      { description: "Tem padding no card", test: ({ html }) => /\.card\s*\{[^}]*padding\s*:\s*\d+/i.test(html) },
+      { description: "Card tem conteúdo real", test: ({ html }) => /<h2[^>]*>[^<]+<\/h2>/i.test(html) },
+    ],
+  },
+  // ===== MÓDULO C — CSS AVANÇADO =====
+  {
+    id: "ch-css-navbar-flex",
+    emoji: "🧭",
+    title: "Navbar com Flexbox",
+    brief: "Crie a barra de navegação de um time de futebol brasileiro: logo à esquerda, links ao centro, botão à direita — usando display: flex.",
+    xp: 40,
+    starter: {
+      html: `<!DOCTYPE html>
+<html>
+  <head>
+    <title>Site do Time</title>
+    <style>
+
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+
+      body { font-family: Arial, sans-serif; }
+
+      .navbar {
+        /* Preencha: background-color do time, display: flex,
+           align-items: center, justify-content: space-between,
+           padding: 0 32px, height: 64px */
+      }
+
+      .logo {
+        /* Preencha: color, font-size, font-weight, text-decoration */
+      }
+
+      .links {
+        display: flex;
+        gap: 8px;
+        list-style: none;
+      }
+
+      .links a {
+        /* Preencha: color, text-decoration, padding, font-size */
+      }
+
+      .links a:hover {
+        /* Preencha: algum efeito de hover */
+      }
+
+      .btn-inscricao {
+        /* Preencha: background-color, color, border, padding, border-radius, cursor */
+      }
+
+    </style>
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="logo">NOME DO TIME</div>
+      <ul class="links">
+        <li><a href="#">Início</a></li>
+        <li><a href="#">Elenco</a></li>
+        <li><a href="#">Jogos</a></li>
+        <li><a href="#">Loja</a></li>
+      </ul>
+      <button class="btn-inscricao">Seja Sócio</button>
+    </nav>
+  </body>
+</html>`,
+      css: "",
+      js: "",
+    },
+    checks: [
+      { description: "Navbar tem display: flex", test: ({ html }) => /\.navbar\s*\{[^}]*display\s*:\s*flex/i.test(html) },
+      { description: "Navbar tem justify-content: space-between", test: ({ html }) => /\.navbar\s*\{[^}]*justify-content\s*:\s*space-between/i.test(html) },
+      { description: "Links têm color definida", test: ({ html }) => /\.links\s*a\s*\{[^}]*color\s*:/i.test(html) },
+      { description: "Botão tem background-color", test: ({ html }) => /\.btn-inscricao\s*\{[^}]*background-color\s*:/i.test(html) },
+    ],
+  },
 ];
 
 export const TOTAL_CHALLENGE_XP = CHALLENGES.reduce((a, c) => a + c.xp, 0);
