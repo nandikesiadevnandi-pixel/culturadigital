@@ -9,7 +9,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 import { LESSONS, CHALLENGES, Challenge } from "@/data/codeLessons";
-import { Play, Save, Trash2, Star, Sparkles, BookOpen, Code2, Trophy, Rocket, ArrowLeft } from "lucide-react";
+import { EXAMPLES, Example } from "@/data/codeExamples";
+import { Play, Save, Trash2, Star, Sparkles, BookOpen, Code2, Trophy, Rocket, ArrowLeft, Wand2, FolderHeart } from "lucide-react";
 import { Link } from "react-router-dom";
 
 type Project = {
@@ -124,6 +125,17 @@ export default function CodarHubPage() {
     setTab("playground");
   };
 
+  const loadExample = (ex: Example) => {
+    setActiveChallenge(null);
+    setCurrentProjectId(null);
+    setTitle(`Cópia de: ${ex.title}`);
+    setHtml(ex.html);
+    setCss(ex.css);
+    setJs(ex.js);
+    setTab("playground");
+    toast({ title: `Exemplo aberto! ${ex.emoji}`, description: "Agora altera o código e vê o que acontece ✨" });
+  };
+
   const submitChallenge = async () => {
     if (!activeChallenge || !user) return;
     const results = activeChallenge.checks.map((c) => ({ d: c.description, ok: c.test({ html, css, js }) }));
@@ -189,8 +201,9 @@ export default function CodarHubPage() {
         </div>
 
         <Tabs value={tab} onValueChange={setTab}>
-          <TabsList className="bg-[#0f0f24] border border-violet-500/20">
+          <TabsList className="bg-[#0f0f24] border border-violet-500/20 flex-wrap h-auto">
             <TabsTrigger value="aulas"><BookOpen className="mr-1 h-4 w-4" /> Aulas</TabsTrigger>
+            <TabsTrigger value="exemplos"><Wand2 className="mr-1 h-4 w-4" /> Exemplos</TabsTrigger>
             <TabsTrigger value="playground"><Code2 className="mr-1 h-4 w-4" /> Playground</TabsTrigger>
             <TabsTrigger value="desafios"><Trophy className="mr-1 h-4 w-4" /> Desafios</TabsTrigger>
             <TabsTrigger value="sites"><Rocket className="mr-1 h-4 w-4" /> Meus sites</TabsTrigger>
