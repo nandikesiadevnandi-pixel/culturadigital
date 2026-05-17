@@ -1,13 +1,19 @@
+import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { BookOpen, Gamepad2, Trophy, TrendingUp, Award, LogOut } from "lucide-react";
 
 const LEVEL_NAMES = ["Iniciante", "Aprendiz", "Codificador", "Hacker", "Mestre Digital"];
 
 export default function AlunoDashboardPage() {
-  const { profile, signOut } = useAuth();
+  const { profile, signOut, isAdmin } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAdmin) navigate("/admin", { replace: true });
+  }, [isAdmin, navigate]);
 
   if (!profile) {
     return <div className="container py-20 text-center text-muted-foreground">Carregando perfil...</div>;
