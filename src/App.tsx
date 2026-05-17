@@ -21,6 +21,11 @@ import AuthPage from "./pages/AuthPage.tsx";
 import CadastroPage from "./pages/CadastroPage.tsx";
 import AlunoDashboardPage from "./pages/AlunoDashboardPage.tsx";
 import CodarHubPage from "./pages/CodarHubPage.tsx";
+import TrilhaPage from "./pages/TrilhaPage.tsx";
+import JogosPage from "./pages/JogosPage.tsx";
+import QuizzesPage from "./pages/QuizzesPage.tsx";
+import EvolucaoPage from "./pages/EvolucaoPage.tsx";
+import MedalhasPage from "./pages/MedalhasPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -57,14 +62,12 @@ const App = () => (
                     </ProtectedRoute>
                   }
                 />
-                <Route
-                  path="/aluno/codar"
-                  element={
-                    <ProtectedRoute>
-                      <CodarHubPage />
-                    </ProtectedRoute>
-                  }
-                />
+                <Route path="/aluno/codar" element={<ProtectedRoute><CodarHubPage /></ProtectedRoute>} />
+                <Route path="/aluno/trilha" element={<ProtectedRoute><TrilhaPage /></ProtectedRoute>} />
+                <Route path="/aluno/jogos" element={<ProtectedRoute><JogosPage /></ProtectedRoute>} />
+                <Route path="/aluno/quizzes" element={<ProtectedRoute><QuizzesPage /></ProtectedRoute>} />
+                <Route path="/aluno/evolucao" element={<ProtectedRoute><EvolucaoPage /></ProtectedRoute>} />
+                <Route path="/aluno/medalhas" element={<ProtectedRoute><MedalhasPage /></ProtectedRoute>} />
 
                 {/* Admin */}
                 <Route
