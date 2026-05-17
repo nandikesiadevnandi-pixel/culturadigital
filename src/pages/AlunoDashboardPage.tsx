@@ -8,12 +8,7 @@ import { BookOpen, Gamepad2, Trophy, TrendingUp, Award, LogOut } from "lucide-re
 const LEVEL_NAMES = ["Iniciante", "Aprendiz", "Codificador", "Hacker", "Mestre Digital"];
 
 export default function AlunoDashboardPage() {
-  const { profile, signOut, isAdmin } = useAuth();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (isAdmin) navigate("/admin", { replace: true });
-  }, [isAdmin, navigate]);
+  const { profile, signOut } = useAuth();
 
   if (!profile) {
     return <div className="container py-20 text-center text-muted-foreground">Carregando perfil...</div>;

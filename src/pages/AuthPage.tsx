@@ -14,22 +14,14 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const redirectByRole = async (uid: string) => {
-      const { data: roles } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", uid);
-      const isAdmin = (roles ?? []).some((r) => r.role === "admin");
-      navigate(isAdmin ? "/admin" : "/aluno", { replace: true });
-    };
+    const goHome = () => navigate("/", { replace: true });
 
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
       if (!session) return;
-      // defer to avoid deadlock inside auth callback
-      setTimeout(() => redirectByRole(session.user.id), 0);
+      setTimeout(goHome, 0);
     });
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) redirectByRole(data.session.user.id);
+      if (data.session) goHome();
     });
     return () => sub.subscription.unsubscribe();
   }, [navigate]);
