@@ -12,19 +12,37 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const ADMIN_PASSWORD = Deno.env.get("ADMIN_PASSWORD");
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
 
     const body = await req.json().catch(() => ({}));
-    const { password, action, payload } = body ?? {};
+    const { action, payload } = body ?? {};
 
-    if (!ADMIN_PASSWORD || password !== ADMIN_PASSWORD) {
-      return new Response(JSON.stringify({ error: "Senha incorreta" }), {
+    // Verify caller is an authenticated admin via JWT
+    const authHeader = req.headers.get("Authorization") ?? "";
+    const userClient = createClient(SUPABASE_URL, ANON_KEY, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: userData } = await userClient.auth.getUser();
+    const user = userData?.user;
+    if (!user) {
+      return new Response(JSON.stringify({ error: "Não autenticado" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+    const { data: isAdmin } = await userClient.rpc("has_role", {
+      _user_id: user.id,
+      _role: "admin",
+    });
+    if (!isAdmin) {
+      return new Response(JSON.stringify({ error: "Acesso negado" }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
 
     const supabase = createClient(SUPABASE_URL, SERVICE_KEY);
 
