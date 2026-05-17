@@ -252,7 +252,60 @@ export default function CodarHubPage() {
             </div>
           </TabsContent>
 
-          {/* PLAYGROUND */}
+          {/* EXEMPLOS */}
+          <TabsContent value="exemplos" className="mt-6">
+            <Card className="mb-4 border-violet-500/20 bg-[#0f0f24]/80 p-4">
+              <p className="text-sm text-violet-100/90">
+                <FolderHeart className="inline h-4 w-4 mr-1 text-pink-300" />
+                Aqui tens uma <strong>pasta de inspirações</strong> 🎁 — clica em "Abrir no Playground" pra carregar o código.
+                Depois <strong>muda as cores, os textos, os números</strong> e vê o que acontece! É assim que se aprende a codar 💜
+              </p>
+            </Card>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {EXAMPLES.map((ex) => (
+                <Card key={ex.id} className="border-violet-500/20 bg-[#0f0f24]/80 overflow-hidden flex flex-col">
+                  <iframe
+                    title={ex.title}
+                    srcDoc={buildSrcDoc(ex.html, ex.css, ex.js)}
+                    sandbox="allow-scripts"
+                    className="w-full h-44 bg-white pointer-events-none border-b border-violet-500/20"
+                  />
+                  <div className="p-4 flex-1 flex flex-col">
+                    <div className="flex items-start justify-between gap-2 mb-1">
+                      <h3 className="font-display text-lg font-extrabold text-white">
+                        {ex.emoji} {ex.title}
+                      </h3>
+                      <Badge
+                        variant="outline"
+                        className={
+                          ex.difficulty === "fácil"
+                            ? "border-emerald-400/40 text-emerald-200 bg-emerald-500/10"
+                            : ex.difficulty === "médio"
+                            ? "border-amber-400/40 text-amber-200 bg-amber-500/10"
+                            : "border-pink-400/40 text-pink-200 bg-pink-500/10"
+                        }
+                      >
+                        {ex.difficulty}
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-violet-200/60 mb-3 flex-1">{ex.description}</p>
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      {ex.tags.map((t) => (
+                        <span key={t} className="text-[10px] px-2 py-0.5 rounded-full bg-violet-500/15 text-violet-200 border border-violet-500/30">
+                          #{t}
+                        </span>
+                      ))}
+                    </div>
+                    <Button onClick={() => loadExample(ex)} className="w-full bg-gradient-to-r from-violet-500 to-cyan-400">
+                      <Wand2 className="mr-1 h-4 w-4" /> Abrir no Playground
+                    </Button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+
           <TabsContent value="playground" className="mt-6">
             <Card className="border-violet-500/20 bg-[#0f0f24]/80 p-4 mb-4">
               <div className="flex items-center gap-3 flex-wrap">
