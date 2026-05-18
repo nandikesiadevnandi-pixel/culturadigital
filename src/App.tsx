@@ -80,6 +80,14 @@ const App = () => (
                   }
                 />
                 <Route
+                  path="/admin/alunos"
+                  element={
+                    <ProtectedRoute requireAdmin>
+                      <AdminStudentsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
                   path="/admin/relatorios"
                   element={
                     <ProtectedRoute requireAdmin>
