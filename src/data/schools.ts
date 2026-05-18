@@ -19,7 +19,7 @@ export const schools: School[] = [
     short: "Bertholdo",
     day: "Segunda-feira",
     accent: "gradient-blue",
-    classes: [], // adicione as turmas conforme forem começando
+    classes: ["6A", "6B"],
   },
   {
     id: "ernesto",
