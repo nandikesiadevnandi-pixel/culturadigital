@@ -26,6 +26,7 @@ import JogosPage from "./pages/JogosPage.tsx";
 import QuizzesPage from "./pages/QuizzesPage.tsx";
 import EvolucaoPage from "./pages/EvolucaoPage.tsx";
 import MedalhasPage from "./pages/MedalhasPage.tsx";
+import AdminStudentsPage from "./pages/AdminStudentsPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -75,6 +76,14 @@ const App = () => (
                   element={
                     <ProtectedRoute requireAdmin>
                       <AdminAvaliacaoPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/alunos"
+                  element={
+                    <ProtectedRoute requireAdmin>
+                      <AdminStudentsPage />
                     </ProtectedRoute>
                   }
                 />

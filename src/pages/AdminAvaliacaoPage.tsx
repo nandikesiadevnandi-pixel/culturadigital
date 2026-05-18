@@ -119,7 +119,13 @@ export default function AdminAvaliacaoPage() {
             {submissions.length} resposta(s). Cada questão aberta vale 0–{MAX_MANUAL_POINTS_PER_OPEN} pontos.
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
+          <a
+            href="/admin/alunos"
+            className="inline-flex items-center rounded-md border px-3 py-1.5 text-sm font-bold hover:bg-muted"
+          >
+            👥 Alunos / Senhas
+          </a>
           <a
             href="/admin/folha-registro"
             className="inline-flex items-center rounded-md border px-3 py-1.5 text-sm font-bold hover:bg-muted"
