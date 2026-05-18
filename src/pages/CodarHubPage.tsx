@@ -8,9 +8,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
-import { LESSONS, CHALLENGES, Challenge } from "@/data/codeLessons";
+import { LESSONS, CHALLENGES, Challenge, ChallengeStep } from "@/data/codeLessons";
 import { EXAMPLES, Example } from "@/data/codeExamples";
-import { Play, Save, Trash2, Star, Sparkles, BookOpen, Code2, Trophy, Rocket, ArrowLeft, Wand2, FolderHeart } from "lucide-react";
+import { Play, Save, Trash2, Star, Sparkles, BookOpen, Code2, Trophy, Rocket, ArrowLeft, Wand2, FolderHeart, ChevronDown, ChevronUp, Lightbulb } from "lucide-react";
 import { Link } from "react-router-dom";
 
 type Project = {
@@ -46,6 +46,7 @@ export default function CodarHubPage() {
   // challenge state
   const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
   const [activeChallenge, setActiveChallenge] = useState<Challenge | null>(null);
+  const [hintOpen, setHintOpen] = useState<Set<number>>(new Set());
 
   const run = () => setSrcDoc(buildSrcDoc(html, css, js));
   useEffect(() => {
@@ -117,12 +118,21 @@ export default function CodarHubPage() {
 
   const startChallenge = (c: Challenge) => {
     setActiveChallenge(c);
+    setHintOpen(new Set());
     setCurrentProjectId(null);
     setTitle(`Desafio: ${c.title}`);
     setHtml(c.starter.html);
     setCss(c.starter.css);
     setJs(c.starter.js);
     setTab("playground");
+  };
+
+  const toggleHint = (i: number) => {
+    setHintOpen((prev) => {
+      const next = new Set(prev);
+      next.has(i) ? next.delete(i) : next.add(i);
+      return next;
+    });
   };
 
   const loadExample = (ex: Example) => {
@@ -337,6 +347,46 @@ export default function CodarHubPage() {
                 <p className="mt-3 text-sm text-pink-100/90">{activeChallenge.brief}</p>
               )}
             </Card>
+
+            {activeChallenge?.steps && (
+              <Card className="border-pink-500/20 bg-[#0f0f24]/80 p-4 mb-4">
+                <div className="mb-3 flex items-center gap-2 text-sm font-bold text-pink-200">
+                  <Lightbulb className="h-4 w-4" />
+                  Guia passo a passo — {activeChallenge.steps.length} passos
+                </div>
+                <div className="space-y-2">
+                  {activeChallenge.steps.map((step: ChallengeStep, i: number) => (
+                    <div key={i} className="rounded-lg border border-violet-500/20 bg-black/30 p-3">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex gap-2 min-w-0">
+                          <span className="mt-0.5 shrink-0 text-xs font-bold text-pink-300">
+                            {i + 1}.
+                          </span>
+                          <span className="text-sm text-violet-100/90 leading-relaxed">{step.instruction}</span>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="shrink-0 text-cyan-300 hover:text-cyan-100 text-xs h-7 px-2"
+                          onClick={() => toggleHint(i)}
+                        >
+                          {hintOpen.has(i) ? (
+                            <><ChevronUp className="h-3 w-3 mr-1" />Esconder</>
+                          ) : (
+                            <><Lightbulb className="h-3 w-3 mr-1" />Ver dica</>
+                          )}
+                        </Button>
+                      </div>
+                      {hintOpen.has(i) && (
+                        <pre className="mt-2 overflow-x-auto rounded bg-black/60 border border-cyan-500/20 p-3 text-xs text-cyan-300 whitespace-pre-wrap">
+                          {step.hint}
+                        </pre>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            )}
 
             <div className="grid gap-4 lg:grid-cols-2">
               <div className="space-y-3">

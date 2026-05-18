@@ -58,6 +58,11 @@ export const LESSONS: Lesson[] = [
   },
 ];
 
+export type ChallengeStep = {
+  instruction: string;
+  hint: string;
+};
+
 export type Challenge = {
   id: string;
   emoji: string;
@@ -67,6 +72,7 @@ export type Challenge = {
   starter: { html: string; css: string; js: string };
   // checks rodam em strings de código (case-insensitive)
   checks: { description: string; test: (code: { html: string; css: string; js: string }) => boolean }[];
+  steps?: ChallengeStep[];
 };
 
 const norm = (s: string) => s.toLowerCase().replace(/\s+/g, "");
@@ -86,6 +92,24 @@ export const CHALLENGES: Challenge[] = [
         test: ({ css }) => /h1[^{]*\{[^}]*color\s*:\s*(pink|hotpink|#ff[0-9a-f]{4}|deeppink)/i.test(css),
       },
     ],
+    steps: [
+      {
+        instruction: "No HTML, troca o texto dentro do <h1> pelo nome do seu site. Só mude o texto entre as tags.",
+        hint: "<h1>Minha Página</h1>",
+      },
+      {
+        instruction: "Agora vai no CSS e escreve h1 { — isso abre o bloco de estilo do título.",
+        hint: "h1 {\n\n}",
+      },
+      {
+        instruction: "Dentro das chaves { }, escreve color: pink; para pintar o título de rosa.",
+        hint: "h1 {\n  color: pink;\n}",
+      },
+      {
+        instruction: "Clica em Rodar e veja o título rosa! Tenta trocar pink por hotpink para um rosa mais forte.",
+        hint: "h1 {\n  color: hotpink;\n}",
+      },
+    ],
   },
   {
     id: "ch-bg-button",
@@ -99,6 +123,20 @@ export const CHALLENGES: Challenge[] = [
       { description: "Tem um <button>", test: ({ html }) => /<button[\s>]/i.test(html) },
       { description: "Botão tem o texto 'Clique aqui'", test: ({ html }) => /clique\s*aqui/i.test(html) },
     ],
+    steps: [
+      {
+        instruction: "No CSS, dentro de body { }, escreve background: orange; — isso pinta o fundo de laranja.",
+        hint: "body {\n  background: orange;\n}",
+      },
+      {
+        instruction: "No HTML, depois do <h1>Oi!</h1>, escreve a tag de botão com o texto 'Clique aqui'.",
+        hint: "<button>Clique aqui</button>",
+      },
+      {
+        instruction: "Tenta trocar orange por outra cor que você gostar! (purple, green, #ff6b6b...)",
+        hint: "body {\n  background: purple;\n}",
+      },
+    ],
   },
   {
     id: "ch-alert-js",
@@ -110,6 +148,20 @@ export const CHALLENGES: Challenge[] = [
     checks: [
       { description: "Usa alert(...)", test: ({ js }) => /alert\s*\(/i.test(js) },
       { description: "Mensagem 'Oi turma'", test: ({ js }) => /oi\s*turma/i.test(js) },
+    ],
+    steps: [
+      {
+        instruction: "Apaga o comentário '// escreve aqui' e começa a digitar: alert( — sim, a palavra alert e depois um parêntese.",
+        hint: "alert(",
+      },
+      {
+        instruction: "Dentro dos parênteses, coloca o texto entre aspas simples. Ex: 'Oi turma!'",
+        hint: "alert('Oi turma!'",
+      },
+      {
+        instruction: "Fecha com ) e ponto e vírgula ; — depois clica em Rodar. Uma janela vai aparecer!",
+        hint: "alert('Oi turma!');",
+      },
     ],
   },
   {
@@ -124,6 +176,24 @@ export const CHALLENGES: Challenge[] = [
       {
         description: "Está centralizado (text-align center ou flex)",
         test: ({ css }) => /text-align\s*:\s*center/i.test(css) || /display\s*:\s*flex/i.test(css),
+      },
+    ],
+    steps: [
+      {
+        instruction: "No HTML, substitui 'Teu nome' pelo seu nome real dentro do <h1>.",
+        hint: "<h1>Maria Silva</h1>",
+      },
+      {
+        instruction: "Substitui 'Turma' pela sua turma real dentro do <p>.",
+        hint: "<p>6 ano - Turma 401</p>",
+      },
+      {
+        instruction: "No CSS, apaga o comentário e escreve text-align: center; dentro de body { }.",
+        hint: "body {\n  text-align: center;\n}",
+      },
+      {
+        instruction: "Agora personaliza com cores! Adiciona background e color no body para deixar com a sua cara.",
+        hint: "body {\n  text-align: center;\n  background: #1a1a2e;\n  color: white;\n  padding: 40px;\n}",
       },
     ],
   },
@@ -142,6 +212,24 @@ export const CHALLENGES: Challenge[] = [
       { description: "Pega o elemento (getElementById ou querySelector)", test: ({ js }) => /getElementById|querySelector/i.test(js) },
       { description: "Define um onclick / addEventListener", test: ({ js }) => /onclick|addEventListener/i.test(js) },
       { description: "Muda style.color", test: ({ js }) => /style\.color/i.test(js) },
+    ],
+    steps: [
+      {
+        instruction: "No JS, apaga o comentário e escreve document.getElementById('titulo') — isso pega o elemento pelo id.",
+        hint: "document.getElementById('titulo')",
+      },
+      {
+        instruction: "Depois do getElementById, adiciona .onclick = function() { — isso diz o que acontece ao clicar.",
+        hint: "document.getElementById('titulo').onclick = function() {",
+      },
+      {
+        instruction: "Dentro das chaves { }, muda a cor com this.style.color = 'hotpink';",
+        hint: "document.getElementById('titulo').onclick = function() {\n  this.style.color = 'hotpink';\n}",
+      },
+      {
+        instruction: "Fecha com }; e clica em Rodar. Agora clica no titulo na preview e veja a magia!",
+        hint: "document.getElementById('titulo').onclick = function() {\n  this.style.color = 'hotpink';\n};",
+      },
     ],
   },
   // ===== MÓDULO A — HTML =====
@@ -181,6 +269,28 @@ export const CHALLENGES: Challenge[] = [
       { description: "Usa <strong> para destaque", test: ({ html }) => /<strong[^>]*>[^<]+<\/strong>/i.test(html) },
       { description: "Usa <em> para itálico", test: ({ html }) => /<em[^>]*>[^<]+<\/em>/i.test(html) },
     ],
+    steps: [
+      {
+        instruction: "Substitui [SEU NOME AQUI] pelo seu nome real no <h1> e também no <title> no topo do HTML.",
+        hint: "<title>Carlos Mendes</title>\n...\n<h1>Carlos Mendes</h1>",
+      },
+      {
+        instruction: "Preenche [IDADE] e [CIDADE] com os seus dados reais no primeiro parágrafo.",
+        hint: "<p>Tenho 12 anos e moro em Salvador.</p>",
+      },
+      {
+        instruction: "Dentro de <strong>, escreve algo que você gosta muito (ex: futebol, dança, culinária).",
+        hint: "<strong>jogar futebol</strong>",
+      },
+      {
+        instruction: "Dentro de <em>, escreve outra coisa que gosta — vai aparecer em itálico.",
+        hint: "<em>ouvir música baiana</em>",
+      },
+      {
+        instruction: "Complete os dois ultimos parágrafos com seu lugar favorito e o que quer aprender.",
+        hint: "<p>Meu lugar favorito é a Praia do Porto da Barra em Salvador.</p>",
+      },
+    ],
   },
   {
     id: "ch-html-receita",
@@ -216,6 +326,28 @@ export const CHALLENGES: Challenge[] = [
       { description: "Tem seção Modo de Preparo", test: ({ html }) => /preparo|preparo|modo/i.test(html) },
       { description: "Usa <strong> nos ingredientes", test: ({ html }) => /<strong[^>]*>[^<]+<\/strong>/i.test(html) },
       { description: "Tem h3 (subseção)", test: ({ html }) => /<h3/i.test(html) },
+    ],
+    steps: [
+      {
+        instruction: "No <h1>, escreve o nome de um prato brasileiro que você gosta. Ex: Acarajé, Coxinha, Feijoada.",
+        hint: "<h1>Acarajé</h1>",
+      },
+      {
+        instruction: "No <title> (dentro do <head>), coloca o mesmo nome do prato.",
+        hint: "<title>Acarajé</title>",
+      },
+      {
+        instruction: "Na seção Ingredientes, escreve os ingredientes dentro do <p>.",
+        hint: "<p>Feijão-fradinho, camarão seco, azeite de dendê, cebola e sal.</p>",
+      },
+      {
+        instruction: "Envolve pelo menos um ingrediente importante com <strong>ingrediente</strong> para destacar.",
+        hint: "<p>Feijão-fradinho, camarão seco, <strong>azeite de dendê</strong>, cebola e sal.</p>",
+      },
+      {
+        instruction: "No <h3>, escreve um título de subseção — ex: Dica Especial ou Tempo de Preparo.",
+        hint: "<h3>Dica Especial</h3>",
+      },
     ],
   },
   // ===== MÓDULO B — CSS =====
@@ -265,6 +397,28 @@ export const CHALLENGES: Challenge[] = [
       { description: "Tem 4 classes de elementos", test: ({ html }) => (html.match(/class="elemento-[1-4]"/g) || []).length >= 4 },
       { description: "CSS tem background-color em pelo menos 2 classes", test: ({ html }) => (html.match(/background-color\s*:/g) || []).length >= 2 },
       { description: "Tem conteúdo real (não placeholder)", test: ({ html }) => !/\[DESCREVA\]|\[SUA COR\]|\[COR\]/.test(html) },
+    ],
+    steps: [
+      {
+        instruction: "Substitui [SEU BAIRRO OU CIDADE] pelo nome do seu bairro ou cidade no <h1>.",
+        hint: "<h1>Cores do Bairro Pelourinho</h1>",
+      },
+      {
+        instruction: "No CSS do body (dentro do <style>), substitui /* SUA COR */ por uma cor de fundo para a página.",
+        hint: "background-color: #f5f0e8;",
+      },
+      {
+        instruction: "Em .elemento-1, troca /* COR */ por uma cor real em color (texto) e outra em background-color.",
+        hint: ".elemento-1 { color: white; background-color: #e74c3c; padding: 12px; margin-bottom: 10px; }",
+      },
+      {
+        instruction: "Repete para .elemento-2, .elemento-3 e .elemento-4 com cores diferentes cada um.",
+        hint: ".elemento-2 { color: white; background-color: #3498db; padding: 12px; margin-bottom: 10px; }",
+      },
+      {
+        instruction: "Substitui [DESCREVA] em cada parágrafo com uma frase real sobre esse lugar do seu bairro.",
+        hint: "<p class=\"elemento-1\"><strong>A Praca:</strong> E onde todo mundo se encontra no fim de semana.</p>",
+      },
     ],
   },
   {
@@ -324,6 +478,28 @@ export const CHALLENGES: Challenge[] = [
       { description: "Tem border-radius no card", test: ({ html }) => /\.card\s*\{[^}]*border-radius\s*:/i.test(html) },
       { description: "Tem padding no card", test: ({ html }) => /\.card\s*\{[^}]*padding\s*:\s*\d+/i.test(html) },
       { description: "Card tem conteúdo real", test: ({ html }) => /<h2[^>]*>[^<]+<\/h2>/i.test(html) },
+    ],
+    steps: [
+      {
+        instruction: "No body do CSS, escreve background-color: #1a1a2e; para um fundo escuro elegante.",
+        hint: "body {\n  background-color: #1a1a2e;\n  font-family: Arial, sans-serif;\n  padding: 40px;\n}",
+      },
+      {
+        instruction: "No .card, escreve width: 300px; e background-color: #2a2a3e; para o tamanho e cor do card.",
+        hint: ".card {\n  width: 300px;\n  background-color: #2a2a3e;\n}",
+      },
+      {
+        instruction: "Adiciona border: 2px solid gold; e border-radius: 12px; no .card para a borda dourada arredondada.",
+        hint: ".card {\n  width: 300px;\n  background-color: #2a2a3e;\n  border: 2px solid gold;\n  border-radius: 12px;\n  padding: 20px;\n}",
+      },
+      {
+        instruction: "No <h2>, escreve o nome de um atleta brasileiro. Ex: Marta, Rebeca Andrade, Neymar.",
+        hint: "<h2>Rebeca Andrade</h2>",
+      },
+      {
+        instruction: "No <p class='esporte'>, escreve o esporte. No outro <p>, escreve uma conquista famosa.",
+        hint: "<p class=\"esporte\">Ginastica Artistica</p>\n<p>Primeira brasileira a ganhar ouro olimpico na modalidade.</p>",
+      },
     ],
   },
   // ===== MÓDULO C — CSS AVANÇADO =====
@@ -395,6 +571,28 @@ export const CHALLENGES: Challenge[] = [
       { description: "Navbar tem justify-content: space-between", test: ({ html }) => /\.navbar\s*\{[^}]*justify-content\s*:\s*space-between/i.test(html) },
       { description: "Links têm color definida", test: ({ html }) => /\.links\s*a\s*\{[^}]*color\s*:/i.test(html) },
       { description: "Botão tem background-color", test: ({ html }) => /\.btn-inscricao\s*\{[^}]*background-color\s*:/i.test(html) },
+    ],
+    steps: [
+      {
+        instruction: "Substitui 'NOME DO TIME' pelo nome de um time brasileiro no <div class='logo'>.",
+        hint: "<div class=\"logo\">Flamengo</div>",
+      },
+      {
+        instruction: "No .navbar do CSS, escreve display: flex; e align-items: center; para alinhar os itens.",
+        hint: "display: flex;\nalign-items: center;",
+      },
+      {
+        instruction: "Adiciona justify-content: space-between; para separar logo, links e botão nas extremidades.",
+        hint: "justify-content: space-between;\npadding: 0 32px;\nheight: 64px;",
+      },
+      {
+        instruction: "Adiciona background-color com a cor do time. Ex: #e31d1c para o Flamengo.",
+        hint: "background-color: #e31d1c;",
+      },
+      {
+        instruction: "No .links a, escreve color: white; e text-decoration: none; para os links ficarem bonitos.",
+        hint: "color: white;\ntext-decoration: none;\npadding: 8px;",
+      },
     ],
   },
 ];
