@@ -54,7 +54,7 @@ export default function AdminStudentDetailPage() {
     : null;
 
   const totalStars = challenges.reduce((a, b) => a + b.stars, 0);
-  const conquistadas = MEDALHAS.filter((m) => profile.total_xp >= m.xpNecessario);
+  const conquistadas = MEDALS.filter((m) => profile.total_xp >= m.criterion.kind === "xp" ? m.criterion.min : 0);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a0a1a] via-[#141432] to-[#0a0a1a] py-8">
@@ -87,8 +87,8 @@ export default function AdminStudentDetailPage() {
           <Card className="border-violet-500/20 bg-[#0f0f24]/80 p-5 backdrop-blur">
             <h2 className="text-white font-bold mb-3 flex items-center gap-2"><Trophy className="h-4 w-4 text-amber-300" /> Medalhas</h2>
             <div className="grid grid-cols-3 gap-2">
-              {MEDALHAS.map((m) => {
-                const got = profile.total_xp >= m.xpNecessario;
+              {MEDALS.map((m) => {
+                const got = profile.total_xp >= m.criterion.kind === "xp" ? m.criterion.min : 0;
                 return (
                   <div
                     key={m.id}
@@ -97,8 +97,8 @@ export default function AdminStudentDetailPage() {
                     }`}
                   >
                     <div className="text-2xl">{m.emoji}</div>
-                    <p className="text-[10px] text-violet-100 font-bold">{m.nome}</p>
-                    <p className="text-[9px] text-violet-200/50">{m.xpNecessario} XP</p>
+                    <p className="text-[10px] text-violet-100 font-bold">{m.title}</p>
+                    <p className="text-[9px] text-violet-200/50">{m.criterion.kind === "xp" ? m.criterion.min : 0} XP</p>
                   </div>
                 );
               })}
