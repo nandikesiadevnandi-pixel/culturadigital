@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, Trophy, Code2, Star, Calendar } from "lucide-react";
-import { MEDALHAS } from "@/data/medalhas";
+import { MEDALS } from "@/data/medalhas";
 
 type ProfileFull = {
   user_id: string;
