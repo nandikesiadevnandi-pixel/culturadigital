@@ -73,6 +73,9 @@ const App = () => (
                 <Route path="/aluno/quizzes" element={<ProtectedRoute><QuizzesPage /></ProtectedRoute>} />
                 <Route path="/aluno/evolucao" element={<ProtectedRoute><EvolucaoPage /></ProtectedRoute>} />
                 <Route path="/aluno/medalhas" element={<ProtectedRoute><MedalhasPage /></ProtectedRoute>} />
+                <Route path="/aluno/perfil" element={<ProtectedRoute><EditProfilePage /></ProtectedRoute>} />
+                <Route path="/aluno/chat" element={<ProtectedRoute><ChatTurmaPage /></ProtectedRoute>} />
+                <Route path="/aluno/fotos" element={<ProtectedRoute><FotosTurmaPage /></ProtectedRoute>} />
 
                 {/* Admin */}
                 <Route
@@ -88,6 +91,14 @@ const App = () => (
                   element={
                     <ProtectedRoute requireAdmin>
                       <AdminStudentsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/alunos/:userId"
+                  element={
+                    <ProtectedRoute requireAdmin>
+                      <AdminStudentDetailPage />
                     </ProtectedRoute>
                   }
                 />
