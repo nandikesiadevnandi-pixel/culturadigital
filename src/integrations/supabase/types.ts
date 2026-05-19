@@ -55,6 +55,69 @@ export type Database = {
           },
         ]
       }
+      chat_messages: {
+        Row: {
+          author_name: string
+          body: string
+          class_name: string
+          created_at: string
+          id: string
+          school: string | null
+          user_id: string
+        }
+        Insert: {
+          author_name: string
+          body: string
+          class_name: string
+          created_at?: string
+          id?: string
+          school?: string | null
+          user_id: string
+        }
+        Update: {
+          author_name?: string
+          body?: string
+          class_name?: string
+          created_at?: string
+          id?: string
+          school?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      class_photos: {
+        Row: {
+          author_name: string
+          caption: string | null
+          class_name: string
+          created_at: string
+          id: string
+          school: string | null
+          storage_path: string
+          user_id: string
+        }
+        Insert: {
+          author_name: string
+          caption?: string | null
+          class_name: string
+          created_at?: string
+          id?: string
+          school?: string | null
+          storage_path: string
+          user_id: string
+        }
+        Update: {
+          author_name?: string
+          caption?: string | null
+          class_name?: string
+          created_at?: string
+          id?: string
+          school?: string | null
+          storage_path?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       code_challenge_progress: {
         Row: {
           challenge_id: string
@@ -141,6 +204,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_3d_url: string | null
           avatar_url: string | null
           class_name: string | null
           created_at: string
@@ -149,11 +213,13 @@ export type Database = {
           id: string
           level: number
           school: string | null
+          theme_palette: string
           total_xp: number
           updated_at: string
           user_id: string
         }
         Insert: {
+          avatar_3d_url?: string | null
           avatar_url?: string | null
           class_name?: string | null
           created_at?: string
@@ -162,11 +228,13 @@ export type Database = {
           id?: string
           level?: number
           school?: string | null
+          theme_palette?: string
           total_xp?: number
           updated_at?: string
           user_id: string
         }
         Update: {
+          avatar_3d_url?: string | null
           avatar_url?: string | null
           class_name?: string | null
           created_at?: string
@@ -175,6 +243,7 @@ export type Database = {
           id?: string
           level?: number
           school?: string | null
+          theme_palette?: string
           total_xp?: number
           updated_at?: string
           user_id?: string
@@ -276,6 +345,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      current_user_class: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

@@ -2,7 +2,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { BookOpen, Gamepad2, Trophy, TrendingUp, Award, LogOut, Code2 } from "lucide-react";
+import { BookOpen, Gamepad2, Trophy, TrendingUp, Award, LogOut, Code2, UserCog, MessageCircle, Camera } from "lucide-react";
+import { paletteById } from "@/lib/themePalettes";
 
 const LEVEL_NAMES = ["Iniciante", "Aprendiz", "Codificador", "Hacker", "Mestre Digital"];
 
@@ -19,6 +20,11 @@ export default function AlunoDashboardPage() {
   const progresso = Math.min(100, ((xpAtual - xpAnterior) / (xpProxNivel - xpAnterior)) * 100);
   const levelName = LEVEL_NAMES[Math.min(profile.level - 1, LEVEL_NAMES.length - 1)];
 
+  const palette = paletteById((profile as any).theme_palette);
+  const portrait = (profile as any).avatar_3d_url
+    ? `${(profile as any).avatar_3d_url.replace(".glb", "")}.png?expression=happy&pose=power-stance&size=256`
+    : null;
+
   const tiles = [
     { to: "/aluno/codar", icon: Code2, title: "Aprendendo a Codar", desc: "HTML, CSS e JS · cria teus sites", color: "from-orange-500 via-pink-500 to-violet-600" },
     { to: "/aluno/trilha", icon: BookOpen, title: "Minha trilha", desc: `Aulas do ${profile.grade_year}º ano`, color: "from-violet-500 to-purple-600" },
@@ -26,7 +32,9 @@ export default function AlunoDashboardPage() {
     { to: "/aluno/quizzes", icon: Trophy, title: "Quizzes", desc: "Mostre o que sabe", color: "from-pink-500 to-rose-500" },
     { to: "/aluno/evolucao", icon: TrendingUp, title: "Minha evolução", desc: "Veja seu progresso", color: "from-emerald-400 to-cyan-500" },
     { to: "/aluno/medalhas", icon: Award, title: "Medalhas", desc: "Suas conquistas", color: "from-amber-400 to-orange-500" },
-    { to: "/galeria", icon: BookOpen, title: "Galeria", desc: "Fotos das aulas", color: "from-fuchsia-500 to-violet-500" },
+    { to: "/aluno/chat", icon: MessageCircle, title: `Chat ${profile.class_name ?? ""}`, desc: "Fale com a turma ao vivo", color: "from-blue-500 to-cyan-400" },
+    { to: "/aluno/fotos", icon: Camera, title: "Fotos da turma", desc: "Webcam · registre momentos", color: "from-fuchsia-500 to-pink-500" },
+    { to: "/aluno/perfil", icon: UserCog, title: "Editar perfil", desc: "Avatar 3D, paleta e nome", color: "from-violet-500 to-cyan-400" },
   ];
 
   return (
@@ -35,8 +43,8 @@ export default function AlunoDashboardPage() {
         {/* Header do perfil */}
         <Card className="mb-8 border-violet-500/20 bg-[#0f0f24]/80 p-6 backdrop-blur-xl shadow-[0_0_60px_rgba(99,102,241,0.15)]">
           <div className="flex flex-col items-start gap-6 md:flex-row md:items-center">
-            <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-cyan-400 text-3xl font-extrabold text-white shadow-[0_0_30px_rgba(167,139,250,0.5)]">
-              {profile.full_name.charAt(0).toUpperCase()}
+            <div className={`flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br ${palette.from} ${palette.via} ${palette.to} text-3xl font-extrabold text-white shadow-[0_0_30px_rgba(167,139,250,0.5)] overflow-hidden`}>
+              {portrait ? <img src={portrait} alt="avatar" className="h-full w-full object-contain" /> : profile.full_name.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1">
               <h1 className="font-display text-2xl font-extrabold text-white md:text-3xl">

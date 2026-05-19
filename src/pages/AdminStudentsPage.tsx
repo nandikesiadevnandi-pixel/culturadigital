@@ -121,7 +121,9 @@ export default function AdminStudentsPage() {
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="font-bold text-white">{s.full_name}</h3>
+                        <Link to={`/admin/alunos/${s.user_id}`} className="font-bold text-white hover:text-cyan-300 underline-offset-2 hover:underline">
+                          {s.full_name}
+                        </Link>
                         {isTeacher && (
                           <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-xs text-amber-200">
                             admin
@@ -140,6 +142,9 @@ export default function AdminStudentsPage() {
                         >
                           <Copy className="h-3.5 w-3.5" />
                         </button>
+                        <Link to={`/admin/alunos/${s.user_id}`} className="text-xs text-cyan-300 hover:underline ml-2">
+                          ver evolução →
+                        </Link>
                       </div>
                     </div>
                     <Button
