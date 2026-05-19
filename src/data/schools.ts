@@ -19,7 +19,7 @@ export const schools: School[] = [
     short: "Bertholdo",
     day: "Segunda-feira",
     accent: "gradient-blue",
-    classes: ["6A", "6B"],
+    classes: ["6A", "6B", "7A", "7B", "8A", "8B"],
   },
   {
     id: "ernesto",
