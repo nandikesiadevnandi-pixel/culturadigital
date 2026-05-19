@@ -54,7 +54,14 @@ export default function AdminStudentDetailPage() {
     : null;
 
   const totalStars = challenges.reduce((a, b) => a + b.stars, 0);
-  const conquistadas = MEDALS.filter((m) => profile.total_xp >= m.criterion.kind === "xp" ? m.criterion.min : 0);
+  const medalAchieved = (m: typeof MEDALS[number]) => {
+    const c = m.criterion;
+    if (c.kind === "xp") return profile.total_xp >= c.min;
+    if (c.kind === "level") return profile.level >= c.min;
+    if (c.kind === "challenges") return challenges.length >= c.min;
+    return false;
+  };
+  const conquistadas = MEDALS.filter(medalAchieved);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a0a1a] via-[#141432] to-[#0a0a1a] py-8">
