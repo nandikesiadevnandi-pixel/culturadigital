@@ -95,7 +95,7 @@ export default function AdminStudentDetailPage() {
             <h2 className="text-white font-bold mb-3 flex items-center gap-2"><Trophy className="h-4 w-4 text-amber-300" /> Medalhas</h2>
             <div className="grid grid-cols-3 gap-2">
               {MEDALS.map((m) => {
-                const got = profile.total_xp >= m.criterion.kind === "xp" ? m.criterion.min : 0;
+                const got = medalAchieved(m);
                 return (
                   <div
                     key={m.id}
@@ -105,7 +105,7 @@ export default function AdminStudentDetailPage() {
                   >
                     <div className="text-2xl">{m.emoji}</div>
                     <p className="text-[10px] text-violet-100 font-bold">{m.title}</p>
-                    <p className="text-[9px] text-violet-200/50">{m.criterion.kind === "xp" ? m.criterion.min : 0} XP</p>
+                    <p className="text-[9px] text-violet-200/50">{m.description}</p>
                   </div>
                 );
               })}
