@@ -27,6 +27,10 @@ import QuizzesPage from "./pages/QuizzesPage.tsx";
 import EvolucaoPage from "./pages/EvolucaoPage.tsx";
 import MedalhasPage from "./pages/MedalhasPage.tsx";
 import AdminStudentsPage from "./pages/AdminStudentsPage.tsx";
+import AdminStudentDetailPage from "./pages/AdminStudentDetailPage.tsx";
+import EditProfilePage from "./pages/EditProfilePage.tsx";
+import ChatTurmaPage from "./pages/ChatTurmaPage.tsx";
+import FotosTurmaPage from "./pages/FotosTurmaPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
