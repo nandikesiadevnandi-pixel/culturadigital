@@ -43,8 +43,8 @@ export default function AlunoDashboardPage() {
         {/* Header do perfil */}
         <Card className="mb-8 border-violet-500/20 bg-[#0f0f24]/80 p-6 backdrop-blur-xl shadow-[0_0_60px_rgba(99,102,241,0.15)]">
           <div className="flex flex-col items-start gap-6 md:flex-row md:items-center">
-            <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-cyan-400 text-3xl font-extrabold text-white shadow-[0_0_30px_rgba(167,139,250,0.5)]">
-              {profile.full_name.charAt(0).toUpperCase()}
+            <div className={`flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br ${palette.from} ${palette.via} ${palette.to} text-3xl font-extrabold text-white shadow-[0_0_30px_rgba(167,139,250,0.5)] overflow-hidden`}>
+              {portrait ? <img src={portrait} alt="avatar" className="h-full w-full object-contain" /> : profile.full_name.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1">
               <h1 className="font-display text-2xl font-extrabold text-white md:text-3xl">
