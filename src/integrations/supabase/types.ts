@@ -62,6 +62,7 @@ export type Database = {
           class_name: string
           created_at: string
           id: string
+          reply_to_id: string | null
           school: string | null
           user_id: string
         }
@@ -71,6 +72,7 @@ export type Database = {
           class_name: string
           created_at?: string
           id?: string
+          reply_to_id?: string | null
           school?: string | null
           user_id: string
         }
@@ -80,6 +82,7 @@ export type Database = {
           class_name?: string
           created_at?: string
           id?: string
+          reply_to_id?: string | null
           school?: string | null
           user_id?: string
         }
@@ -115,6 +118,27 @@ export type Database = {
           school?: string | null
           storage_path?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      class_settings: {
+        Row: {
+          chat_enabled: boolean
+          class_name: string
+          photos_enabled: boolean
+          updated_at: string
+        }
+        Insert: {
+          chat_enabled?: boolean
+          class_name: string
+          photos_enabled?: boolean
+          updated_at?: string
+        }
+        Update: {
+          chat_enabled?: boolean
+          class_name?: string
+          photos_enabled?: boolean
+          updated_at?: string
         }
         Relationships: []
       }
@@ -206,12 +230,16 @@ export type Database = {
         Row: {
           avatar_3d_url: string | null
           avatar_url: string | null
+          chat_photo_url: string | null
+          chat_wallpaper: string
           class_name: string | null
           created_at: string
           full_name: string
           grade_year: number | null
           id: string
+          is_blocked: boolean
           level: number
+          nickname: string | null
           school: string | null
           theme_palette: string
           total_xp: number
@@ -221,12 +249,16 @@ export type Database = {
         Insert: {
           avatar_3d_url?: string | null
           avatar_url?: string | null
+          chat_photo_url?: string | null
+          chat_wallpaper?: string
           class_name?: string | null
           created_at?: string
           full_name: string
           grade_year?: number | null
           id?: string
+          is_blocked?: boolean
           level?: number
+          nickname?: string | null
           school?: string | null
           theme_palette?: string
           total_xp?: number
@@ -236,15 +268,52 @@ export type Database = {
         Update: {
           avatar_3d_url?: string | null
           avatar_url?: string | null
+          chat_photo_url?: string | null
+          chat_wallpaper?: string
           class_name?: string | null
           created_at?: string
           full_name?: string
           grade_year?: number | null
           id?: string
+          is_blocked?: boolean
           level?: number
+          nickname?: string | null
           school?: string | null
           theme_palette?: string
           total_xp?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      student_credentials: {
+        Row: {
+          class_name: string | null
+          created_at: string
+          full_name: string
+          login_email: string
+          plain_password: string
+          school: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          class_name?: string | null
+          created_at?: string
+          full_name: string
+          login_email: string
+          plain_password: string
+          school?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          class_name?: string | null
+          created_at?: string
+          full_name?: string
+          login_email?: string
+          plain_password?: string
+          school?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -345,6 +414,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      class_chat_enabled: { Args: { _class: string }; Returns: boolean }
+      class_photos_enabled: { Args: { _class: string }; Returns: boolean }
       current_user_class: { Args: never; Returns: string }
       has_role: {
         Args: {
@@ -353,6 +424,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      user_is_blocked: { Args: { _uid: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "student"
