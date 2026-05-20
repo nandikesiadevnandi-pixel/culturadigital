@@ -42,14 +42,12 @@ Deno.serve(async (req) => {
     const { action, payload } = body ?? {};
 
     if (action === "list") {
-      // Get all profiles with their emails from auth.users
       const { data: profiles, error: pe } = await supabase
         .from("profiles")
-        .select("*")
+        .select("user_id, full_name, school, class_name, is_blocked, nickname")
         .order("full_name");
       if (pe) throw pe;
 
-      // Fetch emails via admin API (paginate)
       const emailsByUser = new Map<string, string>();
       let page = 1;
       while (true) {
@@ -60,7 +58,6 @@ Deno.serve(async (req) => {
         page++;
       }
 
-      // roles
       const { data: roles } = await supabase.from("user_roles").select("user_id, role");
       const roleByUser = new Map<string, string[]>();
       (roles || []).forEach((r: any) => {
@@ -69,12 +66,21 @@ Deno.serve(async (req) => {
         roleByUser.set(r.user_id, list);
       });
 
+      const { data: creds } = await supabase
+        .from("student_credentials")
+        .select("user_id, plain_password");
+      const credsByUser = new Map<string, string>();
+      (creds || []).forEach((c: any) => credsByUser.set(c.user_id, c.plain_password));
+
       const students = (profiles || []).map((p: any) => ({
         user_id: p.user_id,
         full_name: p.full_name,
+        nickname: p.nickname,
         school: p.school,
         class_name: p.class_name,
         login_email: emailsByUser.get(p.user_id) || "",
+        plain_password: credsByUser.get(p.user_id) || null,
+        is_blocked: !!p.is_blocked,
         roles: roleByUser.get(p.user_id) || [],
       }));
 
@@ -95,7 +101,37 @@ Deno.serve(async (req) => {
         password: String(new_password),
       });
       if (error) throw error;
+      // Atualiza credenciais visíveis pro ADM
+      await supabase
+        .from("student_credentials")
+        .update({ plain_password: String(new_password), updated_at: new Date().toISOString() })
+        .eq("user_id", user_id);
       return new Response(JSON.stringify({ ok: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (action === "set_blocked") {
+      const { user_id, blocked } = payload ?? {};
+      if (!user_id) {
+        return new Response(JSON.stringify({ error: "user_id obrigatório" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const isBlocked = !!blocked;
+      // Atualiza flag no profile
+      const { error: pErr } = await supabase
+        .from("profiles")
+        .update({ is_blocked: isBlocked })
+        .eq("user_id", user_id);
+      if (pErr) throw pErr;
+      // Banir/desbanir sessão (revoga login)
+      const { error: bErr } = await supabase.auth.admin.updateUserById(user_id, {
+        ban_duration: isBlocked ? "876000h" : "none",
+      } as any);
+      if (bErr) throw bErr;
+      return new Response(JSON.stringify({ ok: true, blocked: isBlocked }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }

@@ -5,14 +5,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { ArrowLeft, KeyRound, Copy, Users, Search } from "lucide-react";
+import {
+  ArrowLeft, KeyRound, Copy, Users, Search, ShieldOff, ShieldCheck,
+  Eye, EyeOff, Download, Settings2,
+} from "lucide-react";
 
 type Student = {
   user_id: string;
   full_name: string;
+  nickname: string | null;
   school: string | null;
   class_name: string | null;
   login_email: string;
+  plain_password: string | null;
+  is_blocked: boolean;
   roles: string[];
 };
 
@@ -22,6 +28,7 @@ export default function AdminStudentsPage() {
   const [filter, setFilter] = useState("");
   const [resettingId, setResettingId] = useState<string | null>(null);
   const [newPassword, setNewPassword] = useState("");
+  const [showPasswords, setShowPasswords] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -39,9 +46,7 @@ export default function AdminStudentsPage() {
     }
   };
 
-  useEffect(() => {
-    load();
-  }, []);
+  useEffect(() => { load(); }, []);
 
   const copy = (txt: string) => {
     navigator.clipboard.writeText(txt);
@@ -62,9 +67,48 @@ export default function AdminStudentsPage() {
       toast.success("Senha redefinida! Avise o aluno.");
       setResettingId(null);
       setNewPassword("");
+      load();
     } catch (e: any) {
       toast.error(e.message || "Erro ao redefinir senha");
     }
+  };
+
+  const toggleBlock = async (s: Student) => {
+    const next = !s.is_blocked;
+    const verb = next ? "BLOQUEAR" : "DESBLOQUEAR";
+    if (!confirm(`${verb} ${s.full_name}?`)) return;
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-students", {
+        body: { action: "set_blocked", payload: { user_id: s.user_id, blocked: next } },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      toast.success(next ? "Aluno bloqueado." : "Aluno liberado.");
+      load();
+    } catch (e: any) {
+      toast.error(e.message || "Erro");
+    }
+  };
+
+  const exportCsv = () => {
+    const rows = [["Nome", "Apelido", "Turma", "Escola", "Login", "Senha", "Status"]];
+    filtered.forEach((s) => {
+      rows.push([
+        s.full_name,
+        s.nickname || "",
+        s.class_name || "",
+        s.school || "",
+        s.login_email,
+        s.plain_password || "(definir nova)",
+        s.is_blocked ? "BLOQUEADO" : "ativo",
+      ]);
+    });
+    const csv = rows.map((r) => r.map((c) => `"${(c || "").replace(/"/g, '""')}"`).join(",")).join("\n");
+    const blob = new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `alunos-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
   };
 
   const filtered = students.filter((s) => {
@@ -85,13 +129,33 @@ export default function AdminStudentsPage() {
           <ArrowLeft className="h-4 w-4" /> Voltar
         </Link>
 
-        <div className="mb-6 flex items-center gap-3">
-          <Users className="h-7 w-7 text-cyan-400" />
-          <div>
-            <h1 className="font-display text-3xl font-extrabold text-white">Alunos cadastrados</h1>
-            <p className="text-sm text-violet-200/70">
-              Veja o login de cada aluno e redefina a senha caso esqueçam.
-            </p>
+        <div className="mb-6 flex items-start justify-between gap-3 flex-wrap">
+          <div className="flex items-center gap-3">
+            <Users className="h-7 w-7 text-cyan-400" />
+            <div>
+              <h1 className="font-display text-3xl font-extrabold text-white">Alunos cadastrados</h1>
+              <p className="text-sm text-violet-200/70">
+                Login e senha de cada aluno, bloqueio e ferramentas da turma.
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Link to="/admin/turmas">
+              <Button variant="outline" className="border-violet-500/40 text-violet-100">
+                <Settings2 className="h-4 w-4 mr-1" /> Chat/Fotos por turma
+              </Button>
+            </Link>
+            <Button onClick={exportCsv} variant="outline" className="border-violet-500/40 text-violet-100">
+              <Download className="h-4 w-4 mr-1" /> Exportar CSV
+            </Button>
+            <Button
+              onClick={() => setShowPasswords((v) => !v)}
+              variant="outline"
+              className="border-violet-500/40 text-violet-100"
+            >
+              {showPasswords ? <EyeOff className="h-4 w-4 mr-1" /> : <Eye className="h-4 w-4 mr-1" />}
+              {showPasswords ? "Ocultar senhas" : "Mostrar senhas"}
+            </Button>
           </div>
         </div>
 
@@ -116,49 +180,78 @@ export default function AdminStudentsPage() {
               return (
                 <div
                   key={s.user_id}
-                  className="rounded-2xl border border-violet-500/20 bg-[#0f0f24]/80 p-4 backdrop-blur"
+                  className={`rounded-2xl border bg-[#0f0f24]/80 p-4 backdrop-blur ${
+                    s.is_blocked ? "border-red-500/40" : "border-violet-500/20"
+                  }`}
                 >
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <Link to={`/admin/alunos/${s.user_id}`} className="font-bold text-white hover:text-cyan-300 underline-offset-2 hover:underline">
+                        <Link to={`/admin/alunos/${s.user_id}`} className="font-bold text-white hover:text-cyan-300 hover:underline">
                           {s.full_name}
                         </Link>
                         {isTeacher && (
-                          <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-xs text-amber-200">
-                            admin
-                          </span>
+                          <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-xs text-amber-200">admin</span>
+                        )}
+                        {s.is_blocked && (
+                          <span className="rounded-full bg-red-500/20 px-2 py-0.5 text-xs text-red-200">bloqueado</span>
                         )}
                       </div>
                       <p className="text-xs text-violet-200/70 mt-0.5">
                         {s.class_name || "—"} · {s.school || "—"}
                       </p>
-                      <div className="mt-2 flex items-center gap-2 flex-wrap">
-                        <code className="text-xs text-cyan-300 break-all">{s.login_email}</code>
-                        <button
-                          onClick={() => copy(s.login_email)}
-                          className="text-violet-300 hover:text-white"
-                          title="Copiar"
-                        >
-                          <Copy className="h-3.5 w-3.5" />
-                        </button>
-                        <Link to={`/admin/alunos/${s.user_id}`} className="text-xs text-cyan-300 hover:underline ml-2">
-                          ver evolução →
-                        </Link>
+                      <div className="mt-2 grid sm:grid-cols-2 gap-1.5">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] uppercase text-violet-300/70 w-12">login</span>
+                          <code className="text-xs text-cyan-300 break-all">{s.login_email}</code>
+                          <button onClick={() => copy(s.login_email)} className="text-violet-300 hover:text-white" title="Copiar">
+                            <Copy className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] uppercase text-violet-300/70 w-12">senha</span>
+                          {s.plain_password ? (
+                            <>
+                              <code className="text-xs text-amber-200 break-all">
+                                {showPasswords ? s.plain_password : "•".repeat(Math.min(s.plain_password.length, 10))}
+                              </code>
+                              <button onClick={() => copy(s.plain_password!)} className="text-violet-300 hover:text-white" title="Copiar">
+                                <Copy className="h-3.5 w-3.5" />
+                              </button>
+                            </>
+                          ) : (
+                            <span className="text-xs text-violet-200/50 italic">não salva — clique em "Redefinir senha"</span>
+                          )}
+                        </div>
                       </div>
                     </div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="border-violet-500/40 text-violet-100 hover:bg-violet-500/20"
-                      onClick={() => {
-                        setResettingId(resettingId === s.user_id ? null : s.user_id);
-                        setNewPassword("");
-                      }}
-                    >
-                      <KeyRound className="h-4 w-4 mr-1" />
-                      Redefinir senha
-                    </Button>
+                    <div className="flex flex-col gap-2">
+                      {!isTeacher && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className={s.is_blocked
+                            ? "border-emerald-500/40 text-emerald-200 hover:bg-emerald-500/20"
+                            : "border-red-500/40 text-red-200 hover:bg-red-500/20"}
+                          onClick={() => toggleBlock(s)}
+                        >
+                          {s.is_blocked
+                            ? <><ShieldCheck className="h-4 w-4 mr-1" /> Desbloquear</>
+                            : <><ShieldOff className="h-4 w-4 mr-1" /> Bloquear</>}
+                        </Button>
+                      )}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="border-violet-500/40 text-violet-100 hover:bg-violet-500/20"
+                        onClick={() => {
+                          setResettingId(resettingId === s.user_id ? null : s.user_id);
+                          setNewPassword("");
+                        }}
+                      >
+                        <KeyRound className="h-4 w-4 mr-1" /> Redefinir senha
+                      </Button>
+                    </div>
                   </div>
 
                   {resettingId === s.user_id && (
@@ -180,7 +273,7 @@ export default function AdminStudentsPage() {
                         </Button>
                       </div>
                       <p className="mt-2 text-xs text-violet-200/60">
-                        Anote e passe ao aluno. Mínimo 4 caracteres.
+                        A nova senha também fica visível aqui pra você passar ao aluno. Mínimo 4 caracteres.
                       </p>
                     </div>
                   )}
