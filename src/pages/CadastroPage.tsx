@@ -8,8 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { schools } from "@/data/schools";
 import { studentLoginEmail } from "@/lib/studentEmail";
+import { genStudentPassword } from "@/lib/passwordGen";
 import { toast } from "sonner";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Copy, Printer } from "lucide-react";
 
 const ADMIN_EMAIL = "nandikesiadevnandi@gmail.com";
 
@@ -18,7 +19,6 @@ const studentSchema = z.object({
   school: z.string().trim().min(2, "Diga sua escola"),
   class_name: z.string().trim().min(1, "Diga sua turma").max(20),
   grade_year: z.number().int().min(4).max(8),
-  password: z.string().min(6, "Mínimo 6 caracteres").max(72),
 });
 
 const teacherSchema = z.object({
@@ -27,10 +27,13 @@ const teacherSchema = z.object({
   password: z.string().min(6, "Mínimo 6 caracteres").max(72),
 });
 
+type CredsCard = { login: string; password: string; name: string; school: string; class_name: string };
+
 export default function CadastroPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [isTeacher, setIsTeacher] = useState(false);
+  const [creds, setCreds] = useState<CredsCard | null>(null);
   const [form, setForm] = useState({
     full_name: "",
     school: "",
@@ -50,60 +53,115 @@ export default function CadastroPage() {
     e.preventDefault();
 
     let email: string;
+    let password: string;
     let metadata: Record<string, string>;
 
     if (isTeacher) {
       const parsed = teacherSchema.safeParse(form);
-      if (!parsed.success) {
-        toast.error(parsed.error.issues[0].message);
-        return;
-      }
+      if (!parsed.success) return toast.error(parsed.error.issues[0].message);
       email = parsed.data.email;
-      metadata = {
-        full_name: parsed.data.full_name,
-        school: "Todas as escolas",
-        class_name: "",
-        grade_year: "",
-      };
+      password = parsed.data.password;
+      metadata = { full_name: parsed.data.full_name, school: "Todas as escolas", class_name: "", grade_year: "" };
     } else {
       const parsed = studentSchema.safeParse(form);
-      if (!parsed.success) {
-        toast.error(parsed.error.issues[0].message);
-        return;
-      }
+      if (!parsed.success) return toast.error(parsed.error.issues[0].message);
       email = studentLoginEmail(parsed.data.full_name, parsed.data.class_name, parsed.data.school);
+      password = genStudentPassword();
       metadata = {
         full_name: parsed.data.full_name,
         school: parsed.data.school,
         class_name: parsed.data.class_name,
         grade_year: String(parsed.data.grade_year),
+        plain_password: password, // saved to student_credentials via trigger
       };
     }
 
     setLoading(true);
     const { error } = await supabase.auth.signUp({
       email,
-      password: form.password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/aluno`,
-        data: metadata,
-      },
+      password,
+      options: { emailRedirectTo: `${window.location.origin}/aluno`, data: metadata },
     });
     setLoading(false);
+
     if (error) {
-      toast.error(
+      return toast.error(
         error.message.includes("already registered")
           ? "Já existe uma conta com esses dados. Tente entrar."
           : error.message,
       );
-      return;
     }
-    toast.success(`Bem-vindx, ${form.full_name.split(" ")[0]}! 🚀`);
-    navigate(isTeacher || form.email === ADMIN_EMAIL ? "/admin" : "/aluno", { replace: true });
+
+    if (isTeacher) {
+      toast.success(`Bem-vinda, ${form.full_name.split(" ")[0]}! 🚀`);
+      navigate(form.email === ADMIN_EMAIL ? "/admin" : "/aluno", { replace: true });
+    } else {
+      // Mostra cartão com credenciais antes de entrar
+      setCreds({
+        login: email,
+        password,
+        name: form.full_name,
+        school: form.school,
+        class_name: form.class_name,
+      });
+    }
   };
 
   const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
+
+  const copyAll = () => {
+    if (!creds) return;
+    const text = `Nome: ${creds.name}\nTurma: ${creds.class_name}\nEscola: ${creds.school}\nLogin: ${creds.login}\nSenha: ${creds.password}`;
+    navigator.clipboard.writeText(text);
+    toast.success("Copiado! Cole no caderno ou no WhatsApp.");
+  };
+
+  const printCard = () => window.print();
+
+  if (creds) {
+    return (
+      <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-[#0a0a1a] via-[#141432] to-[#0a0a1a] py-12">
+        <div className="container max-w-lg">
+          <div className="rounded-3xl border-2 border-cyan-400/40 bg-[#0f0f24]/90 p-6 shadow-[0_0_60px_rgba(34,211,238,0.25)] print:bg-white print:text-black">
+            <div className="text-center mb-4">
+              <span className="text-5xl">🎉</span>
+              <h1 className="font-display text-2xl font-extrabold text-white mt-2 print:text-black">Conta criada!</h1>
+              <p className="text-violet-200/80 text-sm print:text-black">Anote ou imprima — você vai precisar dessa senha pra entrar de novo.</p>
+            </div>
+
+            <div className="rounded-2xl border border-violet-500/30 bg-[#0a0a1a] p-4 space-y-2 print:bg-white print:border-black">
+              <Row k="Nome" v={creds.name} />
+              <Row k="Turma" v={creds.class_name} />
+              <Row k="Escola" v={creds.school} />
+              <Row k="Login" v={creds.login} mono />
+              <Row k="Senha" v={creds.password} mono highlight />
+            </div>
+
+            <p className="text-xs text-violet-200/60 mt-3 print:text-black">
+              ⚠️ A professora também guarda essa senha — se esquecer, ela consegue te passar de novo.
+            </p>
+
+            <div className="mt-4 grid grid-cols-2 gap-2 print:hidden">
+              <Button onClick={copyAll} variant="outline" className="border-violet-500/40 text-violet-100">
+                <Copy className="h-4 w-4 mr-1" /> Copiar
+              </Button>
+              <Button onClick={printCard} variant="outline" className="border-violet-500/40 text-violet-100">
+                <Printer className="h-4 w-4 mr-1" /> Imprimir
+              </Button>
+            </div>
+
+            <Button
+              onClick={() => navigate("/aluno", { replace: true })}
+              className="mt-3 w-full bg-gradient-to-r from-violet-500 to-cyan-400 text-white font-bold print:hidden"
+            >
+              Entrar na plataforma 🚀
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-[#0a0a1a] via-[#141432] to-[#0a0a1a] py-12">
@@ -187,37 +245,42 @@ export default function CadastroPage() {
                   </SelectContent>
                 </Select>
               </div>
+
+              <p className="text-xs text-violet-200/60 rounded-lg bg-cyan-500/10 border border-cyan-500/30 p-2">
+                ✨ A senha é gerada automaticamente. Mostramos pra você anotar.
+              </p>
             </>
           )}
 
           {isTeacher && (
-            <div>
-              <Label className="text-violet-200">Email</Label>
-              <Input
-                type="email"
-                className="mt-1 border-violet-500/30 bg-[#0a0a1a] text-white placeholder:text-violet-300/30"
-                placeholder="seu@email.com"
-                value={form.email}
-                onChange={(e) => set("email", e.target.value)}
-                required
-                maxLength={255}
-              />
-            </div>
+            <>
+              <div>
+                <Label className="text-violet-200">Email</Label>
+                <Input
+                  type="email"
+                  className="mt-1 border-violet-500/30 bg-[#0a0a1a] text-white placeholder:text-violet-300/30"
+                  placeholder="seu@email.com"
+                  value={form.email}
+                  onChange={(e) => set("email", e.target.value)}
+                  required
+                  maxLength={255}
+                />
+              </div>
+              <div>
+                <Label className="text-violet-200">Senha</Label>
+                <Input
+                  type="password"
+                  className="mt-1 border-violet-500/30 bg-[#0a0a1a] text-white placeholder:text-violet-300/30"
+                  placeholder="Mínimo 6 caracteres"
+                  value={form.password}
+                  onChange={(e) => set("password", e.target.value)}
+                  required
+                  minLength={6}
+                  maxLength={72}
+                />
+              </div>
+            </>
           )}
-
-          <div>
-            <Label className="text-violet-200">Senha</Label>
-            <Input
-              type="password"
-              className="mt-1 border-violet-500/30 bg-[#0a0a1a] text-white placeholder:text-violet-300/30"
-              placeholder="Mínimo 6 caracteres"
-              value={form.password}
-              onChange={(e) => set("password", e.target.value)}
-              required
-              minLength={6}
-              maxLength={72}
-            />
-          </div>
 
           <Button
             type="submit"
@@ -235,6 +298,23 @@ export default function CadastroPage() {
           </p>
         </form>
       </div>
+    </div>
+  );
+}
+
+function Row({ k, v, mono, highlight }: { k: string; v: string; mono?: boolean; highlight?: boolean }) {
+  return (
+    <div className="flex items-baseline justify-between gap-3">
+      <span className="text-xs text-violet-200/70 print:text-black">{k}</span>
+      <span
+        className={[
+          "text-right break-all",
+          mono ? "font-mono text-sm" : "text-sm",
+          highlight ? "text-cyan-300 font-bold text-base print:text-black" : "text-white print:text-black",
+        ].join(" ")}
+      >
+        {v}
+      </span>
     </div>
   );
 }
