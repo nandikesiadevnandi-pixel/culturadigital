@@ -215,8 +215,30 @@ export default function FotosTurmaPage() {
                 </Button>
               </div>
               <div className="p-3 space-y-3">
-                <video ref={videoRef} className="w-full rounded-lg bg-black aspect-video" muted playsInline />
+                <video ref={videoRef} style={{ filter }} className="w-full rounded-lg bg-black aspect-video" muted playsInline />
                 <canvas ref={canvasRef} className="hidden" />
+                <div className="flex gap-1 overflow-x-auto">
+                  {[
+                    { id: "none", name: "Normal" },
+                    { id: "grayscale(1)", name: "P&B" },
+                    { id: "sepia(1)", name: "Sépia" },
+                    { id: "saturate(2)", name: "Pop" },
+                    { id: "contrast(1.4) brightness(1.1)", name: "Drama" },
+                    { id: "hue-rotate(180deg)", name: "Neon" },
+                    { id: "blur(2px)", name: "Sonho" },
+                  ].map((f) => (
+                    <button
+                      key={f.id}
+                      type="button"
+                      onClick={() => setFilter(f.id)}
+                      className={`px-2 py-1 rounded-md text-xs whitespace-nowrap border ${
+                        filter === f.id ? "border-cyan-400 text-cyan-300" : "border-violet-500/30 text-violet-200"
+                      }`}
+                    >
+                      {f.name}
+                    </button>
+                  ))}
+                </div>
                 <Input
                   placeholder="Legenda (opcional)"
                   value={caption}

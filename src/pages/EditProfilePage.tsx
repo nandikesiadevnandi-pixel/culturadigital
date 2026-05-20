@@ -10,9 +10,8 @@ import { PALETTES, paletteById } from "@/lib/themePalettes";
 import { toast } from "sonner";
 import { ArrowLeft, Sparkles } from "lucide-react";
 
-// Ready Player Me embed
-const RPM_SUBDOMAIN = "demo"; // troca por subdomínio próprio se quiser
-const RPM_URL = `https://${RPM_SUBDOMAIN}.readyplayer.me/avatar?frameApi&clearCache`;
+// Ready Player Me embed — subdomínio "demo" é público e funciona pra criação
+const RPM_URL = "https://demo.readyplayer.me/avatar?frameApi&clearCache&bodyType=halfbody";
 
 export default function EditProfilePage() {
   const { profile, refreshProfile } = useAuth();
@@ -32,9 +31,17 @@ export default function EditProfilePage() {
 
   // Recebe avatar do iframe do Ready Player Me
   useEffect(() => {
+    const subscribe = () => {
+      iframeRef.current?.contentWindow?.postMessage(
+        JSON.stringify({ target: "readyplayerme", type: "subscribe", eventName: "v1.**" }),
+        "*"
+      );
+    };
     const onMsg = (e: MessageEvent) => {
       try {
         const json = typeof e.data === "string" ? JSON.parse(e.data) : e.data;
+        if (json?.source !== "readyplayerme" && !json?.eventName?.startsWith?.("v1.")) return;
+        if (json?.eventName === "v1.frame.ready") subscribe();
         if (json?.eventName === "v1.avatar.exported") {
           const url = json.data?.url as string;
           if (url) {
@@ -43,17 +50,16 @@ export default function EditProfilePage() {
             toast.success("Avatar 3D pronto! Lembre de salvar.");
           }
         }
-        if (json?.eventName === "v1.frame.ready") {
-          iframeRef.current?.contentWindow?.postMessage(
-            JSON.stringify({ target: "readyplayerme", type: "subscribe", eventName: "v1.**" }),
-            "*"
-          );
-        }
       } catch {}
     };
     window.addEventListener("message", onMsg);
-    return () => window.removeEventListener("message", onMsg);
-  }, []);
+    // fallback: tenta inscrever após o iframe carregar
+    const t = setTimeout(subscribe, 4000);
+    return () => {
+      window.removeEventListener("message", onMsg);
+      clearTimeout(t);
+    };
+  }, [showRPM]);
 
   const save = async () => {
     if (!profile) return;
