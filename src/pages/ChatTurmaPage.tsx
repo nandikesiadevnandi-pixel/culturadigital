@@ -22,9 +22,20 @@ export default function ChatTurmaPage() {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(true);
+  const [chatEnabled, setChatEnabled] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const turma = profile?.class_name ?? "";
+
+  useEffect(() => {
+    if (!turma) return;
+    supabase
+      .from("class_settings")
+      .select("chat_enabled")
+      .eq("class_name", turma)
+      .maybeSingle()
+      .then(({ data }) => setChatEnabled(data?.chat_enabled ?? true));
+  }, [turma]);
 
   useEffect(() => {
     if (!turma) return;
@@ -68,6 +79,10 @@ export default function ChatTurmaPage() {
 
   const send = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!chatEnabled && !isAdmin) {
+      toast.error("Chat desligado pela professora.");
+      return;
+    }
     const body = text.trim();
     if (!body || !profile) return;
     setText("");

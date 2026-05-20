@@ -28,11 +28,23 @@ export default function FotosTurmaPage() {
   const [camOpen, setCamOpen] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [caption, setCaption] = useState("");
+  const [filter, setFilter] = useState<string>("none");
   const [uploading, setUploading] = useState(false);
+  const [photosEnabled, setPhotosEnabled] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const turma = profile?.class_name ?? "";
+
+  useEffect(() => {
+    if (!turma) return;
+    supabase
+      .from("class_settings")
+      .select("photos_enabled")
+      .eq("class_name", turma)
+      .maybeSingle()
+      .then(({ data }) => setPhotosEnabled(data?.photos_enabled ?? true));
+  }, [turma]);
 
   const load = async () => {
     if (!turma) return;
@@ -84,7 +96,10 @@ export default function FotosTurmaPage() {
     const c = canvasRef.current;
     c.width = v.videoWidth;
     c.height = v.videoHeight;
-    c.getContext("2d")!.drawImage(v, 0, 0);
+    const ctx = c.getContext("2d")!;
+    ctx.filter = filter;
+    ctx.drawImage(v, 0, 0);
+    ctx.filter = "none";
     setUploading(true);
     const blob: Blob = await new Promise((res) =>
       c.toBlob((b) => res(b!), "image/jpeg", 0.85)!
@@ -144,10 +159,20 @@ export default function FotosTurmaPage() {
             <h1 className="font-display text-2xl font-extrabold text-white">📸 Fotos da turma {turma}</h1>
             <p className="text-xs text-violet-200/60">Momentos das nossas aulas</p>
           </div>
-          <Button onClick={openCam} className="bg-gradient-to-r from-violet-500 to-cyan-400 text-white">
-            <Camera className="h-4 w-4 mr-1" /> Tirar foto
+          <Button
+            onClick={openCam}
+            disabled={!photosEnabled && !isAdmin}
+            className="bg-gradient-to-r from-violet-500 to-cyan-400 text-white disabled:opacity-50"
+          >
+            <Camera className="h-4 w-4 mr-1" /> {photosEnabled || isAdmin ? "Tirar foto" : "Fotos desligadas"}
           </Button>
         </div>
+
+        {!photosEnabled && !isAdmin && (
+          <div className="mb-3 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-amber-100 text-sm">
+            🔒 As fotos da turma estão desligadas pela professora.
+          </div>
+        )}
 
         {loading ? (
           <p className="text-violet-200/70 text-center">Carregando...</p>
