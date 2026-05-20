@@ -28,6 +28,7 @@ import EvolucaoPage from "./pages/EvolucaoPage.tsx";
 import MedalhasPage from "./pages/MedalhasPage.tsx";
 import AdminStudentsPage from "./pages/AdminStudentsPage.tsx";
 import AdminStudentDetailPage from "./pages/AdminStudentDetailPage.tsx";
+import AdminClassSettingsPage from "./pages/AdminClassSettingsPage.tsx";
 import EditProfilePage from "./pages/EditProfilePage.tsx";
 import ChatTurmaPage from "./pages/ChatTurmaPage.tsx";
 import FotosTurmaPage from "./pages/FotosTurmaPage.tsx";
@@ -99,6 +100,14 @@ const App = () => (
                   element={
                     <ProtectedRoute requireAdmin>
                       <AdminStudentDetailPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/turmas"
+                  element={
+                    <ProtectedRoute requireAdmin>
+                      <AdminClassSettingsPage />
                     </ProtectedRoute>
                   }
                 />

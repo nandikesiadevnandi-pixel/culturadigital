@@ -6,10 +6,16 @@ export type Profile = {
   id: string;
   user_id: string;
   full_name: string;
+  nickname: string | null;
   school: string | null;
   class_name: string | null;
   grade_year: number | null;
   avatar_url: string | null;
+  avatar_3d_url: string | null;
+  chat_photo_url: string | null;
+  chat_wallpaper: string | null;
+  theme_palette: string | null;
+  is_blocked: boolean;
   total_xp: number;
   level: number;
 };
