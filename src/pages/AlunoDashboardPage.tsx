@@ -2,7 +2,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { BookOpen, Gamepad2, Trophy, TrendingUp, Award, LogOut, Code2, UserCog, MessageCircle, Camera } from "lucide-react";
+import { BookOpen, Gamepad2, Trophy, TrendingUp, Award, LogOut, Code2, UserCog, MessageCircle, Camera, Newspaper } from "lucide-react";
 import { paletteById } from "@/lib/themePalettes";
 
 const LEVEL_NAMES = ["Iniciante", "Aprendiz", "Codificador", "Hacker", "Mestre Digital"];
@@ -34,6 +34,7 @@ export default function AlunoDashboardPage() {
     { to: "/aluno/medalhas", icon: Award, title: "Medalhas", desc: "Suas conquistas", color: "from-amber-400 to-orange-500" },
     { to: "/aluno/chat", icon: MessageCircle, title: `Chat ${profile.class_name ?? ""}`, desc: "Fale com a turma ao vivo", color: "from-blue-500 to-cyan-400" },
     { to: "/aluno/fotos", icon: Camera, title: "Fotos da turma", desc: "Webcam · registre momentos", color: "from-fuchsia-500 to-pink-500" },
+    { to: "/aluno/feed", icon: Newspaper, title: "Feed da turma", desc: "Posts, curtidas, comentários", color: "from-pink-500 to-purple-600" },
     { to: "/aluno/perfil", icon: UserCog, title: "Editar perfil", desc: "Avatar 3D, paleta e nome", color: "from-violet-500 to-cyan-400" },
   ];
 

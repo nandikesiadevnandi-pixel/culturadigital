@@ -5,8 +5,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Send, Trash2, MessageCircle } from "lucide-react";
+import { ArrowLeft, Send, Trash2, MessageCircle, ShieldAlert } from "lucide-react";
 import { toast } from "sonner";
+import { moderateText, logFlag } from "@/lib/moderation";
 
 type Msg = {
   id: string;
@@ -85,6 +86,22 @@ export default function ChatTurmaPage() {
     }
     const body = text.trim();
     if (!body || !profile) return;
+    const mod = await moderateText(body, "chat_turma");
+    if (!mod.allowed) {
+      await logFlag({
+        user_id: profile.user_id,
+        author_name: profile.full_name,
+        class_name: turma,
+        context: "chat_turma",
+        original_text: body,
+        reason: mod.reason,
+        severity: mod.severity,
+      });
+      toast.error(`🛡️ Bloqueado pela IA: ${mod.reason || "linguagem inadequada"}`, {
+        description: mod.suggestion ? `Tente: ${mod.suggestion}` : undefined,
+      });
+      return;
+    }
     setText("");
     const { error } = await supabase.from("chat_messages").insert({
       user_id: profile.user_id,
@@ -119,10 +136,13 @@ export default function ChatTurmaPage() {
         <Card className="border-violet-500/20 bg-[#0f0f24]/80 backdrop-blur flex flex-col h-[75vh]">
           <div className="p-4 border-b border-violet-500/20 flex items-center gap-2">
             <MessageCircle className="h-5 w-5 text-cyan-300" />
-            <div>
+            <div className="flex-1">
               <h1 className="text-white font-bold">Chat da turma {turma}</h1>
               <p className="text-xs text-violet-200/60">{profile.school} · só sua turma vê esse chat</p>
             </div>
+            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] text-emerald-300">
+              <ShieldAlert className="h-3 w-3" /> IA anti-bullying
+            </span>
           </div>
 
           <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-2">

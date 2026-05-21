@@ -32,6 +32,7 @@ import AdminClassSettingsPage from "./pages/AdminClassSettingsPage.tsx";
 import EditProfilePage from "./pages/EditProfilePage.tsx";
 import ChatTurmaPage from "./pages/ChatTurmaPage.tsx";
 import FotosTurmaPage from "./pages/FotosTurmaPage.tsx";
+import FeedPage from "./pages/FeedPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -77,6 +78,7 @@ const App = () => (
                 <Route path="/aluno/perfil" element={<ProtectedRoute><EditProfilePage /></ProtectedRoute>} />
                 <Route path="/aluno/chat" element={<ProtectedRoute><ChatTurmaPage /></ProtectedRoute>} />
                 <Route path="/aluno/fotos" element={<ProtectedRoute><FotosTurmaPage /></ProtectedRoute>} />
+                <Route path="/aluno/feed" element={<ProtectedRoute><FeedPage /></ProtectedRoute>} />
 
                 {/* Admin */}
                 <Route
