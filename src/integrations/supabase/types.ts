@@ -199,6 +199,42 @@ export type Database = {
         }
         Relationships: []
       }
+      moderation_flags: {
+        Row: {
+          author_name: string | null
+          class_name: string | null
+          context: string
+          created_at: string
+          id: string
+          original_text: string
+          reason: string | null
+          severity: string | null
+          user_id: string | null
+        }
+        Insert: {
+          author_name?: string | null
+          class_name?: string | null
+          context: string
+          created_at?: string
+          id?: string
+          original_text: string
+          reason?: string | null
+          severity?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          author_name?: string | null
+          class_name?: string | null
+          context?: string
+          created_at?: string
+          id?: string
+          original_text?: string
+          reason?: string | null
+          severity?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       monthly_reports: {
         Row: {
           created_at: string
@@ -282,6 +318,100 @@ export type Database = {
           theme_palette?: string
           total_xp?: number
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      social_comments: {
+        Row: {
+          author_name: string
+          body: string
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          author_name: string
+          body: string
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          author_name?: string
+          body?: string
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "social_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      social_likes: {
+        Row: {
+          created_at: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "social_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      social_posts: {
+        Row: {
+          author_name: string
+          caption: string
+          class_name: string
+          created_at: string
+          id: string
+          image_path: string | null
+          school: string | null
+          user_id: string
+        }
+        Insert: {
+          author_name: string
+          caption?: string
+          class_name: string
+          created_at?: string
+          id?: string
+          image_path?: string | null
+          school?: string | null
+          user_id: string
+        }
+        Update: {
+          author_name?: string
+          caption?: string
+          class_name?: string
+          created_at?: string
+          id?: string
+          image_path?: string | null
+          school?: string | null
           user_id?: string
         }
         Relationships: []
