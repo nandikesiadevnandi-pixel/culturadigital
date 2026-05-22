@@ -12,7 +12,7 @@ import { Sparkles } from "lucide-react";
 
 export default function AuthPage() {
   const navigate = useNavigate();
-  const [isTeacher, setIsTeacher] = useState(false);
+  const isTeacher = false;
   const [fullName, setFullName] = useState("");
   const [school, setSchool] = useState("");
   const [className, setClassName] = useState("");
@@ -58,19 +58,6 @@ export default function AuthPage() {
         </div>
 
         <form onSubmit={signIn} className="space-y-4 rounded-3xl border border-violet-500/20 bg-[#0f0f24]/80 p-6 backdrop-blur-xl shadow-[0_0_60px_rgba(99,102,241,0.15)]">
-          <div className="flex items-center gap-2 rounded-xl border border-violet-500/20 bg-[#0a0a1a] px-3 py-2">
-            <input
-              id="is_teacher"
-              type="checkbox"
-              checked={isTeacher}
-              onChange={(e) => setIsTeacher(e.target.checked)}
-              className="h-4 w-4 accent-cyan-400"
-            />
-            <Label htmlFor="is_teacher" className="cursor-pointer text-violet-100">
-              Sou professora (entro com email)
-            </Label>
-          </div>
-
           {!isTeacher ? (
             <>
               <div>
