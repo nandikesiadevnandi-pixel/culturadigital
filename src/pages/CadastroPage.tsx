@@ -189,19 +189,6 @@ export default function CadastroPage() {
             />
           </div>
 
-          <div className="flex items-center gap-2 rounded-xl border border-violet-500/20 bg-[#0a0a1a] px-3 py-2">
-            <input
-              id="is_teacher"
-              type="checkbox"
-              checked={isTeacher}
-              onChange={(e) => setIsTeacher(e.target.checked)}
-              className="h-4 w-4 accent-cyan-400"
-            />
-            <Label htmlFor="is_teacher" className="cursor-pointer text-violet-100">
-              Sou professora (entro com email)
-            </Label>
-          </div>
-
           {!isTeacher && (
             <>
               <div className="grid grid-cols-2 gap-3">
