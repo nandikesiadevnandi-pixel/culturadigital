@@ -12,7 +12,7 @@ import { Sparkles } from "lucide-react";
 
 export default function AuthPage() {
   const navigate = useNavigate();
-  const isTeacher = false;
+  const [isTeacher, setIsTeacher] = useState(false);
   const [fullName, setFullName] = useState("");
   const [school, setSchool] = useState("");
   const [className, setClassName] = useState("");
