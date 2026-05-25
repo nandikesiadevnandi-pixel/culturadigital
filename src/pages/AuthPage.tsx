@@ -12,7 +12,7 @@ import { Sparkles } from "lucide-react";
 
 export default function AuthPage() {
   const navigate = useNavigate();
-  const isTeacher = false;
+  const [isTeacher, setIsTeacher] = useState(false);
   const [fullName, setFullName] = useState("");
   const [school, setSchool] = useState("");
   const [className, setClassName] = useState("");
@@ -58,6 +58,22 @@ export default function AuthPage() {
         </div>
 
         <form onSubmit={signIn} className="space-y-4 rounded-3xl border border-violet-500/20 bg-[#0f0f24]/80 p-6 backdrop-blur-xl shadow-[0_0_60px_rgba(99,102,241,0.15)]">
+          <div className="flex gap-2 rounded-xl bg-[#0a0a1a] p-1 border border-violet-500/20">
+            <button
+              type="button"
+              onClick={() => setIsTeacher(false)}
+              className={`flex-1 rounded-lg px-3 py-2 text-sm font-bold transition ${!isTeacher ? "bg-gradient-to-r from-violet-500 to-cyan-400 text-white" : "text-violet-200/70"}`}
+            >
+              Aluno
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsTeacher(true)}
+              className={`flex-1 rounded-lg px-3 py-2 text-sm font-bold transition ${isTeacher ? "bg-gradient-to-r from-violet-500 to-cyan-400 text-white" : "text-violet-200/70"}`}
+            >
+              Professora / ADM
+            </button>
+          </div>
           {!isTeacher ? (
             <>
               <div>
