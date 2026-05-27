@@ -321,3 +321,10 @@
 .copa-filter-inactive:hover {
   background: rgba(255,255,255,0.18);
 }
+
+/* ─── Chat ─── */
+.chat-textarea {
+  line-height: 1.5;
+}
+.chat-avatar-sm { font-size: 10px; }
+.chat-avatar-md { font-size: 13px; }

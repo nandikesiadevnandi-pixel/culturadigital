@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Heart, MessageSquare, Send, Trash2, ImagePlus, ShieldAlert } from "lucide-react";
+import { ArrowLeft, Heart, MessageSquare, Send, Trash2, ImagePlus, Camera, X, ShieldAlert } from "lucide-react";
 import { toast } from "sonner";
 import { moderateText, logFlag } from "@/lib/moderation";
 
@@ -29,6 +29,17 @@ type Comment = {
   created_at: string;
 };
 
+const FILTERS = [
+  { id: "none",                               name: "Normal" },
+  { id: "grayscale(1)",                       name: "P&B" },
+  { id: "sepia(1)",                           name: "Sépia" },
+  { id: "saturate(2)",                        name: "Pop" },
+  { id: "contrast(1.4) brightness(1.1)",      name: "Drama" },
+  { id: "hue-rotate(180deg)",                 name: "Neon" },
+  { id: "brightness(1.2) contrast(0.9)",      name: "Soft" },
+  { id: "blur(2px) brightness(1.1)",          name: "Sonho" },
+];
+
 const publicUrl = (path: string | null) =>
   path ? supabase.storage.from("social-posts").getPublicUrl(path).data.publicUrl : null;
 
@@ -38,11 +49,25 @@ export default function FeedPage() {
   const [likes, setLikes] = useState<Record<string, { count: number; mine: boolean }>>({});
   const [comments, setComments] = useState<Record<string, Comment[]>>({});
   const [caption, setCaption] = useState("");
-  const [file, setFile] = useState<File | null>(null);
+  const [imageSource, setImageSource] = useState<File | Blob | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [posting, setPosting] = useState(false);
   const [openComments, setOpenComments] = useState<Record<string, boolean>>({});
   const [commentDraft, setCommentDraft] = useState<Record<string, string>>({});
-  const fileRef = useRef<HTMLInputElement>(null);
+
+  // Webcam
+  const [camOpen, setCamOpen] = useState(false);
+  const [stream, setStream] = useState<MediaStream | null>(null);
+  const [filter, setFilter] = useState("none");
+  const [capturing, setCapturing] = useState(false);
+
+  const fileRef   = useRef<HTMLInputElement>(null);
+  const videoRef  = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    if (videoRef.current) videoRef.current.style.filter = filter;
+  }, [filter]);
 
   const turma = profile?.class_name ?? "";
 
@@ -87,16 +112,58 @@ export default function FeedPage() {
       .on("postgres_changes", { event: "*", schema: "public", table: "social_likes" }, loadAll)
       .on("postgres_changes", { event: "*", schema: "public", table: "social_comments" }, loadAll)
       .subscribe();
-    return () => {
-      supabase.removeChannel(ch);
-    };
+    return () => { supabase.removeChannel(ch); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile?.user_id]);
 
+  // ── Webcam ──
+  const openCam = async () => {
+    setCamOpen(true);
+    setFilter("none");
+    try {
+      const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
+      setStream(s);
+      if (videoRef.current) { videoRef.current.srcObject = s; await videoRef.current.play(); }
+    } catch {
+      toast.error("Não consegui acessar a webcam. Permita o acesso no navegador.");
+      setCamOpen(false);
+    }
+  };
+
+  const closeCam = () => {
+    stream?.getTracks().forEach((t) => t.stop());
+    setStream(null);
+    setCamOpen(false);
+  };
+
+  const captureCam = async () => {
+    if (!videoRef.current || !canvasRef.current) return;
+    const v = videoRef.current, c = canvasRef.current;
+    c.width = v.videoWidth; c.height = v.videoHeight;
+    const ctx = c.getContext("2d")!;
+    ctx.filter = filter;
+    ctx.drawImage(v, 0, 0);
+    ctx.filter = "none";
+    setCapturing(true);
+    const blob: Blob = await new Promise((res) => c.toBlob((b) => res(b!), "image/jpeg", 0.85)!);
+    setCapturing(false);
+    setImageSource(blob);
+    setImagePreview(URL.createObjectURL(blob));
+    closeCam();
+    toast.success("Foto capturada! Adicione uma legenda e publique.");
+  };
+
+  const clearImage = () => {
+    setImageSource(null);
+    setImagePreview(null);
+    if (fileRef.current) fileRef.current.value = "";
+  };
+
+  // ── Post ──
   const createPost = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!profile || !turma) return;
-    if (!caption.trim() && !file) {
+    if (!caption.trim() && !imageSource) {
       toast.error("Escreva uma legenda ou escolha uma foto.");
       return;
     }
@@ -123,12 +190,14 @@ export default function FeedPage() {
       }
 
       let imagePath: string | null = null;
-      if (file) {
-        const ext = file.name.split(".").pop() || "jpg";
+      if (imageSource) {
+        const isFile = imageSource instanceof File;
+        const ext = isFile ? (imageSource.name.split(".").pop() || "jpg") : "jpg";
+        const contentType = isFile ? imageSource.type : "image/jpeg";
         const path = `${profile.user_id}/${Date.now()}.${ext}`;
-        const { error: upErr } = await supabase.storage.from("social-posts").upload(path, file, {
+        const { error: upErr } = await supabase.storage.from("social-posts").upload(path, imageSource, {
           upsert: false,
-          contentType: file.type,
+          contentType,
         });
         if (upErr) throw upErr;
         imagePath = path;
@@ -144,8 +213,7 @@ export default function FeedPage() {
       });
       if (error) throw error;
       setCaption("");
-      setFile(null);
-      if (fileRef.current) fileRef.current.value = "";
+      clearImage();
       toast.success("Publicado! 🎉");
     } catch (err: any) {
       toast.error(err.message ?? "Erro ao publicar");
@@ -232,18 +300,51 @@ export default function FeedPage() {
               maxLength={500}
               className="border-violet-500/30 bg-[#0a0a1a] text-white"
             />
-            <div className="flex items-center gap-2">
-              <label className="inline-flex items-center gap-2 cursor-pointer text-violet-200 text-sm hover:text-white">
+
+            {/* Image preview */}
+            {imagePreview && (
+              <div className="relative inline-block">
+                <img src={imagePreview} alt="preview" className="max-h-40 rounded-xl object-cover" />
+                <button
+                  type="button"
+                  onClick={clearImage}
+                  title="Remover foto"
+                  aria-label="Remover foto"
+                  className="absolute top-1 right-1 bg-black/60 rounded-full p-1 text-white"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            )}
+
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* File picker */}
+              <label className="inline-flex items-center gap-1.5 cursor-pointer text-violet-200 text-sm hover:text-white">
                 <ImagePlus className="h-4 w-4" />
-                <span>{file ? file.name : "Adicionar foto"}</span>
+                <span>Enviar foto</span>
                 <input
                   ref={fileRef}
                   type="file"
                   accept="image/*"
                   className="hidden"
-                  onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                  onChange={(e) => {
+                    const f = e.target.files?.[0] ?? null;
+                    setImageSource(f);
+                    setImagePreview(f ? URL.createObjectURL(f) : null);
+                  }}
                 />
               </label>
+
+              {/* Webcam */}
+              <button
+                type="button"
+                onClick={openCam}
+                className="inline-flex items-center gap-1.5 text-violet-200 text-sm hover:text-white"
+              >
+                <Camera className="h-4 w-4" />
+                <span>Tirar foto</span>
+              </button>
+
               <Button
                 type="submit"
                 disabled={posting}
@@ -277,9 +378,10 @@ export default function FeedPage() {
                   </div>
                   {canDelete && (
                     <button
+                      type="button"
                       onClick={() => deletePost(p.id)}
                       className="text-violet-300/60 hover:text-red-400"
-                      title="Apagar"
+                      title="Apagar post"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -294,6 +396,7 @@ export default function FeedPage() {
                   )}
                   <div className="flex items-center gap-4 text-sm">
                     <button
+                      type="button"
                       onClick={() => toggleLike(p.id)}
                       className={`inline-flex items-center gap-1 ${
                         l.mine ? "text-pink-400" : "text-violet-200/70 hover:text-pink-400"
@@ -303,9 +406,8 @@ export default function FeedPage() {
                       {l.count}
                     </button>
                     <button
-                      onClick={() =>
-                        setOpenComments((o) => ({ ...o, [p.id]: !o[p.id] }))
-                      }
+                      type="button"
+                      onClick={() => setOpenComments((o) => ({ ...o, [p.id]: !o[p.id] }))}
                       className="inline-flex items-center gap-1 text-violet-200/70 hover:text-cyan-300"
                     >
                       <MessageSquare className="h-4 w-4" />
@@ -321,6 +423,7 @@ export default function FeedPage() {
                           <span className="text-violet-100 flex-1 break-words">{c.body}</span>
                           {(c.user_id === profile.user_id || isAdmin) && (
                             <button
+                              type="button"
                               onClick={() => deleteComment(c.id)}
                               className="opacity-0 group-hover:opacity-100 text-violet-300/60 hover:text-red-400"
                             >
@@ -332,17 +435,12 @@ export default function FeedPage() {
                       <div className="flex gap-2">
                         <Input
                           value={commentDraft[p.id] ?? ""}
-                          onChange={(e) =>
-                            setCommentDraft((d) => ({ ...d, [p.id]: e.target.value }))
-                          }
+                          onChange={(e) => setCommentDraft((d) => ({ ...d, [p.id]: e.target.value }))}
                           placeholder="Comentar com respeito..."
                           maxLength={300}
                           className="border-violet-500/30 bg-[#0a0a1a] text-white text-sm h-9"
                           onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                              e.preventDefault();
-                              sendComment(p.id);
-                            }
+                            if (e.key === "Enter") { e.preventDefault(); sendComment(p.id); }
                           }}
                         />
                         <Button
@@ -361,6 +459,58 @@ export default function FeedPage() {
           })}
         </div>
       </div>
+
+      {/* ── Webcam Modal ── */}
+      {camOpen && (
+        <div className="fixed inset-0 z-50 bg-black/90 p-4 flex items-center justify-center">
+          <div className="bg-[#0f0f24] rounded-2xl border border-violet-500/30 w-full max-w-md overflow-hidden">
+            <div className="flex items-center justify-between p-3 border-b border-violet-500/20">
+              <p className="text-white font-bold">📸 Tirar foto para o feed</p>
+              <Button variant="ghost" size="sm" onClick={closeCam} className="text-violet-200">
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="p-4 space-y-3">
+              <div className="relative overflow-hidden rounded-xl aspect-video bg-black">
+                <video
+                  ref={videoRef}
+                  className="w-full h-full object-cover"
+                  muted
+                  playsInline
+                />
+              </div>
+              <canvas ref={canvasRef} className="hidden" />
+
+              {/* Filters */}
+              <div className="flex gap-1.5 overflow-x-auto pb-1">
+                {FILTERS.map((f) => (
+                  <button
+                    key={f.id}
+                    type="button"
+                    onClick={() => setFilter(f.id)}
+                    className={`px-2.5 py-1 rounded-lg text-xs whitespace-nowrap border flex-shrink-0 transition ${
+                      filter === f.id
+                        ? "border-cyan-400 bg-cyan-500/20 text-cyan-300"
+                        : "border-violet-500/30 text-violet-200 hover:border-violet-400/50"
+                    }`}
+                  >
+                    {f.name}
+                  </button>
+                ))}
+              </div>
+
+              <Button
+                type="button"
+                onClick={captureCam}
+                disabled={capturing || !stream}
+                className="w-full bg-gradient-to-r from-violet-500 to-cyan-400 text-white font-bold"
+              >
+                {capturing ? "Capturando..." : "📸 Usar esta foto"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
