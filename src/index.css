@@ -238,3 +238,69 @@
 .bg-gradient-radial {
   background-image: radial-gradient(var(--tw-gradient-stops));
 }
+
+/* ─── Copa 2026 theme ─── */
+.copa-hero-number {
+  font-size: clamp(56px, 12vw, 100px);
+  letter-spacing: -0.04em;
+  text-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  line-height: 1;
+}
+
+.copa-hero-title {
+  text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+.copa-pack-shadow {
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+
+.copa-open-btn {
+  background: linear-gradient(135deg, #FBBA16, #E57200);
+  box-shadow: 0 4px 20px rgba(251,186,22,0.5);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.copa-open-btn:hover:not(:disabled) {
+  box-shadow: 0 8px 30px rgba(251,186,22,0.7);
+}
+.copa-open-btn:active:not(:disabled) {
+  transform: scale(0.96);
+}
+.copa-open-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.copa-pack-bar {
+  background: linear-gradient(90deg, #FBBA16, #E57200, #D43B2A);
+}
+
+.copa-progress-bar {
+  background: linear-gradient(90deg, #1E9B5F, #FBBA16, #D43B2A);
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.5s ease;
+}
+
+.copa-panel {
+  border-radius: 1rem;
+  border: 1px solid rgba(255,255,255,0.22);
+  background: rgba(255,255,255,0.12);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+.copa-filter-active {
+  background: #FBBA16;
+  border-color: #E57200;
+  color: #1a1a1a;
+}
+
+.copa-filter-inactive {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.75);
+}
+.copa-filter-inactive:hover {
+  background: rgba(255,255,255,0.18);
+}

@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAlbum } from '@/hooks/useAlbum';
 import { ALBUM_CHALLENGES, AlbumChallenge, CHALLENGE_TYPE_CONFIG, DIFFICULTY_CONFIG } from '@/data/albumChallenges';
-import { Card } from '@/components/ui/card';
+import { CopaBackground } from '@/components/album/CopaBackground';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, CheckCircle2, XCircle, Package, Coins, Zap, Lock } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, XCircle, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
@@ -37,10 +37,7 @@ export default function DesafiosAlbumPage() {
       if (saved) {
         setDone(prev => new Set([...prev, active.id]));
         await album.addReward(active.packsReward, active.coinsReward, active.xpReward);
-        await album.postFeedEvent('challenge_won', {
-          challengeTitle: active.title,
-          packs: active.packsReward,
-        });
+        await album.postFeedEvent('challenge_won', { challengeTitle: active.title, packs: active.packsReward });
         toast.success(`+${active.packsReward} pacote(s) · +${active.coinsReward} moedas · +${active.xpReward} XP!`);
       } else {
         toast.info('Você já completou esse desafio.');
@@ -51,52 +48,52 @@ export default function DesafiosAlbumPage() {
   };
 
   const filteredChallenges = ALBUM_CHALLENGES.filter(c => filter === 'all' || c.type === filter);
-  const completedCount = done.size;
+
+  const filterOptions = [
+    { key: 'all', label: 'Todos' },
+    ...Object.entries(CHALLENGE_TYPE_CONFIG).map(([k, v]) => ({ key: k, label: `${v.emoji} ${v.label}` })),
+  ];
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-[#060612] via-[#0d0d28] to-[#060612]">
-      <div className="container py-8">
+    <div className="min-h-[calc(100vh-4rem)] relative overflow-x-hidden">
+      <CopaBackground />
+
+      <div className="relative z-10 container py-8">
         <Link to="/aluno/album">
-          <Button variant="ghost" className="mb-6 text-violet-200 hover:text-white">
+          <Button variant="ghost" className="mb-6 text-white/80 hover:text-white hover:bg-white/10">
             <ArrowLeft className="mr-2 h-4 w-4" /> Álbum
           </Button>
         </Link>
 
         <div className="mb-6">
-          <h1 className="font-black text-3xl text-white">⚡ Desafios de Programação</h1>
-          <p className="text-violet-200/60">Acerte e ganhe pacotes, moedas e XP</p>
+          <h1 className="copa-hero-title font-black text-3xl text-white">⚡ Desafios de Programação</h1>
+          <p className="text-white/60">Acerte e ganhe pacotes, moedas e XP</p>
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-3 gap-3 mb-6">
-          <Card className="border-violet-500/20 bg-[#0f0f24]/80 p-3 text-center">
-            <div className="font-black text-2xl text-white">{completedCount}/{ALBUM_CHALLENGES.length}</div>
-            <div className="text-xs text-violet-200/60">Completos</div>
-          </Card>
-          <Card className="border-violet-500/20 bg-[#0f0f24]/80 p-3 text-center">
-            <div className="font-black text-2xl text-cyan-300">{album.stats.packsAvail}</div>
-            <div className="text-xs text-violet-200/60">Pacotes</div>
-          </Card>
-          <Card className="border-violet-500/20 bg-[#0f0f24]/80 p-3 text-center">
-            <div className="font-black text-2xl text-yellow-300">{album.stats.coins}</div>
-            <div className="text-xs text-violet-200/60">Moedas</div>
-          </Card>
+          {[
+            { label: 'Completos', value: `${done.size}/${ALBUM_CHALLENGES.length}`, color: 'text-white' },
+            { label: 'Pacotes',   value: album.stats.packsAvail,                   color: 'text-[#1E9B5F]' },
+            { label: 'Moedas',    value: album.stats.coins,                        color: 'text-[#FBBA16]' },
+          ].map(s => (
+            <div key={s.label} className="copa-panel p-3 text-center">
+              <div className={`font-black text-2xl ${s.color}`}>{s.value}</div>
+              <div className="text-xs text-white/60">{s.label}</div>
+            </div>
+          ))}
         </div>
 
         {/* Filter */}
         <div className="flex flex-wrap gap-2 mb-6">
-          {[
-            { key: 'all', label: 'Todos' },
-            ...Object.entries(CHALLENGE_TYPE_CONFIG).map(([k, v]) => ({ key: k, label: `${v.emoji} ${v.label}` })),
-          ].map(f => (
+          {filterOptions.map(f => (
             <button
+              type="button"
               key={f.key}
               onClick={() => setFilter(f.key)}
               className={cn(
-                'rounded-full px-3 py-1.5 text-xs font-bold transition-all border',
-                filter === f.key
-                  ? 'bg-violet-500 border-violet-400 text-white'
-                  : 'border-violet-500/30 bg-violet-500/10 text-violet-200/70',
+                'rounded-full px-3 py-1.5 text-xs font-bold transition-all',
+                filter === f.key ? 'copa-filter-active' : 'copa-filter-inactive',
               )}
             >
               {f.label}
@@ -113,18 +110,18 @@ export default function DesafiosAlbumPage() {
               const diffCfg = DIFFICULTY_CONFIG[ch.difficulty];
 
               return (
-                <Card
+                <div
                   key={ch.id}
                   onClick={() => !isDone && setActive(ch)}
                   className={cn(
-                    'group relative border-violet-500/20 bg-[#0f0f24]/80 p-5 backdrop-blur-xl transition-all',
-                    !isDone && 'cursor-pointer hover:border-cyan-400/50 hover:shadow-[0_0_20px_rgba(103,232,249,0.2)]',
+                    'copa-panel group relative p-5 transition-all',
+                    !isDone && 'cursor-pointer hover:bg-white/20 hover:border-white/40',
                     isDone && 'opacity-60',
                   )}
                 >
                   {isDone && (
                     <div className="absolute top-3 right-3">
-                      <CheckCircle2 className="h-5 w-5 text-emerald-400" />
+                      <CheckCircle2 className="h-5 w-5 text-[#1E9B5F]" />
                     </div>
                   )}
 
@@ -132,27 +129,25 @@ export default function DesafiosAlbumPage() {
                     {ch.emoji}
                   </div>
 
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-black text-white text-sm">{ch.title}</h3>
-                  </div>
-                  <p className="text-xs text-violet-200/60 mb-3">{ch.description}</p>
+                  <h3 className="font-black text-white text-sm mb-1">{ch.title}</h3>
+                  <p className="text-xs text-white/60 mb-3">{ch.description}</p>
 
                   <div className="flex items-center justify-between">
                     <span className={cn('text-xs font-bold', diffCfg.color)}>{diffCfg.label}</span>
                     <div className="flex items-center gap-2 text-xs">
-                      <span className="text-violet-300">📦×{ch.packsReward}</span>
-                      <span className="text-yellow-300">🪙{ch.coinsReward}</span>
-                      <span className="text-cyan-300">⚡{ch.xpReward} XP</span>
+                      <span className="text-white/80">📦×{ch.packsReward}</span>
+                      <span className="text-[#FBBA16]">🪙{ch.coinsReward}</span>
+                      <span className="text-[#38BDF8]">⚡{ch.xpReward}</span>
                     </div>
                   </div>
-                </Card>
+                </div>
               );
             })}
           </div>
         ) : (
           /* Active challenge */
           <div className="max-w-2xl mx-auto">
-            <Card className="border-violet-500/30 bg-[#0f0f24]/80 p-8 backdrop-blur-xl">
+            <div className="copa-panel p-8">
               <div className="flex items-center gap-3 mb-6">
                 <div className={`inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${CHALLENGE_TYPE_CONFIG[active.type].color} text-3xl shadow-lg`}>
                   {active.emoji}
@@ -170,24 +165,25 @@ export default function DesafiosAlbumPage() {
               <div className="space-y-3 mb-6">
                 {active.options.map((opt, idx) => {
                   const isSelected = selected === idx;
-                  const isCorrect = idx === active.correct;
+                  const isCorrect  = idx === active.correct;
                   return (
                     <button
+                      type="button"
                       key={idx}
                       disabled={answered}
                       onClick={() => handleAnswer(idx)}
                       className={cn(
                         'flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left text-sm font-semibold transition-all',
-                        !answered && 'border-violet-500/30 bg-[#1a1a3a] text-white hover:border-cyan-400',
-                        answered && isCorrect && 'border-emerald-400 bg-emerald-500/20 text-white',
-                        answered && isSelected && !isCorrect && 'border-red-500 bg-red-500/20 text-white',
-                        answered && !isSelected && !isCorrect && 'border-violet-500/20 bg-[#1a1a3a] text-violet-200/50',
+                        !answered && 'border-white/20 bg-white/10 text-white hover:border-[#FBBA16]/60 hover:bg-white/15',
+                        answered && isCorrect  && 'border-[#1E9B5F] bg-[#1E9B5F]/20 text-white',
+                        answered && isSelected && !isCorrect && 'border-[#D43B2A] bg-[#D43B2A]/20 text-white',
+                        answered && !isSelected && !isCorrect && 'border-white/10 bg-white/5 text-white/40',
                       )}
                     >
-                      <span className="font-mono text-violet-400 mr-3">{String.fromCharCode(65 + idx)}.</span>
+                      <span className="font-mono text-[#FBBA16] mr-3">{String.fromCharCode(65 + idx)}.</span>
                       <span className="flex-1">{opt}</span>
-                      {answered && isCorrect && <CheckCircle2 className="h-5 w-5 text-emerald-400 ml-2 flex-shrink-0" />}
-                      {answered && isSelected && !isCorrect && <XCircle className="h-5 w-5 text-red-400 ml-2 flex-shrink-0" />}
+                      {answered && isCorrect   && <CheckCircle2 className="h-5 w-5 text-[#1E9B5F] ml-2 flex-shrink-0" />}
+                      {answered && isSelected && !isCorrect && <XCircle className="h-5 w-5 text-[#D43B2A] ml-2 flex-shrink-0" />}
                     </button>
                   );
                 })}
@@ -197,34 +193,37 @@ export default function DesafiosAlbumPage() {
                 <div className={cn(
                   'rounded-2xl border p-4 mb-6',
                   selected === active.correct
-                    ? 'border-emerald-400/40 bg-emerald-500/10'
-                    : 'border-red-400/40 bg-red-500/10',
+                    ? 'border-[#1E9B5F]/40 bg-[#1E9B5F]/10'
+                    : 'border-[#D43B2A]/40 bg-[#D43B2A]/10',
                 )}>
                   <p className="font-bold text-sm mb-1 text-white">
-                    {selected === active.correct ? '🎉 Correto!' : '❌ Errado!'} {selected === active.correct ? `+${active.packsReward} pacote(s) · +${active.coinsReward} moedas · +${active.xpReward} XP` : ''}
+                    {selected === active.correct
+                      ? `🎉 Correto! +${active.packsReward} pacote(s) · +${active.coinsReward} moedas · +${active.xpReward} XP`
+                      : '❌ Errado!'}
                   </p>
-                  <p className="text-sm text-violet-200/80">{active.explanation}</p>
+                  <p className="text-sm text-white/80">{active.explanation}</p>
                 </div>
               )}
 
               <div className="flex gap-3">
-                <Button
-                  variant="ghost"
+                <button
+                  type="button"
                   onClick={() => { setActive(null); setSelected(null); setAnswered(false); }}
-                  className="flex-1 text-violet-200"
+                  className="flex-1 rounded-xl border border-white/20 bg-white/10 text-white font-bold py-2.5 hover:bg-white/20 transition-colors"
                 >
                   ← Voltar
-                </Button>
+                </button>
                 {answered && (
-                  <Button
+                  <button
+                    type="button"
                     onClick={() => { setActive(null); setSelected(null); setAnswered(false); }}
-                    className="flex-1 bg-gradient-to-r from-violet-500 to-cyan-400"
+                    className="copa-open-btn flex-1 rounded-xl text-gray-900 font-black py-2.5"
                   >
-                    Próximo desafio →
-                  </Button>
+                    Próximo →
+                  </button>
                 )}
               </div>
-            </Card>
+            </div>
           </div>
         )}
       </div>
