@@ -210,10 +210,18 @@ function FigurinhaCard({ f, qtd, novidade }: { f: Figurinha; qtd?: number; novid
       {qtd && qtd > 1 && (
         <span className="absolute top-1 left-1 text-[10px] font-extrabold bg-fuchsia-500 text-white px-2 py-0.5 rounded-full z-10">x{qtd}</span>
       )}
-      <div className="flex-1 flex items-center justify-center text-6xl drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
-        {f.emoji}
+      <div className="flex-1 flex items-center justify-center relative">
+        <div className="w-full aspect-square rounded-xl overflow-hidden bg-white/5 ring-1 ring-white/10 shadow-inner">
+          <img
+            src={f.imagem}
+            alt={f.nome}
+            loading="lazy"
+            className="w-full h-full object-cover drop-shadow-[0_0_15px_rgba(255,255,255,0.25)]"
+          />
+        </div>
+        <span className="absolute bottom-1 right-1 text-lg drop-shadow">{f.emoji}</span>
       </div>
-      <div className="text-center">
+      <div className="text-center mt-2">
         <div className="font-extrabold text-white text-sm leading-tight truncate">{f.nome}</div>
         <div className="text-[10px] text-white/60">{f.posicao} · {f.selecao}</div>
         <div className={`mt-1 inline-block text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full text-white ${s.chip}`}>
