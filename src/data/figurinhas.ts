@@ -6,8 +6,21 @@ export interface Figurinha {
   selecao: string;
   posicao: string;
   raridade: Raridade;
-  emoji: string; // usado como "imagem" estilizada
+  emoji: string; // bandeira da seleção
+  imagem: string; // URL do retrato ilustrado (gerado, sem direitos autorais)
 }
+
+// Retrato ilustrado único por jogador (DiceBear — sem usar fotos reais protegidas)
+const FLAG: Record<string, string> = {
+  Brasil: "10b981", Argentina: "38bdf8", França: "1e3a8a", Alemanha: "111827",
+  Portugal: "16a34a", Inglaterra: "ffffff", Espanha: "dc2626", Itália: "1d4ed8",
+  Holanda: "f97316", Uruguai: "7dd3fc",
+};
+export const retratoDe = (nome: string, selecao: string) => {
+  const bg = FLAG[selecao] ?? "0ea5e9";
+  const seed = encodeURIComponent(nome);
+  return `https://api.dicebear.com/9.x/personas/svg?seed=${seed}&backgroundColor=${bg}&backgroundType=gradientLinear&radius=20`;
+};
 
 // Lista curada (sem usar nomes/marcas oficiais protegidos — usamos apelidos/jogadores históricos e fictícios)
 const base: Omit<Figurinha, "id">[] = [
