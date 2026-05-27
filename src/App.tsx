@@ -33,7 +33,11 @@ import EditProfilePage from "./pages/EditProfilePage.tsx";
 import ChatTurmaPage from "./pages/ChatTurmaPage.tsx";
 import FotosTurmaPage from "./pages/FotosTurmaPage.tsx";
 import FeedPage from "./pages/FeedPage.tsx";
-import AlbumCopaPage from "./pages/AlbumCopaPage.tsx";
+import AlbumHub from "./pages/album/AlbumHub.tsx";
+import InventarioPage from "./pages/album/InventarioPage.tsx";
+import TrocasPage from "./pages/album/TrocasPage.tsx";
+import DesafiosAlbumPage from "./pages/album/DesafiosAlbumPage.tsx";
+import RankingAlbumPage from "./pages/album/RankingAlbumPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -80,7 +84,14 @@ const App = () => (
                 <Route path="/aluno/chat" element={<ProtectedRoute><ChatTurmaPage /></ProtectedRoute>} />
                 <Route path="/aluno/fotos" element={<ProtectedRoute><FotosTurmaPage /></ProtectedRoute>} />
                 <Route path="/aluno/feed" element={<ProtectedRoute><FeedPage /></ProtectedRoute>} />
-                <Route path="/aluno/album-copa" element={<ProtectedRoute><AlbumCopaPage /></ProtectedRoute>} />
+
+                {/* Álbum da Copa 2026 */}
+                <Route path="/aluno/album" element={<ProtectedRoute><AlbumHub /></ProtectedRoute>} />
+                <Route path="/aluno/album-copa" element={<ProtectedRoute><AlbumHub /></ProtectedRoute>} />
+                <Route path="/aluno/album/inventario" element={<ProtectedRoute><InventarioPage /></ProtectedRoute>} />
+                <Route path="/aluno/album/trocas" element={<ProtectedRoute><TrocasPage /></ProtectedRoute>} />
+                <Route path="/aluno/album/desafios" element={<ProtectedRoute><DesafiosAlbumPage /></ProtectedRoute>} />
+                <Route path="/aluno/album/ranking" element={<ProtectedRoute><RankingAlbumPage /></ProtectedRoute>} />
 
                 {/* Admin */}
                 <Route

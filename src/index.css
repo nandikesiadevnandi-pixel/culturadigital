@@ -190,3 +190,51 @@
     color: transparent;
   }
 }
+
+/* ─── Álbum da Copa: animações holográficas ─── */
+@keyframes shimmer-gold {
+  0%   { transform: translateX(-100%) rotate(25deg); }
+  100% { transform: translateX(300%) rotate(25deg); }
+}
+@keyframes holo-shine {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.shimmer-gold {
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 215, 0, 0.6) 50%,
+    rgba(255, 255, 255, 0.4) 55%,
+    transparent 65%
+  );
+  background-size: 200% 100%;
+  animation: shimmer-gold 2.5s infinite linear;
+}
+
+.legendary-card {
+  animation: holo-shine 4s ease infinite;
+}
+
+.epic-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 1rem;
+  background: linear-gradient(135deg, rgba(139,92,246,0.15) 0%, transparent 50%, rgba(139,92,246,0.15) 100%);
+  pointer-events: none;
+}
+
+/* Pack opening glow pulse */
+@keyframes pack-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(139,92,246,0.4); }
+  50%       { box-shadow: 0 0 50px rgba(139,92,246,0.8), 0 0 80px rgba(103,232,249,0.3); }
+}
+.pack-pulse { animation: pack-glow 1.5s ease-in-out infinite; }
+
+/* Radial gradient utility */
+.bg-gradient-radial {
+  background-image: radial-gradient(var(--tw-gradient-stops));
+}
