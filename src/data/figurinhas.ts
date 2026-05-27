@@ -103,7 +103,7 @@ const base: FigInput[] = [
   { nome: "Godín", selecao: "Uruguai", posicao: "Zagueiro", raridade: "comum", emoji: "🇺🇾" },
 ];
 
-export const FIGURINHAS: Figurinha[] = base.map((f, i) => ({ ...f, id: i + 1 }));
+export const FIGURINHAS: Figurinha[] = base.map((f, i) => ({ ...f, id: i + 1, imagem: retratoDe(f.nome, f.selecao) }));
 
 export const SELECOES = Array.from(new Set(FIGURINHAS.map(f => f.selecao)));
 
