@@ -10,6 +10,8 @@ export interface Figurinha {
   imagem: string; // URL do retrato ilustrado (gerado, sem direitos autorais)
 }
 
+type FigInput = Omit<Figurinha, "id" | "imagem">;
+
 // Retrato ilustrado único por jogador (DiceBear — sem usar fotos reais protegidas)
 const FLAG: Record<string, string> = {
   Brasil: "10b981", Argentina: "38bdf8", França: "1e3a8a", Alemanha: "111827",
