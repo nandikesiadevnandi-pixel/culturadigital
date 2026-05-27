@@ -89,7 +89,12 @@ export default function AlunoDashboardPage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {tiles.map((t) => (
             <Link key={t.to} to={t.to}>
-              <Card className="group h-full cursor-pointer border-violet-500/20 bg-[#0f0f24]/80 p-6 backdrop-blur-xl transition-all hover:border-cyan-400/50 hover:shadow-[0_0_30px_rgba(103,232,249,0.25)]">
+              <Card className="group h-full cursor-pointer border-violet-500/20 bg-[#0f0f24]/80 p-6 backdrop-blur-xl transition-all hover:border-cyan-400/50 hover:shadow-[0_0_30px_rgba(103,232,249,0.25)] relative">
+                {(t as any).badge && (
+                  <span className="absolute top-2 right-2 text-[10px] font-extrabold bg-gradient-to-r from-amber-400 to-orange-500 text-black px-2 py-0.5 rounded-full shadow-[0_0_15px_rgba(251,191,36,0.6)] animate-pulse">
+                    {(t as any).badge}
+                  </span>
+                )}
                 <div className={`mb-3 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${t.color} shadow-lg group-hover:scale-110 transition-transform`}>
                   <t.icon className="h-6 w-6 text-white" />
                 </div>
