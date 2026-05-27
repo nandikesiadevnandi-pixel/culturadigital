@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AlbumPlayer, RARITY_CONFIG, getPlayerImageUrl, getFallbackAvatar, getFlagUrl } from '@/data/albumPlayers';
+import { AlbumPlayer, RARITY_CONFIG, getPlayerImageUrl, getFlagUrl } from '@/data/albumPlayers';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -13,8 +13,33 @@ interface Props {
   animate?: boolean;
 }
 
+function PlayerSilhouette() {
+  return (
+    <svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg" className="h-full w-full" aria-hidden="true">
+      {/* Head */}
+      <circle cx="50" cy="22" r="18" fill="rgba(255,255,255,0.22)" />
+      {/* Body / jersey */}
+      <path d="M22 56 L31 42 L45 48 L50 66 L55 48 L69 42 L78 56 L73 96 L27 96 Z" fill="rgba(255,255,255,0.18)" />
+      {/* Left arm */}
+      <path d="M27 60 L8 80 L16 82 L32 64" fill="rgba(255,255,255,0.15)" />
+      {/* Right arm */}
+      <path d="M73 60 L92 80 L84 82 L68 64" fill="rgba(255,255,255,0.15)" />
+      {/* Shorts */}
+      <rect x="29" y="93" width="42" height="18" rx="4" fill="rgba(255,255,255,0.25)" />
+      {/* Left leg */}
+      <rect x="31" y="109" width="15" height="26" rx="6" fill="rgba(255,255,255,0.18)" />
+      {/* Right leg */}
+      <rect x="54" y="109" width="15" height="26" rx="6" fill="rgba(255,255,255,0.18)" />
+      {/* Left boot */}
+      <ellipse cx="38" cy="137" rx="12" ry="4" fill="rgba(255,255,255,0.28)" />
+      {/* Right boot */}
+      <ellipse cx="61" cy="137" rx="12" ry="4" fill="rgba(255,255,255,0.28)" />
+    </svg>
+  );
+}
+
 export function CardFigurina({ player, quantity = 1, size = 'md', showQuantity, selected, onClick, glow = false, animate = false }: Props) {
-  const [imgError, setImgError] = useState(false);
+  const [imgState, setImgState] = useState<'loading' | 'ok' | 'error'>('loading');
   const cfg = RARITY_CONFIG[player.rarity];
 
   const sizeClass = {
@@ -25,12 +50,14 @@ export function CardFigurina({ player, quantity = 1, size = 'md', showQuantity, 
 
   const fontSizes = {
     sm: { name: 'text-[10px]', overall: 'text-base', pos: 'text-[8px]' },
-    md: { name: 'text-xs', overall: 'text-xl', pos: 'text-[10px]' },
-    lg: { name: 'text-sm', overall: 'text-2xl', pos: 'text-xs' },
+    md: { name: 'text-xs',     overall: 'text-xl',   pos: 'text-[10px]' },
+    lg: { name: 'text-sm',     overall: 'text-2xl',  pos: 'text-xs' },
   }[size];
 
   const isLegendary = player.rarity === 'legendary';
-  const isEpic = player.rarity === 'epic';
+  const isEpic      = player.rarity === 'epic';
+  const hasPhoto    = !!player.sofascoreId;
+  const showPhoto   = hasPhoto && imgState !== 'error';
 
   return (
     <div
@@ -39,21 +66,11 @@ export function CardFigurina({ player, quantity = 1, size = 'md', showQuantity, 
         'relative flex-shrink-0 rounded-2xl overflow-hidden border-2 transition-all duration-300 cursor-pointer select-none',
         sizeClass,
         cfg.border,
+        isLegendary ? 'card-legendary legendary-card' : isEpic ? 'card-epic epic-card' : 'card-base',
         selected && 'ring-4 ring-cyan-400 scale-105',
         glow && `shadow-lg ${cfg.glow}`,
         animate && 'hover:scale-105 hover:-translate-y-1',
-        isLegendary && 'legendary-card',
-        isEpic && 'epic-card',
       )}
-      style={isLegendary ? {
-        background: 'linear-gradient(135deg, #1a0a00, #2d1600, #1a0a00)',
-        boxShadow: '0 0 30px rgba(245,158,11,0.6), inset 0 0 30px rgba(245,158,11,0.1)',
-      } : isEpic ? {
-        background: 'linear-gradient(135deg, #0d0016, #1a003a, #0d0016)',
-        boxShadow: '0 0 20px rgba(139,92,246,0.5), inset 0 0 20px rgba(139,92,246,0.1)',
-      } : {
-        background: 'linear-gradient(135deg, #0a0a1a, #141432)',
-      }}
     >
       {/* Holographic shimmer for legendary */}
       {isLegendary && (
@@ -75,41 +92,44 @@ export function CardFigurina({ player, quantity = 1, size = 'md', showQuantity, 
         />
       </div>
 
-      {/* Player photo */}
+      {/* Player visual area */}
       <div className="absolute inset-0 flex items-center justify-center pt-6">
-        <img
-          src={imgError || !player.sofascoreId ? getFallbackAvatar(player) : getPlayerImageUrl(player)}
-          alt={player.name}
-          onError={() => setImgError(true)}
-          className="h-full w-full object-cover object-top"
-          style={{ maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)' }}
-        />
+        {showPhoto ? (
+          <img
+            src={getPlayerImageUrl(player)}
+            alt={player.name}
+            referrerPolicy="no-referrer"
+            onLoad={() => setImgState('ok')}
+            onError={() => setImgState('error')}
+            className={cn(
+              'card-photo-mask h-full w-full object-cover object-top transition-opacity duration-300',
+              imgState === 'ok' ? 'opacity-100' : 'opacity-0',
+            )}
+          />
+        ) : null}
+
+        {/* Silhouette shown when: no sofascoreId, loading, or error */}
+        {(!showPhoto || imgState === 'loading') && (
+          <div className={cn(
+            'absolute inset-0 flex items-center justify-center pt-6 transition-opacity duration-300',
+            imgState === 'ok' ? 'opacity-0' : 'opacity-100',
+          )}>
+            <PlayerSilhouette />
+          </div>
+        )}
       </div>
 
       {/* Gradient overlay bottom */}
-      <div className={cn('absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-10')} />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent z-10" />
 
       {/* Bottom info */}
       <div className="absolute bottom-0 left-0 right-0 z-20 p-2">
-        {/* Overall rating */}
-        <div className={cn('font-black leading-none', fontSizes.overall, cfg.text)}>
-          {player.overall}
-        </div>
-
-        {/* Position badge */}
-        <div className={cn('rounded px-1 py-0.5 font-black uppercase w-fit', fontSizes.pos, 'bg-white/20 text-white/90 mb-1')}>
+        <div className={cn('font-black leading-none', fontSizes.overall, cfg.text)}>{player.overall}</div>
+        <div className={cn('rounded px-1 py-0.5 font-black uppercase w-fit bg-white/20 text-white/90 mb-1', fontSizes.pos)}>
           {player.position}
         </div>
-
-        {/* Name */}
-        <div className={cn('font-extrabold text-white leading-tight line-clamp-2', fontSizes.name)}>
-          {player.name}
-        </div>
-
-        {/* Country */}
+        <div className={cn('font-extrabold text-white leading-tight line-clamp-2', fontSizes.name)}>{player.name}</div>
         <div className={cn('text-white/60', fontSizes.pos)}>{player.country}</div>
-
-        {/* Special skill */}
         {player.special && (isLegendary || isEpic) && size !== 'sm' && (
           <div className={cn('mt-1 rounded px-1 py-0.5 truncate', fontSizes.pos, cfg.badge, cfg.text)}>
             {player.special}
@@ -123,8 +143,6 @@ export function CardFigurina({ player, quantity = 1, size = 'md', showQuantity, 
           ×{quantity}
         </div>
       )}
-
-      {/* "NEW" badge */}
       {showQuantity && quantity === 1 && (
         <div className="absolute top-6 right-1 z-30 rounded-full bg-emerald-500 text-white text-[8px] font-black px-1 shadow-lg">
           NEW

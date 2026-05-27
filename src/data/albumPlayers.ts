@@ -202,7 +202,8 @@ export function getPlayerById(id: string): AlbumPlayer | undefined {
 
 export function getPlayerImageUrl(player: AlbumPlayer): string {
   if (player.sofascoreId) {
-    return `https://api.sofascore.com/api/v1/player/${player.sofascoreId}/image`;
+    // Use media CDN with no-referrer to bypass hotlink protection
+    return `https://media.sofascore.com/api/v1/player/${player.sofascoreId}/image`;
   }
   return '';
 }
