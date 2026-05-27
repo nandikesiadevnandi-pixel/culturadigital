@@ -9,7 +9,7 @@ import { PALETTES, paletteById } from "@/lib/themePalettes";
 import { toast } from "sonner";
 import { ArrowLeft, Camera, Upload, X, Sparkles } from "lucide-react";
 
-const RPM_URL = "https://demo.readyplayer.me/avatar?frameApi&clearCache&bodyType=halfbody";
+const RPM_URL = "https://readyplayer.me/avatar?frameApi&bodyType=halfbody";
 const BUCKET  = "avatars";
 
 type PhotoMode = "none" | "webcam" | "upload";
