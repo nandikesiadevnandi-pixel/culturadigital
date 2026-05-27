@@ -25,7 +25,7 @@ export const retratoDe = (nome: string, selecao: string) => {
 };
 
 // Lista curada (sem usar nomes/marcas oficiais protegidos — usamos apelidos/jogadores históricos e fictícios)
-const base: Omit<Figurinha, "id">[] = [
+const base: FigInput[] = [
   // Brasil
   { nome: "Pelé", selecao: "Brasil", posicao: "Atacante", raridade: "lendaria", emoji: "🇧🇷" },
   { nome: "Ronaldo", selecao: "Brasil", posicao: "Atacante", raridade: "lendaria", emoji: "🇧🇷" },
