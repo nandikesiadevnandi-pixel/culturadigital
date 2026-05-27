@@ -2,7 +2,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { BookOpen, Gamepad2, Trophy, TrendingUp, Award, LogOut, Code2, UserCog, MessageCircle, Camera, Newspaper } from "lucide-react";
+import { BookOpen, Gamepad2, Trophy, TrendingUp, Award, LogOut, Code2, UserCog, MessageCircle, Camera, Newspaper, Sparkles } from "lucide-react";
 import { paletteById } from "@/lib/themePalettes";
 
 const LEVEL_NAMES = ["Iniciante", "Aprendiz", "Codificador", "Hacker", "Mestre Digital"];
@@ -27,6 +27,7 @@ export default function AlunoDashboardPage() {
 
   const tiles = [
     { to: "/aluno/codar", icon: Code2, title: "Aprendendo a Codar", desc: "HTML, CSS e JS · cria teus sites", color: "from-orange-500 via-pink-500 to-violet-600" },
+    { to: "/aluno/album-copa", icon: Sparkles, title: "⚽ Álbum da Copa", desc: "NOVIDADE · abra pacotes, colecione craques", color: "from-amber-400 via-emerald-500 to-cyan-500", badge: "NOVO" },
     { to: "/aluno/trilha", icon: BookOpen, title: "Minha trilha", desc: `Aulas do ${profile.grade_year}º ano`, color: "from-violet-500 to-purple-600" },
     { to: "/aluno/jogos", icon: Gamepad2, title: "Jogos", desc: "Desafios e mini-games", color: "from-cyan-400 to-blue-500" },
     { to: "/aluno/quizzes", icon: Trophy, title: "Quizzes", desc: "Mostre o que sabe", color: "from-pink-500 to-rose-500" },
@@ -88,7 +89,12 @@ export default function AlunoDashboardPage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {tiles.map((t) => (
             <Link key={t.to} to={t.to}>
-              <Card className="group h-full cursor-pointer border-violet-500/20 bg-[#0f0f24]/80 p-6 backdrop-blur-xl transition-all hover:border-cyan-400/50 hover:shadow-[0_0_30px_rgba(103,232,249,0.25)]">
+              <Card className="group h-full cursor-pointer border-violet-500/20 bg-[#0f0f24]/80 p-6 backdrop-blur-xl transition-all hover:border-cyan-400/50 hover:shadow-[0_0_30px_rgba(103,232,249,0.25)] relative">
+                {(t as any).badge && (
+                  <span className="absolute top-2 right-2 text-[10px] font-extrabold bg-gradient-to-r from-amber-400 to-orange-500 text-black px-2 py-0.5 rounded-full shadow-[0_0_15px_rgba(251,191,36,0.6)] animate-pulse">
+                    {(t as any).badge}
+                  </span>
+                )}
                 <div className={`mb-3 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${t.color} shadow-lg group-hover:scale-110 transition-transform`}>
                   <t.icon className="h-6 w-6 text-white" />
                 </div>
