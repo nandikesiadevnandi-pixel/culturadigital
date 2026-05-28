@@ -44,7 +44,8 @@ export const ALBUM_PLAYERS: AlbumPlayer[] = [
   // ───── BRASIL ─────
   { id: 'br-alisson',    name: 'Alisson Becker',  country: 'Brasil',    flagCode: 'br', position: 'GK',  rarity: 'epic',      overall: 88, sofascoreId: 32868,  special: 'Mãos de Ouro',
     photoUrl: W('4/4f/20180610_FIFA_Friendly_Match_Austria_vs._Brazil_850_1625.jpg') },
-  { id: 'br-danilo',     name: 'Danilo',           country: 'Brasil',    flagCode: 'br', position: 'DEF', rarity: 'rare',      overall: 80 },
+  { id: 'br-danilo',     name: 'Danilo',           country: 'Brasil',    flagCode: 'br', position: 'DEF', rarity: 'rare',      overall: 80,
+    photoUrl: W('d/d0/Danilo_T%C3%BCrk_2014.jpg') },
   { id: 'br-marquinhos', name: 'Marquinhos',       country: 'Brasil',    flagCode: 'br', position: 'DEF', rarity: 'epic',      overall: 86, sofascoreId: 50801,  special: 'Capitão da Defesa',
     photoUrl: W('d/dc/FC_Salzburg_gegen_Paris_Saint-Germain_UEFA_Champions_League_49_%28cropped%29.jpg') },
   { id: 'br-militao',   name: 'Éder Militão',     country: 'Brasil',    flagCode: 'br', position: 'DEF', rarity: 'rare',      overall: 83 },
@@ -83,7 +84,8 @@ export const ALBUM_PLAYERS: AlbumPlayer[] = [
   // ───── FRANÇA ─────
   { id: 'fr-mbappe',    name: 'Kylian Mbappé',    country: 'França',    flagCode: 'fr', position: 'ATK', rarity: 'legendary', overall: 96, sofascoreId: 231747, special: 'Velocidade Máxima ⚡',
     photoUrl: W('6/66/Picture_with_Mbapp%C3%A9_%28cropped_and_rotated%29.jpg') },
-  { id: 'fr-maignan',   name: 'Mike Maignan',     country: 'França',    flagCode: 'fr', position: 'GK',  rarity: 'rare',      overall: 85, sofascoreId: 131540 },
+  { id: 'fr-maignan',   name: 'Mike Maignan',     country: 'França',    flagCode: 'fr', position: 'GK',  rarity: 'rare',      overall: 85, sofascoreId: 131540,
+    photoUrl: W('e/e1/Mike_Maignan_2022_Salzburg_vs_AC_Milan_2022-09-06.jpg') },
   { id: 'fr-saliba',    name: 'William Saliba',   country: 'França',    flagCode: 'fr', position: 'DEF', rarity: 'rare',      overall: 84, sofascoreId: 891526 },
   { id: 'fr-griezmann', name: 'Antoine Griezmann',country: 'França',    flagCode: 'fr', position: 'ATK', rarity: 'epic',      overall: 86, sofascoreId: 82928,  special: 'Artista do Gol',
     photoUrl: W('6/6e/FRA-ARG_%2810%29_%28cropped%29.jpg') },
@@ -113,7 +115,8 @@ export const ALBUM_PLAYERS: AlbumPlayer[] = [
   { id: 'es-rodri',     name: 'Rodri',            country: 'Espanha',   flagCode: 'es', position: 'MID', rarity: 'epic',      overall: 90, sofascoreId: 700041, special: 'Controle Total' },
   { id: 'es-pedri',     name: 'Pedri',            country: 'Espanha',   flagCode: 'es', position: 'MID', rarity: 'epic',      overall: 87, sofascoreId: 984498, special: 'Maestro Catalão' },
   { id: 'es-yamal',     name: 'Lamine Yamal',     country: 'Espanha',   flagCode: 'es', position: 'ATK', rarity: 'epic',      overall: 87, sofascoreId: 1130889,special: 'Prodígio do Futuro 🌟' },
-  { id: 'es-morata',    name: 'Álvaro Morata',    country: 'Espanha',   flagCode: 'es', position: 'ATK', rarity: 'rare',      overall: 82 },
+  { id: 'es-morata',    name: 'Álvaro Morata',    country: 'Espanha',   flagCode: 'es', position: 'ATK', rarity: 'rare',      overall: 82,
+    photoUrl: W('6/62/%C3%81lvaro_Morata_in_2025.jpg') },
   { id: 'es-fabian',    name: 'Fabián Ruiz',      country: 'Espanha',   flagCode: 'es', position: 'MID', rarity: 'rare',      overall: 82, sofascoreId: 474524 },
   { id: 'es-cucurella', name: 'Marc Cucurella',   country: 'Espanha',   flagCode: 'es', position: 'DEF', rarity: 'common',    overall: 79 },
 
@@ -132,18 +135,23 @@ export const ALBUM_PLAYERS: AlbumPlayer[] = [
   // ───── ALEMANHA ─────
   { id: 'de-neuer',     name: 'Manuel Neuer',     country: 'Alemanha',  flagCode: 'de', position: 'GK',  rarity: 'epic',      overall: 85, sofascoreId: 16484,  special: 'Sweep-Keeper Lendário' },
   { id: 'de-rudiger',   name: 'Antonio Rüdiger',  country: 'Alemanha',  flagCode: 'de', position: 'DEF', rarity: 'rare',      overall: 84, sofascoreId: 236817 },
-  { id: 'de-wirtz',     name: 'Florian Wirtz',    country: 'Alemanha',  flagCode: 'de', position: 'MID', rarity: 'epic',      overall: 87, sofascoreId: 1082762,special: 'Wunderkind' },
+  { id: 'de-wirtz',     name: 'Florian Wirtz',    country: 'Alemanha',  flagCode: 'de', position: 'MID', rarity: 'epic',      overall: 87, sofascoreId: 1082762,special: 'Wunderkind',
+    photoUrl: W('5/5d/Florian_Wirtz%2C_2022-07-31%2C_Saisoner%C3%B6ffnung_Bayer_04%2C_Leverkusen_%281%29_%28cropped%29.jpg') },
   { id: 'de-musiala',   name: 'Jamal Musiala',    country: 'Alemanha',  flagCode: 'de', position: 'MID', rarity: 'epic',      overall: 86, sofascoreId: 1010796,special: 'Bailarino do Campo' },
-  { id: 'de-havertz',   name: 'Kai Havertz',      country: 'Alemanha',  flagCode: 'de', position: 'ATK', rarity: 'rare',      overall: 83, sofascoreId: 773323 },
+  { id: 'de-havertz',   name: 'Kai Havertz',      country: 'Alemanha',  flagCode: 'de', position: 'ATK', rarity: 'rare',      overall: 83, sofascoreId: 773323,
+    photoUrl: W('e/e8/2019-06-11_Fu%C3%9Fball%2C_M%C3%A4nner%2C_L%C3%A4nderspiel%2C_Deutschland-Estland_StP_2059_LR10_by_Stepro.jpg') },
   { id: 'de-kimmich',   name: 'Joshua Kimmich',   country: 'Alemanha',  flagCode: 'de', position: 'MID', rarity: 'rare',      overall: 85, sofascoreId: 319765 },
   { id: 'de-sane',      name: 'Leroy Sané',       country: 'Alemanha',  flagCode: 'de', position: 'ATK', rarity: 'rare',      overall: 82, sofascoreId: 338721 },
   { id: 'de-gnabry',    name: 'Serge Gnabry',     country: 'Alemanha',  flagCode: 'de', position: 'ATK', rarity: 'common',    overall: 79 },
 
   // ───── HOLANDA ─────
-  { id: 'nl-vandijk',   name: 'Virgil van Dijk',  country: 'Holanda',   flagCode: 'nl', position: 'DEF', rarity: 'epic',      overall: 88, sofascoreId: 236501, special: 'Gigante da Defesa' },
+  { id: 'nl-vandijk',   name: 'Virgil van Dijk',  country: 'Holanda',   flagCode: 'nl', position: 'DEF', rarity: 'epic',      overall: 88, sofascoreId: 236501, special: 'Gigante da Defesa',
+    photoUrl: W('5/5d/20160604_AUT_NED_8876_%28cropped%29.jpg') },
   { id: 'nl-dumfries',  name: 'Denzel Dumfries',  country: 'Holanda',   flagCode: 'nl', position: 'DEF', rarity: 'rare',      overall: 82, sofascoreId: 617498 },
-  { id: 'nl-gakpo',     name: 'Cody Gakpo',       country: 'Holanda',   flagCode: 'nl', position: 'ATK', rarity: 'rare',      overall: 83, sofascoreId: 826062 },
-  { id: 'nl-xavi',      name: 'Xavi Simons',      country: 'Holanda',   flagCode: 'nl', position: 'MID', rarity: 'rare',      overall: 83, sofascoreId: 1082748 },
+  { id: 'nl-gakpo',     name: 'Cody Gakpo',       country: 'Holanda',   flagCode: 'nl', position: 'ATK', rarity: 'rare',      overall: 83, sofascoreId: 826062,
+    photoUrl: W('4/4f/Cody_Gakpo_06042025_%282%29_%28cropped%29.jpg') },
+  { id: 'nl-xavi',      name: 'Xavi Simons',      country: 'Holanda',   flagCode: 'nl', position: 'MID', rarity: 'rare',      overall: 83, sofascoreId: 1082748,
+    photoUrl: W('6/6d/Xavi_Simons%2C_Nick_Verhagen_in_duel_met_Xavi_Simons.jpg') },
   { id: 'nl-reijnders', name: 'Tijjani Reijnders',country: 'Holanda',   flagCode: 'nl', position: 'MID', rarity: 'rare',      overall: 82 },
   { id: 'nl-ake',       name: 'Nathan Aké',       country: 'Holanda',   flagCode: 'nl', position: 'DEF', rarity: 'common',    overall: 80 },
 
@@ -157,7 +165,8 @@ export const ALBUM_PLAYERS: AlbumPlayer[] = [
   { id: 'uy-darwin',    name: 'Darwin Núñez',     country: 'Uruguai',   flagCode: 'uy', position: 'ATK', rarity: 'epic',      overall: 86, sofascoreId: 863798, special: 'Explosão Celeste' },
   { id: 'uy-valverde',  name: 'Federico Valverde',country: 'Uruguai',   flagCode: 'uy', position: 'MID', rarity: 'epic',      overall: 87, sofascoreId: 710657, special: 'Bulldozer' },
   { id: 'uy-araujo',    name: 'Ronald Araújo',    country: 'Uruguai',   flagCode: 'uy', position: 'DEF', rarity: 'rare',      overall: 84, sofascoreId: 863743 },
-  { id: 'uy-bentancur', name: 'R. Bentancur',     country: 'Uruguai',   flagCode: 'uy', position: 'MID', rarity: 'rare',      overall: 82 },
+  { id: 'uy-bentancur', name: 'R. Bentancur',     country: 'Uruguai',   flagCode: 'uy', position: 'MID', rarity: 'rare',      overall: 82,
+    photoUrl: W('c/c8/20171114_AUT_URU_4518_-_Rodrigo_Bentancur_%28cropped%29_2.jpg') },
   { id: 'uy-suarez',    name: 'Luis Suárez',      country: 'Uruguai',   flagCode: 'uy', position: 'ATK', rarity: 'rare',      overall: 79 },
   { id: 'uy-olivera',   name: 'Mathías Olivera',  country: 'Uruguai',   flagCode: 'uy', position: 'DEF', rarity: 'common',    overall: 77 },
 
@@ -169,26 +178,34 @@ export const ALBUM_PLAYERS: AlbumPlayer[] = [
 
   // ───── MARROCOS ─────
   { id: 'ma-bono',      name: 'Yassine Bounou',   country: 'Marrocos',  flagCode: 'ma', position: 'GK',  rarity: 'epic',      overall: 85, sofascoreId: 154490, special: 'O Bono Invencível' },
-  { id: 'ma-hakimi',    name: 'Achraf Hakimi',    country: 'Marrocos',  flagCode: 'ma', position: 'DEF', rarity: 'epic',      overall: 87, sofascoreId: 773669, special: 'Foguete pela Direita' },
+  { id: 'ma-hakimi',    name: 'Achraf Hakimi',    country: 'Marrocos',  flagCode: 'ma', position: 'DEF', rarity: 'epic',      overall: 87, sofascoreId: 773669, special: 'Foguete pela Direita',
+    photoUrl: W('5/56/Achraf_Hakimi_%28cropped2%29.jpg') },
   { id: 'ma-amrabat',   name: 'Sofyan Amrabat',   country: 'Marrocos',  flagCode: 'ma', position: 'MID', rarity: 'rare',      overall: 82, sofascoreId: 620980 },
   { id: 'ma-ziyech',    name: 'Hakim Ziyech',     country: 'Marrocos',  flagCode: 'ma', position: 'ATK', rarity: 'rare',      overall: 82, sofascoreId: 390854 },
   { id: 'ma-ennesyri',  name: 'En-Nesyri',        country: 'Marrocos',  flagCode: 'ma', position: 'ATK', rarity: 'rare',      overall: 80 },
 
   // ───── JAPÃO ─────
-  { id: 'jp-mitoma',    name: 'Kaoru Mitoma',     country: 'Japão',     flagCode: 'jp', position: 'ATK', rarity: 'epic',      overall: 83, sofascoreId: 867893, special: 'Raio do Japão' },
+  { id: 'jp-mitoma',    name: 'Kaoru Mitoma',     country: 'Japão',     flagCode: 'jp', position: 'ATK', rarity: 'epic',      overall: 83, sofascoreId: 867893, special: 'Raio do Japão',
+    photoUrl: W('9/90/Kaoru_Mitoma_%282022%29.jpg') },
   { id: 'jp-kubo',      name: 'Takefusa Kubo',    country: 'Japão',     flagCode: 'jp', position: 'ATK', rarity: 'epic',      overall: 83, sofascoreId: 972706, special: 'Samurai Habilidoso' },
   { id: 'jp-doan',      name: 'Ritsu Dōan',       country: 'Japão',     flagCode: 'jp', position: 'ATK', rarity: 'rare',      overall: 81 },
-  { id: 'jp-endo',      name: 'Wataru Endō',      country: 'Japão',     flagCode: 'jp', position: 'MID', rarity: 'rare',      overall: 80 },
-  { id: 'jp-tanaka',    name: 'Hidemasa Morita',  country: 'Japão',     flagCode: 'jp', position: 'MID', rarity: 'common',    overall: 76 },
+  { id: 'jp-endo',      name: 'Wataru Endō',      country: 'Japão',     flagCode: 'jp', position: 'MID', rarity: 'rare',      overall: 80,
+    photoUrl: W('f/fe/Wataru_Endo_at_Iran-Japan_pre-match_conference.jpg') },
+  { id: 'jp-tanaka',    name: 'Hidemasa Morita',  country: 'Japão',     flagCode: 'jp', position: 'MID', rarity: 'common',    overall: 76,
+    photoUrl: W('4/45/%E5%AE%88%E7%94%B0%E8%8B%B1%E6%AD%A3_%28cropped%29.jpg') },
 
   // ───── COREIA DO SUL ─────
-  { id: 'kr-son',       name: 'Son Heung-min',    country: 'Coreia do Sul', flagCode: 'kr', position: 'ATK', rarity: 'epic',  overall: 88, sofascoreId: 175562, special: 'Capitão Asiático 🎮' },
+  { id: 'kr-son',       name: 'Son Heung-min',    country: 'Coreia do Sul', flagCode: 'kr', position: 'ATK', rarity: 'epic',  overall: 88, sofascoreId: 175562, special: 'Capitão Asiático 🎮',
+    photoUrl: W('b/b0/BFA_2023_-2_Heung-Min_Son_%28cropped%29.jpg') },
   { id: 'kr-kim',       name: 'Kim Min-jae',      country: 'Coreia do Sul', flagCode: 'kr', position: 'DEF', rarity: 'rare',  overall: 84, sofascoreId: 852105 },
-  { id: 'kr-lee',       name: 'Lee Kang-in',      country: 'Coreia do Sul', flagCode: 'kr', position: 'MID', rarity: 'rare',  overall: 81, sofascoreId: 998906 },
-  { id: 'kr-hwang',     name: 'Hwang Hee-chan',   country: 'Coreia do Sul', flagCode: 'kr', position: 'ATK', rarity: 'common',overall: 77 },
+  { id: 'kr-lee',       name: 'Lee Kang-in',      country: 'Coreia do Sul', flagCode: 'kr', position: 'MID', rarity: 'rare',  overall: 81, sofascoreId: 998906,
+    photoUrl: W('1/13/Lee_Kang-in_-_2022_%2852551771501%29_%28cropped%29.jpg') },
+  { id: 'kr-hwang',     name: 'Hwang Hee-chan',   country: 'Coreia do Sul', flagCode: 'kr', position: 'ATK', rarity: 'common',overall: 77,
+    photoUrl: W('b/be/240622_%ED%99%A9%ED%9D%AC%EC%B0%AC_%ED%92%8B%EB%B3%BC_%ED%8E%98%EC%8A%A4%ED%8B%B0%EB%B2%8C.jpg') },
 
   // ───── EUA ─────
-  { id: 'us-pulisic',   name: 'Christian Pulisic',country: 'EUA',       flagCode: 'us', position: 'ATK', rarity: 'epic',      overall: 83, sofascoreId: 726724, special: 'Captain America ⚽' },
+  { id: 'us-pulisic',   name: 'Christian Pulisic',country: 'EUA',       flagCode: 'us', position: 'ATK', rarity: 'epic',      overall: 83, sofascoreId: 726724, special: 'Captain America ⚽',
+    photoUrl: W('7/71/Christian_Pulisic_USMNT_v_Belgium_Mar_28_2026-73_%28cropped%29.jpg') },
   { id: 'us-reyna',     name: 'Giovanni Reyna',   country: 'EUA',       flagCode: 'us', position: 'MID', rarity: 'rare',      overall: 80, sofascoreId: 935429 },
   { id: 'us-mckennie',  name: 'Weston McKennie',  country: 'EUA',       flagCode: 'us', position: 'MID', rarity: 'rare',      overall: 79, sofascoreId: 799429 },
   { id: 'us-dest',      name: 'Sergiño Dest',     country: 'EUA',       flagCode: 'us', position: 'DEF', rarity: 'common',    overall: 76 },
@@ -196,7 +213,8 @@ export const ALBUM_PLAYERS: AlbumPlayer[] = [
   // ───── MÉXICO ─────
   { id: 'mx-ochoa',     name: 'Guillermo Ochoa',  country: 'México',    flagCode: 'mx', position: 'GK',  rarity: 'rare',      overall: 82 },
   { id: 'mx-lozano',    name: 'Hirving Lozano',   country: 'México',    flagCode: 'mx', position: 'ATK', rarity: 'epic',      overall: 82, sofascoreId: 397501, special: 'El Chucky' },
-  { id: 'mx-jimenez',   name: 'Raúl Jiménez',     country: 'México',    flagCode: 'mx', position: 'ATK', rarity: 'rare',      overall: 80, sofascoreId: 120419 },
+  { id: 'mx-jimenez',   name: 'Raúl Jiménez',     country: 'México',    flagCode: 'mx', position: 'ATK', rarity: 'rare',      overall: 80, sofascoreId: 120419,
+    photoUrl: W('d/de/Ra%C3%BAl_Jim%C3%A9nez_04032026_%281%29.jpg') },
   { id: 'mx-alvarez',   name: 'Edson Álvarez',    country: 'México',    flagCode: 'mx', position: 'MID', rarity: 'rare',      overall: 81, sofascoreId: 786699 },
   { id: 'mx-guardado',  name: 'Andrés Guardado',  country: 'México',    flagCode: 'mx', position: 'MID', rarity: 'common',    overall: 75 },
 
