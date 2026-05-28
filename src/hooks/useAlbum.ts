@@ -211,16 +211,29 @@ export function useAlbum() {
   }, [user, userName, className]);
 
   // ── Accept / decline trade ──
-  const respondTrade = useCallback(async (tradeId: string, accept: boolean) => {
-    if (!user) return;
+  const respondTrade = useCallback(async (tradeId: string, accept: boolean): Promise<{ ok: boolean; error?: string }> => {
+    if (!user) return { ok: false, error: 'Não autenticado' };
     const trade = trades.find(t => t.id === tradeId);
-    if (!trade) return;
+    if (!trade) return { ok: false, error: 'Troca não encontrada' };
 
     if (accept) {
-      // Swap cards
-      for (const cardId of trade.offeredCards) {
-        await supabase.from('album_inventory').upsert({ user_id: user.id, card_id: cardId, quantity: (inventory.find(e => e.cardId === cardId)?.quantity ?? 0) + 1 }, { onConflict: 'user_id,card_id' });
+      // Validate: check we have every card they requested
+      if (trade.requestedCards.length > 0) {
+        const missing = trade.requestedCards.filter(cardId => (inventory.find(e => e.cardId === cardId)?.quantity ?? 0) < 1);
+        if (missing.length > 0) {
+          const names = missing.map(id => getPlayerById(id)?.name ?? id).join(', ');
+          return { ok: false, error: `Você não tem: ${names}` };
+        }
       }
+
+      // Swap cards: give offered cards to the acceptor
+      for (const cardId of trade.offeredCards) {
+        await supabase.from('album_inventory').upsert(
+          { user_id: user.id, card_id: cardId, quantity: (inventory.find(e => e.cardId === cardId)?.quantity ?? 0) + 1 },
+          { onConflict: 'user_id,card_id' },
+        );
+      }
+      // Remove requested cards from acceptor
       for (const cardId of trade.requestedCards) {
         const qty = inventory.find(e => e.cardId === cardId)?.quantity ?? 0;
         if (qty > 1) await supabase.from('album_inventory').update({ quantity: qty - 1 }).eq('user_id', user.id).eq('card_id', cardId);
@@ -230,6 +243,7 @@ export function useAlbum() {
     }
 
     await supabase.from('album_trades').update({ status: accept ? 'accepted' : 'declined', updated_at: new Date().toISOString() }).eq('id', tradeId);
+    return { ok: true };
   }, [user, trades, inventory]);
 
   const cancelTrade = useCallback(async (tradeId: string) => {

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAlbum } from '@/hooks/useAlbum';
 import { useAuth } from '@/hooks/useAuth';
@@ -14,28 +14,24 @@ import { cn } from '@/lib/utils';
 import { supabase as supabaseTyped } from '@/integrations/supabase/client';
 const supabase = supabaseTyped as any;
 
-// ── Packs rewarded per attempt ──
-const PACKS_FIRST   = 3;
-const PACKS_SECOND  = 1;
-const COOLDOWN_MS   = 5 * 60 * 1000; // 5 minutes
+const PACKS_FIRST  = 3;
+const PACKS_SECOND = 1;
+const COOLDOWN_MS  = 5 * 60 * 1000;
 
-const cdlKey = (userId: string, challengeId: string) => `cdl_${userId}_${challengeId}`;
-
-function saveCooldown(userId: string, challengeId: string, wrongIdx: number, until: number) {
-  localStorage.setItem(cdlKey(userId, challengeId), JSON.stringify({ wrongIdx, until }));
+const cdlKey = (uid: string, cid: string) => `cdl_${uid}_${cid}`;
+function saveCooldown(uid: string, cid: string, wrongIdx: number, until: number) {
+  localStorage.setItem(cdlKey(uid, cid), JSON.stringify({ wrongIdx, until }));
 }
-
-function loadCooldown(userId: string, challengeId: string): { wrongIdx: number; until: number } | null {
-  try {
-    const raw = localStorage.getItem(cdlKey(userId, challengeId));
-    return raw ? JSON.parse(raw) : null;
-  } catch { return null; }
+function loadCooldown(uid: string, cid: string): { wrongIdx: number; until: number } | null {
+  try { const r = localStorage.getItem(cdlKey(uid, cid)); return r ? JSON.parse(r) : null; }
+  catch { return null; }
 }
+function clearCooldown(uid: string, cid: string) { localStorage.removeItem(cdlKey(uid, cid)); }
 
-function clearCooldown(userId: string, challengeId: string) {
-  localStorage.removeItem(cdlKey(userId, challengeId));
-}
+const fmtTime = (s: number) =>
+  `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
 
+type CdlState = { wrongIdx: number; until: number; remaining: number };
 type GameState = 'playing' | 'wrong-first' | 'won' | 'lost';
 
 export default function DesafiosAlbumPage() {
@@ -49,91 +45,97 @@ export default function DesafiosAlbumPage() {
   const [gradeFilter, setGradeFilter] = useState<GradeGroup | 'all'>('all');
   const [showInfo,    setShowInfo]    = useState(false);
 
-  // Per-question state
-  const [gameState,     setGameState]     = useState<GameState>('playing');
-  const [wrongChoice,   setWrongChoice]   = useState<number | null>(null);   // first wrong pick
-  const [finalChoice,   setFinalChoice]   = useState<number | null>(null);   // second pick (right or wrong)
-  const [packsEarned,   setPacksEarned]   = useState(0);
+  const [gameState,   setGameState]   = useState<GameState>('playing');
+  const [wrongChoice, setWrongChoice] = useState<number | null>(null);
+  const [finalChoice, setFinalChoice] = useState<number | null>(null);
+  const [packsEarned, setPacksEarned] = useState(0);
 
-  // Cooldown state
-  const [remaining, setRemaining] = useState(0); // seconds
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // cooldownMap: per-challenge timer state (shown in card grid)
+  const [cooldownMap, setCooldownMap] = useState<Map<string, CdlState>>(new Map());
 
-  // Auto-select grade based on student profile
+  // Auto-select grade from profile
   useEffect(() => {
     const gy = (profile as any)?.grade_year as number | undefined;
     if (gy) setGradeFilter(gy <= 5 ? '4-5' : '6-8');
   }, [profile]);
 
+  // Load completed challenges
   useEffect(() => {
     if (!user) return;
     supabase
-      .from('album_challenge_done')
-      .select('challenge_id')
-      .eq('user_id', user.id)
+      .from('album_challenge_done').select('challenge_id').eq('user_id', user.id)
       .then(({ data }: { data: Array<{ challenge_id: string }> | null }) => {
         if (data) setDone(new Set(data.map(r => r.challenge_id)));
       });
   }, [user]);
 
-  const startCooldown = (until: number) => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    const tick = () => {
-      const secs = Math.max(0, Math.ceil((until - Date.now()) / 1000));
-      setRemaining(secs);
-      if (secs === 0 && timerRef.current) clearInterval(timerRef.current);
-    };
-    tick();
-    timerRef.current = setInterval(tick, 500);
-  };
+  // Load cooldowns from localStorage on mount/user change
+  useEffect(() => {
+    if (!user) return;
+    const map = new Map<string, CdlState>();
+    for (const ch of ALBUM_CHALLENGES) {
+      if (done.has(ch.id)) continue;
+      const saved = loadCooldown(user.id, ch.id);
+      if (saved) {
+        const remaining = Math.max(0, Math.ceil((saved.until - Date.now()) / 1000));
+        map.set(ch.id, { ...saved, remaining });
+      }
+    }
+    setCooldownMap(map);
+  }, [user, done]);
 
-  // Clean up timer on unmount
-  useEffect(() => () => { if (timerRef.current) clearInterval(timerRef.current); }, []);
+  // Global interval — ticks all active cooldowns
+  useEffect(() => {
+    const iv = setInterval(() => {
+      const now = Date.now();
+      setCooldownMap(prev => {
+        let changed = false;
+        const next = new Map(prev);
+        for (const [id, state] of next) {
+          const r = Math.max(0, Math.ceil((state.until - now) / 1000));
+          if (r !== state.remaining) { next.set(id, { ...state, remaining: r }); changed = true; }
+        }
+        return changed ? next : prev;
+      });
+    }, 500);
+    return () => clearInterval(iv);
+  }, []);
 
   const resetQuiz = () => {
-    if (timerRef.current) clearInterval(timerRef.current);
     setGameState('playing');
     setWrongChoice(null);
     setFinalChoice(null);
     setPacksEarned(0);
-    setRemaining(0);
   };
 
   const openChallenge = (ch: AlbumChallenge) => {
+    const cdl = cooldownMap.get(ch.id);
+    if (cdl && cdl.remaining > 0) return; // still counting down — blocked
     resetQuiz();
-    // Restore cooldown if still active
-    if (user) {
-      const saved = loadCooldown(user.id, ch.id);
-      if (saved) {
-        const secs = Math.ceil((saved.until - Date.now()) / 1000);
-        setWrongChoice(saved.wrongIdx);
-        setGameState('wrong-first');
-        if (secs > 0) startCooldown(saved.until);
-      }
+    if (cdl && cdl.remaining === 0) {
+      // Cooldown expired, 2nd attempt available
+      setWrongChoice(cdl.wrongIdx);
+      setGameState('wrong-first');
     }
     setActive(ch);
   };
 
-  const closeChallenge = () => {
-    resetQuiz();
-    setActive(null);
-  };
+  const closeChallenge = () => { resetQuiz(); setActive(null); };
 
   const handleAnswer = async (idx: number) => {
     if (!active || !user) return;
     if (gameState === 'won' || gameState === 'lost') return;
-    if (gameState === 'wrong-first' && remaining > 0) return; // cooldown active
-    if (gameState === 'wrong-first' && idx === wrongChoice) return; // can't re-pick same wrong
+    if (gameState === 'wrong-first' && idx === wrongChoice) return;
 
-    const isCorrect   = idx === active.correct;
-    const isFirstTry  = gameState === 'playing';
+    const isCorrect  = idx === active.correct;
+    const isFirstTry = gameState === 'playing';
 
     if (isCorrect) {
-      const packs    = isFirstTry ? PACKS_FIRST : PACKS_SECOND;
-      const coins    = isFirstTry ? active.coinsReward : Math.ceil(active.coinsReward / 2);
-      const xp       = isFirstTry ? active.xpReward    : Math.ceil(active.xpReward    / 2);
-
+      const packs = isFirstTry ? PACKS_FIRST : PACKS_SECOND;
+      const coins  = isFirstTry ? active.coinsReward : Math.ceil(active.coinsReward / 2);
+      const xp     = isFirstTry ? active.xpReward    : Math.ceil(active.xpReward    / 2);
       clearCooldown(user.id, active.id);
+      setCooldownMap(prev => { const n = new Map(prev); n.delete(active.id); return n; });
       const saved = await album.completeChallenge(active.id);
       if (saved) {
         setDone(prev => new Set([...prev, active.id]));
@@ -145,15 +147,21 @@ export default function DesafiosAlbumPage() {
       setGameState('won');
     } else {
       if (isFirstTry) {
-        // First wrong — start cooldown, show hint
+        // First wrong → start cooldown, close modal, timer appears in card
         const until = Date.now() + COOLDOWN_MS;
         saveCooldown(user.id, active.id, idx, until);
-        setWrongChoice(idx);
-        setGameState('wrong-first');
-        startCooldown(until);
+        setCooldownMap(prev => {
+          const n = new Map(prev);
+          n.set(active.id, { wrongIdx: idx, until, remaining: Math.ceil(COOLDOWN_MS / 1000) });
+          return n;
+        });
+        toast.error(`Quase! 💡 Dica: ${active.hint}`, { duration: 6000 });
+        resetQuiz();
+        setActive(null); // return to grid — timer visible in card
       } else {
-        // Second wrong — game over, reveal answer
+        // Second wrong — game over
         clearCooldown(user.id, active.id);
+        setCooldownMap(prev => { const n = new Map(prev); n.delete(active.id); return n; });
         setFinalChoice(idx);
         setGameState('lost');
       }
@@ -178,20 +186,17 @@ export default function DesafiosAlbumPage() {
 
   const earnedFromChallenges = [...done].reduce((sum, id) => {
     const ch = ALBUM_CHALLENGES.find(c => c.id === id);
-    return sum + (ch ? (PACKS_FIRST) : 0); // simplified estimate
+    return sum + (ch ? PACKS_FIRST : 0);
   }, 0);
 
-  const fmtTime = (s: number) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
-
-  // ── Attempt indicator ──
+  // Attempt dots for modal
   const attemptDots = (
     <div className="flex gap-1.5 items-center">
       <div className={cn('h-3 w-3 rounded-full', gameState !== 'playing' && gameState !== 'wrong-first' ? 'bg-white/30' : 'bg-[#FBBA16]')} />
       <div className={cn('h-3 w-3 rounded-full', gameState === 'lost' ? 'bg-[#D43B2A]' : gameState === 'won' ? 'bg-[#1E9B5F]' : gameState === 'wrong-first' ? 'bg-[#FBBA16]' : 'bg-white/20')} />
       <p className="text-xs text-white/50 ml-1">
         {gameState === 'playing'     && 'Tentativa 1 de 2'}
-        {gameState === 'wrong-first' && remaining > 0 && `Próxima tentativa em ${fmtTime(remaining)}`}
-        {gameState === 'wrong-first' && remaining === 0 && 'Tentativa 2 de 2 — última chance!'}
+        {gameState === 'wrong-first' && 'Tentativa 2 de 2 — última chance!'}
         {gameState === 'won'         && 'Correto! 🎉'}
         {gameState === 'lost'        && 'Esgotado 😅'}
       </p>
@@ -226,8 +231,8 @@ export default function DesafiosAlbumPage() {
               <p>• Você tem <strong className="text-white">2 tentativas</strong> por desafio.</p>
               <p>• Acertar na <strong className="text-[#FBBA16]">1ª tentativa</strong>: ganhe <strong className="text-white">3 📦 pacotes</strong>.</p>
               <p>• Acertar na <strong className="text-white">2ª tentativa</strong>: ganhe <strong className="text-white">1 📦 pacote</strong>.</p>
+              <p>• Se errar a 1ª, aguarde <strong className="text-white">5 minutos</strong> para a 2ª tentativa.</p>
               <p>• Se errar as duas: nenhum pacote. A resposta será revelada para aprender.</p>
-              <p>• Ao entrar na plataforma você já recebe <strong className="text-white">3 pacotes de boas-vindas</strong>.</p>
               <p className="text-[#1E9B5F] font-bold">Desafios completos: {done.size} · Pacotes estimados ganhos: {earnedFromChallenges}</p>
             </div>
           )}
@@ -250,15 +255,8 @@ export default function DesafiosAlbumPage() {
         {/* Grade filter */}
         <div className="flex gap-2 mb-3">
           {gradeOptions.map(g => (
-            <button
-              type="button"
-              key={g.key}
-              onClick={() => setGradeFilter(g.key)}
-              className={cn(
-                'rounded-full px-3 py-1.5 text-xs font-bold transition-all',
-                gradeFilter === g.key ? 'copa-filter-active' : 'copa-filter-inactive',
-              )}
-            >
+            <button type="button" key={g.key} onClick={() => setGradeFilter(g.key)}
+              className={cn('rounded-full px-3 py-1.5 text-xs font-bold transition-all', gradeFilter === g.key ? 'copa-filter-active' : 'copa-filter-inactive')}>
               {g.label}
             </button>
           ))}
@@ -267,15 +265,8 @@ export default function DesafiosAlbumPage() {
         {/* Type filter */}
         <div className="flex flex-wrap gap-2 mb-6">
           {typeOptions.map(f => (
-            <button
-              type="button"
-              key={f.key}
-              onClick={() => setTypeFilter(f.key)}
-              className={cn(
-                'rounded-full px-3 py-1.5 text-xs font-bold transition-all',
-                typeFilter === f.key ? 'copa-filter-active' : 'copa-filter-inactive',
-              )}
-            >
+            <button type="button" key={f.key} onClick={() => setTypeFilter(f.key)}
+              className={cn('rounded-full px-3 py-1.5 text-xs font-bold transition-all', typeFilter === f.key ? 'copa-filter-active' : 'copa-filter-inactive')}>
               {f.label}
             </button>
           ))}
@@ -285,24 +276,36 @@ export default function DesafiosAlbumPage() {
         {!active ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredChallenges.map(ch => {
-              const isDone    = done.has(ch.id);
-              const typeCfg   = CHALLENGE_TYPE_CONFIG[ch.type];
-              const diffCfg   = DIFFICULTY_CONFIG[ch.difficulty];
-              const gradeCfg  = GRADE_CONFIG[ch.gradeGroup];
+              const isDone         = done.has(ch.id);
+              const cdl            = cooldownMap.get(ch.id);
+              const isOnCooldown   = !!cdl && cdl.remaining > 0;
+              const hasSecondChance = !!cdl && cdl.remaining === 0;
+              const typeCfg        = CHALLENGE_TYPE_CONFIG[ch.type];
+              const diffCfg        = DIFFICULTY_CONFIG[ch.difficulty];
+              const gradeCfg       = GRADE_CONFIG[ch.gradeGroup];
+
               return (
                 <div
                   key={ch.id}
-                  onClick={() => !isDone && openChallenge(ch)}
+                  onClick={() => !isDone && !isOnCooldown && openChallenge(ch)}
                   className={cn(
-                    'copa-panel group relative p-5 transition-all',
-                    !isDone && 'cursor-pointer hover:bg-white/20 hover:border-white/40',
+                    'copa-panel group relative p-5 transition-all overflow-hidden',
+                    !isDone && !isOnCooldown && 'cursor-pointer hover:bg-white/20 hover:border-white/40',
                     isDone && 'opacity-50 cursor-not-allowed',
+                    isOnCooldown && 'cursor-not-allowed border-[#D43B2A]/30',
+                    hasSecondChance && 'border-[#FBBA16]/60 bg-[#FBBA16]/5',
                   )}
                 >
                   {isDone && <div className="absolute top-3 right-3"><CheckCircle2 className="h-5 w-5 text-[#1E9B5F]" /></div>}
 
+                  {hasSecondChance && !isDone && (
+                    <div className="absolute top-3 right-3 rounded-full bg-[#FBBA16]/20 border border-[#FBBA16]/50 text-[#FBBA16] text-[9px] font-black px-2 py-0.5 uppercase">
+                      2ª tentativa!
+                    </div>
+                  )}
+
                   <div className="flex items-start justify-between mb-3">
-                    <div className={`inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${typeCfg.color} text-2xl shadow-lg group-hover:scale-110 transition-transform`}>
+                    <div className={`inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${typeCfg.color} text-2xl shadow-lg ${!isOnCooldown ? 'group-hover:scale-110' : ''} transition-transform`}>
                       {ch.emoji}
                     </div>
                     <span className={cn('rounded-full border text-[9px] font-black px-2 py-0.5 uppercase tracking-wide', gradeCfg.bg, gradeCfg.color)}>
@@ -313,14 +316,27 @@ export default function DesafiosAlbumPage() {
                   <h3 className="font-black text-white text-sm mb-1">{ch.title}</h3>
                   <p className="text-xs text-white/60 mb-3">{ch.description}</p>
 
-                  <div className="flex items-center justify-between">
-                    <span className={cn('text-xs font-bold', diffCfg.color)}>{diffCfg.label}</span>
-                    <div className="flex items-center gap-2 text-xs">
-                      <span className="text-white/80">📦×3</span>
-                      <span className="text-[#FBBA16]">🪙{ch.coinsReward}</span>
-                      <span className="text-[#38BDF8]">⚡{ch.xpReward}</span>
+                  {/* Cooldown timer inside the card */}
+                  {isOnCooldown && cdl ? (
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 rounded-xl bg-[#D43B2A]/15 border border-[#D43B2A]/30 px-3 py-2 flex-1">
+                        <span className="text-sm">⏳</span>
+                        <div>
+                          <div className="font-mono font-black text-white text-sm leading-none">{fmtTime(cdl.remaining)}</div>
+                          <div className="text-[9px] text-white/40 leading-none mt-0.5">2ª tentativa</div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="flex items-center justify-between">
+                      <span className={cn('text-xs font-bold', diffCfg.color)}>{diffCfg.label}</span>
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className="text-white/80">📦×3</span>
+                        <span className="text-[#FBBA16]">🪙{ch.coinsReward}</span>
+                        <span className="text-[#38BDF8]">⚡{ch.xpReward}</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -333,10 +349,10 @@ export default function DesafiosAlbumPage() {
           </div>
         ) : (
 
-          /* ── Active challenge ── */
+          /* ── Active challenge modal ── */
           <div className="max-w-2xl mx-auto">
 
-            {/* ── WON screen ── */}
+            {/* WON */}
             {gameState === 'won' && (
               <div className="copa-panel p-8 text-center">
                 <div className="text-6xl mb-4 animate-bounce">
@@ -346,11 +362,8 @@ export default function DesafiosAlbumPage() {
                   {packsEarned === PACKS_FIRST ? 'Incrível! Acertou de primeira!' : 'Mandou bem! Acertou na segunda.'}
                 </h2>
                 <p className="text-white/60 mb-8">
-                  {packsEarned === PACKS_FIRST
-                    ? 'Resposta certa logo de cara — você é fera!'
-                    : 'Persistiu e acertou. Isso que conta!'}
+                  {packsEarned === PACKS_FIRST ? 'Resposta certa logo de cara — você é fera!' : 'Persistiu e acertou. Isso que conta!'}
                 </p>
-
                 <div className="flex items-center justify-center gap-3 mb-8">
                   <div className="rounded-2xl border-2 border-[#1E9B5F]/60 bg-[#1E9B5F]/15 px-8 py-5">
                     <div className="text-5xl font-black text-[#1E9B5F] leading-none">{packsEarned}</div>
@@ -359,32 +372,23 @@ export default function DesafiosAlbumPage() {
                     </div>
                   </div>
                 </div>
-
                 <p className="text-white/50 text-sm mb-6">
                   +{packsEarned === PACKS_FIRST ? active.coinsReward : Math.ceil(active.coinsReward / 2)} moedas
                   · +{packsEarned === PACKS_FIRST ? active.xpReward : Math.ceil(active.xpReward / 2)} XP
-                  adicionados ao seu perfil
                 </p>
-
                 <div className="flex flex-col gap-3">
-                  <Button
-                    onClick={() => navigate('/aluno/album')}
-                    className="w-full bg-gradient-to-r from-[#1E9B5F] to-[#38BDF8] text-white font-black text-lg py-6 rounded-2xl shadow-[0_0_30px_rgba(30,155,95,0.5)]"
-                  >
+                  <Button onClick={() => navigate('/aluno/album')}
+                    className="w-full bg-gradient-to-r from-[#1E9B5F] to-[#38BDF8] text-white font-black text-lg py-6 rounded-2xl shadow-[0_0_30px_rgba(30,155,95,0.5)]">
                     📦 Ir abrir meus pacotes!
                   </Button>
-                  <button
-                    type="button"
-                    onClick={closeChallenge}
-                    className="text-sm text-white/50 hover:text-white/80 py-2"
-                  >
+                  <button type="button" onClick={closeChallenge} className="text-sm text-white/50 hover:text-white/80 py-2">
                     Continuar nos desafios →
                   </button>
                 </div>
               </div>
             )}
 
-            {/* ── LOST screen ── */}
+            {/* LOST */}
             {gameState === 'lost' && (
               <div className="copa-panel p-8">
                 <div className="text-center mb-6">
@@ -392,33 +396,24 @@ export default function DesafiosAlbumPage() {
                   <h2 className="font-black text-2xl text-white mb-1">Quase lá!</h2>
                   <p className="text-white/60">Você errou as duas tentativas. Mas aprender com o erro também é evoluir!</p>
                 </div>
-
                 <div className="rounded-2xl border border-[#1E9B5F]/40 bg-[#1E9B5F]/10 p-4 mb-4">
                   <p className="text-xs font-black text-[#1E9B5F] uppercase tracking-wider mb-2">✅ A resposta certa era:</p>
                   <p className="font-bold text-white">{active.options[active.correct]}</p>
                 </div>
-
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-4 mb-6">
                   <p className="text-xs font-black text-white/50 uppercase tracking-wider mb-2">💡 Explicação</p>
                   <p className="text-sm text-white/80 leading-relaxed">{active.explanation}</p>
                 </div>
-
-                <div className="flex gap-3">
-                  <button
-                    type="button"
-                    onClick={closeChallenge}
-                    className="flex-1 rounded-xl border border-white/20 bg-white/10 text-white font-bold py-2.5 hover:bg-white/20 transition-colors"
-                  >
-                    ← Voltar aos desafios
-                  </button>
-                </div>
+                <button type="button" onClick={closeChallenge}
+                  className="w-full rounded-xl border border-white/20 bg-white/10 text-white font-bold py-2.5 hover:bg-white/20 transition-colors">
+                  ← Voltar aos desafios
+                </button>
               </div>
             )}
 
-            {/* ── PLAYING / WRONG-FIRST screens ── */}
+            {/* PLAYING / WRONG-FIRST */}
             {(gameState === 'playing' || gameState === 'wrong-first') && (
               <div className="copa-panel p-8">
-                {/* Header */}
                 <div className="flex items-start gap-3 mb-4">
                   <div className={`flex-shrink-0 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${CHALLENGE_TYPE_CONFIG[active.type].color} text-3xl shadow-lg`}>
                     {active.emoji}
@@ -436,54 +431,35 @@ export default function DesafiosAlbumPage() {
                   </div>
                 </div>
 
-                {/* Attempt indicator */}
                 <div className="mb-5">{attemptDots}</div>
 
-                {/* "Wrong first" banner — cooldown or hint */}
-                {gameState === 'wrong-first' && remaining > 0 && (
-                  <div className="mb-4 rounded-xl border border-[#D43B2A]/40 bg-[#D43B2A]/10 px-4 py-5 text-center">
-                    <p className="font-black text-[#D43B2A] text-sm mb-3">⏳ Resposta errada! Aguarde para tentar de novo.</p>
-                    <div className="font-mono text-4xl font-black text-white mb-2">{fmtTime(remaining)}</div>
-                    <p className="text-xs text-white/40">Sua segunda chance estará disponível em breve.</p>
-                    <div className="mt-3 rounded-lg bg-[#FBBA16]/10 border border-[#FBBA16]/20 px-3 py-2">
-                      <p className="text-sm text-white/70">💡 Dica: {active.hint}</p>
-                    </div>
-                  </div>
-                )}
-                {gameState === 'wrong-first' && remaining === 0 && (
+                {/* 2nd attempt hint (cooldown already expired when modal opens) */}
+                {gameState === 'wrong-first' && (
                   <div className="mb-4 rounded-xl border border-[#FBBA16]/40 bg-[#FBBA16]/10 px-4 py-3">
-                    <p className="font-black text-[#FBBA16] text-sm mb-1">⚠️ Opa! Não foi dessa vez.</p>
+                    <p className="font-black text-[#FBBA16] text-sm mb-1">⚠️ 2ª e última tentativa!</p>
                     <p className="text-sm text-white/70">💡 Dica: {active.hint}</p>
-                    <p className="text-xs text-white/40 mt-1">Você ainda tem 1 chance. Pense bem antes de responder!</p>
+                    <p className="text-xs text-white/40 mt-1">Pense bem antes de responder!</p>
                   </div>
                 )}
 
-                {/* Question */}
                 <p className="text-white text-lg font-bold mb-6 leading-relaxed">{active.question}</p>
 
-                {/* Options */}
                 <div className="space-y-3 mb-6">
                   {active.options.map((opt, idx) => {
                     const isFirstWrong = idx === wrongChoice;
-                    const onCooldown   = gameState === 'wrong-first' && remaining > 0;
-                    const isDisabled   = isFirstWrong || onCooldown;
-
                     return (
                       <button
                         type="button"
                         key={idx}
-                        disabled={isDisabled}
+                        disabled={isFirstWrong}
                         onClick={() => handleAnswer(idx)}
                         className={cn(
                           'flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left text-sm font-semibold transition-all',
-                          !isDisabled && 'border-white/20 bg-white/10 text-white hover:border-[#FBBA16]/60 hover:bg-white/15 cursor-pointer',
+                          !isFirstWrong && 'border-white/20 bg-white/10 text-white hover:border-[#FBBA16]/60 hover:bg-white/15 cursor-pointer',
                           isFirstWrong && 'border-[#D43B2A]/60 bg-[#D43B2A]/15 text-white/50 cursor-not-allowed opacity-60',
-                          onCooldown && !isFirstWrong && 'border-white/10 bg-white/5 text-white/30 cursor-not-allowed',
                         )}
                       >
-                        <span className="font-mono text-[#FBBA16] flex-shrink-0">
-                          {String.fromCharCode(65 + idx)}.
-                        </span>
+                        <span className="font-mono text-[#FBBA16] flex-shrink-0">{String.fromCharCode(65 + idx)}.</span>
                         <span className="flex-1">{opt}</span>
                         {isFirstWrong && <XCircle className="h-4 w-4 text-[#D43B2A] flex-shrink-0" />}
                       </button>
@@ -491,17 +467,12 @@ export default function DesafiosAlbumPage() {
                   })}
                 </div>
 
-                {/* Reward preview */}
                 <div className="flex items-center justify-between text-xs text-white/40 border-t border-white/10 pt-4">
                   <span>Acertando de 1ª: <strong className="text-[#1E9B5F]">3 📦 pacotes</strong></span>
                   <span>Acertando de 2ª: <strong className="text-white/60">1 📦 pacote</strong></span>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={closeChallenge}
-                  className="mt-4 text-xs text-white/30 hover:text-white/60 w-full text-center"
-                >
+                <button type="button" onClick={closeChallenge} className="mt-4 text-xs text-white/30 hover:text-white/60 w-full text-center">
                   ← Voltar aos desafios
                 </button>
               </div>

@@ -27,9 +27,10 @@ export default function RankingAlbumPage() {
     const load = async () => {
       setLoading(true);
       const school = (profile as any)?.school ?? '';
+      // Teachers have school = "Todas as escolas" — they see everyone
+      const filterBySchool = school && school !== 'Todas as escolas';
 
-      // If school is set, filter by it; otherwise show all users
-      const profilesQuery = school
+      const profilesQuery = filterBySchool
         ? supabase.from('profiles').select('user_id, full_name, class_name').eq('school', school)
         : supabase.from('profiles').select('user_id, full_name, class_name');
 
@@ -61,8 +62,8 @@ export default function RankingAlbumPage() {
             coins: stats?.coins ?? 0,
           };
         })
-        // Only show users who have interacted with the album
-        .filter((e: RankEntry) => e.uniqueCards > 0 || e.legendaries > 0 || e.coins > 100);
+        // Only show users who have interacted with the album (have any stats row)
+        .filter((e: RankEntry) => statsMap.has(e.userId) || e.uniqueCards > 0);
 
       entries.sort((a: RankEntry, b: RankEntry) => b.uniqueCards - a.uniqueCards || b.legendaries - a.legendaries);
       setRanking(entries);

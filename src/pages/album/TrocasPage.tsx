@@ -32,8 +32,19 @@ export default function TrocasPage() {
     setShowModal(false);
   };
 
+  const canFulfill = (trade: TradeProposal): boolean => {
+    if (trade.requestedCards.length === 0) return true; // free trade — no requirements
+    return trade.requestedCards.every(cardId =>
+      (album.inventory.find(e => e.cardId === cardId)?.quantity ?? 0) >= 1,
+    );
+  };
+
   const handleRespond = async (tradeId: string, accept: boolean) => {
-    await album.respondTrade(tradeId, accept);
+    const result = await album.respondTrade(tradeId, accept);
+    if (!result.ok) {
+      toast.error(result.error ?? 'Você não tem as figurinhas necessárias para essa troca.');
+      return;
+    }
     toast.success(accept ? 'Troca aceita! Figurinhas transferidas.' : 'Troca recusada.');
   };
 
@@ -125,7 +136,7 @@ export default function TrocasPage() {
             ) : (
               <div className="grid gap-3">
                 {openTrades.map(trade => (
-                  <TradeCard key={trade.id} trade={trade} onAccept={() => handleRespond(trade.id, true)} />
+                  <TradeCard key={trade.id} trade={trade} canFulfill={canFulfill(trade)} onAccept={() => handleRespond(trade.id, true)} />
                 ))}
               </div>
             )}
@@ -143,6 +154,7 @@ export default function TrocasPage() {
               <TradeCard
                 key={trade.id}
                 trade={trade}
+                canFulfill={canFulfill(trade)}
                 onAccept={() => handleRespond(trade.id, true)}
                 onDecline={() => handleRespond(trade.id, false)}
               />
@@ -166,9 +178,10 @@ export default function TrocasPage() {
   );
 }
 
-function TradeCard({ trade, isOwn, onAccept, onDecline, onCancel }: {
+function TradeCard({ trade, isOwn, canFulfill = true, onAccept, onDecline, onCancel }: {
   trade: TradeProposal;
   isOwn?: boolean;
+  canFulfill?: boolean;
   onAccept?: () => void;
   onDecline?: () => void;
   onCancel?: () => void;
@@ -262,19 +275,25 @@ function TradeCard({ trade, isOwn, onAccept, onDecline, onCancel }: {
       {(onAccept || onDecline || onCancel) && !['accepted','declined','cancelled'].includes(trade.status) && (
         <div className="flex gap-2">
           {onAccept && (
-            <button
-              type="button"
-              onClick={onAccept}
-              className={cn(
-                'flex-1 flex items-center justify-center gap-1.5 rounded-xl text-sm font-black py-2.5 transition-all',
-                isOpenOther
-                  ? 'bg-gradient-to-r from-[#1E9B5F] to-[#38BDF8] text-white shadow-[0_0_16px_rgba(30,155,95,0.5)] hover:opacity-90'
-                  : 'bg-[#1E9B5F]/20 border border-[#1E9B5F]/40 text-[#1E9B5F] hover:bg-[#1E9B5F]/30',
-              )}
-            >
-              <Check className="h-4 w-4" />
-              {isOpenOther ? '⚡ Aceitar agora!' : 'Aceitar'}
-            </button>
+            canFulfill ? (
+              <button
+                type="button"
+                onClick={onAccept}
+                className={cn(
+                  'flex-1 flex items-center justify-center gap-1.5 rounded-xl text-sm font-black py-2.5 transition-all',
+                  isOpenOther
+                    ? 'bg-gradient-to-r from-[#1E9B5F] to-[#38BDF8] text-white shadow-[0_0_16px_rgba(30,155,95,0.5)] hover:opacity-90'
+                    : 'bg-[#1E9B5F]/20 border border-[#1E9B5F]/40 text-[#1E9B5F] hover:bg-[#1E9B5F]/30',
+                )}
+              >
+                <Check className="h-4 w-4" />
+                {isOpenOther ? '⚡ Aceitar agora!' : 'Aceitar'}
+              </button>
+            ) : (
+              <div className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-white/5 border border-white/15 text-white/35 text-xs font-bold py-2.5 cursor-not-allowed">
+                Você não tem as figurinhas pedidas
+              </div>
+            )
           )}
           {onDecline && (
             <button type="button" onClick={onDecline} className="flex-1 flex items-center justify-center gap-1 rounded-xl bg-[#D43B2A]/20 border border-[#D43B2A]/40 text-[#D43B2A] text-sm font-black py-2 hover:bg-[#D43B2A]/30 transition-colors">
