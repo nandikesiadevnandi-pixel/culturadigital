@@ -4,7 +4,7 @@ import { useAlbum } from '@/hooks/useAlbum';
 import { ALBUM_CHALLENGES, AlbumChallenge, CHALLENGE_TYPE_CONFIG, DIFFICULTY_CONFIG } from '@/data/albumChallenges';
 import { CopaBackground } from '@/components/album/CopaBackground';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, CheckCircle2, XCircle, Zap } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, XCircle, Info } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { supabase as supabaseTyped } from '@/integrations/supabase/client';
@@ -19,12 +19,13 @@ export default function DesafiosAlbumPage() {
   const [selected, setSelected] = useState<number | null>(null);
   const [answered, setAnswered] = useState(false);
   const [filter, setFilter] = useState<string>('all');
+  const [showInfo, setShowInfo] = useState(false);
 
   useEffect(() => {
     if (!user) return;
     supabase.from('album_challenge_done').select('challenge_id').eq('user_id', user.id)
-      .then(({ data }) => {
-        if (data) setDone(new Set(data.map((r: { challenge_id: string }) => r.challenge_id)));
+      .then(({ data }: { data: Array<{ challenge_id: string }> | null }) => {
+        if (data) setDone(new Set(data.map(r => r.challenge_id)));
       });
   }, [user]);
 
@@ -55,6 +56,14 @@ export default function DesafiosAlbumPage() {
     ...Object.entries(CHALLENGE_TYPE_CONFIG).map(([k, v]) => ({ key: k, label: `${v.emoji} ${v.label}` })),
   ];
 
+  // Packs earned from challenges (vs. starter packs)
+  const earnedFromChallenges = done.size > 0
+    ? [...done].reduce((sum, id) => {
+        const ch = ALBUM_CHALLENGES.find(c => c.id === id);
+        return sum + (ch?.packsReward ?? 0);
+      }, 0)
+    : 0;
+
   return (
     <div className="min-h-[calc(100vh-4rem)] relative overflow-x-hidden">
       <CopaBackground />
@@ -71,16 +80,47 @@ export default function DesafiosAlbumPage() {
           <p className="text-white/60">Acerte e ganhe pacotes, moedas e XP</p>
         </div>
 
+        {/* Starter packs info banner */}
+        <div
+          className={cn(
+            'mb-6 rounded-2xl border transition-all overflow-hidden',
+            showInfo
+              ? 'border-[#38BDF8]/40 bg-[#38BDF8]/10'
+              : 'border-white/10 bg-white/5',
+          )}
+        >
+          <button
+            type="button"
+            onClick={() => setShowInfo(v => !v)}
+            className="w-full flex items-center gap-3 px-4 py-3 text-left"
+          >
+            <Info className="h-4 w-4 text-[#38BDF8] flex-shrink-0" />
+            <p className="text-sm font-bold text-white/80">
+              📦 Seus pacotes incluem 3 de boas-vindas + ganhos em desafios
+            </p>
+            <span className="ml-auto text-xs text-white/40">{showInfo ? '▲' : '▼'}</span>
+          </button>
+          {showInfo && (
+            <div className="px-4 pb-4 space-y-1.5 text-sm text-white/70">
+              <p>• Ao entrar na plataforma você recebe <strong className="text-white">3 pacotes de boas-vindas</strong> automaticamente.</p>
+              <p>• Cada desafio concluído adiciona mais pacotes à sua conta.</p>
+              <p>• Os pacotes ficam disponíveis para abrir no <strong className="text-white">Hub do Álbum</strong>.</p>
+              <p className="text-[#1E9B5F] font-bold">Desafios completos: {done.size} · Pacotes ganhos neles: {earnedFromChallenges}</p>
+            </div>
+          )}
+        </div>
+
         {/* Stats */}
         <div className="grid grid-cols-3 gap-3 mb-6">
           {[
-            { label: 'Completos', value: `${done.size}/${ALBUM_CHALLENGES.length}`, color: 'text-white' },
-            { label: 'Pacotes',   value: album.stats.packsAvail,                   color: 'text-[#1E9B5F]' },
-            { label: 'Moedas',    value: album.stats.coins,                        color: 'text-[#FBBA16]' },
+            { label: 'Completos', value: `${done.size}/${ALBUM_CHALLENGES.length}`, color: 'text-white', sub: `${Math.round(done.size / ALBUM_CHALLENGES.length * 100)}%` },
+            { label: 'Pacotes',   value: album.stats.packsAvail,                   color: 'text-[#1E9B5F]', sub: '3 iniciais + desafios' },
+            { label: 'Moedas',    value: album.stats.coins,                        color: 'text-[#FBBA16]', sub: null },
           ].map(s => (
             <div key={s.label} className="copa-panel p-3 text-center">
               <div className={`font-black text-2xl ${s.color}`}>{s.value}</div>
               <div className="text-xs text-white/60">{s.label}</div>
+              {s.sub && <div className="text-[9px] text-white/35 mt-0.5 leading-tight">{s.sub}</div>}
             </div>
           ))}
         </div>
@@ -102,7 +142,6 @@ export default function DesafiosAlbumPage() {
           ))}
         </div>
 
-        {/* Challenge grid */}
         {!active ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredChallenges.map(ch => {
@@ -146,7 +185,6 @@ export default function DesafiosAlbumPage() {
             })}
           </div>
         ) : (
-          /* Active challenge */
           <div className="max-w-2xl mx-auto">
             <div className="copa-panel p-8">
               <div className="flex items-center gap-3 mb-6">

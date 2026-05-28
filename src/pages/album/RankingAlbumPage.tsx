@@ -6,7 +6,7 @@ const supabase = supabaseTyped as any;
 import { ALBUM_PLAYERS } from '@/data/albumPlayers';
 import { CopaBackground } from '@/components/album/CopaBackground';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Crown, Medal } from 'lucide-react';
+import { ArrowLeft, Crown, Medal, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface RankEntry {
@@ -26,12 +26,14 @@ export default function RankingAlbumPage() {
   useEffect(() => {
     const load = async () => {
       setLoading(true);
-      const school = profile?.school ?? '';
+      const school = (profile as any)?.school ?? '';
 
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('user_id, full_name, class_name')
-        .eq('school', school);
+      // If school is set, filter by it; otherwise show all users
+      const profilesQuery = school
+        ? supabase.from('profiles').select('user_id, full_name, class_name').eq('school', school)
+        : supabase.from('profiles').select('user_id, full_name, class_name');
+
+      const { data: profiles } = await profilesQuery;
 
       if (!profiles?.length) { setLoading(false); return; }
 
@@ -46,28 +48,32 @@ export default function RankingAlbumPage() {
       const statsData = (statsRes.data ?? []) as Array<{ user_id: string; legendaries: number; coins: number }>;
       const statsMap  = new Map(statsData.map(s => [s.user_id, s]));
 
-      const entries: RankEntry[] = profiles.map((p: { user_id: string; full_name: string; class_name: string }) => {
-        const userInv = invData.filter(e => e.user_id === p.user_id && e.quantity >= 1);
-        const stats   = statsMap.get(p.user_id);
-        return {
-          userId: p.user_id,
-          name: p.full_name,
-          className: p.class_name ?? '',
-          uniqueCards: userInv.length,
-          legendaries: stats?.legendaries ?? 0,
-          coins: stats?.coins ?? 0,
-        };
-      });
+      const entries: RankEntry[] = profiles
+        .map((p: { user_id: string; full_name: string; class_name: string }) => {
+          const userInv = invData.filter(e => e.user_id === p.user_id && e.quantity >= 1);
+          const stats   = statsMap.get(p.user_id);
+          return {
+            userId: p.user_id,
+            name: p.full_name ?? 'Anônimo',
+            className: p.class_name ?? '',
+            uniqueCards: userInv.length,
+            legendaries: stats?.legendaries ?? 0,
+            coins: stats?.coins ?? 0,
+          };
+        })
+        // Only show users who have interacted with the album
+        .filter((e: RankEntry) => e.uniqueCards > 0 || e.legendaries > 0 || e.coins > 100);
 
-      entries.sort((a, b) => b.uniqueCards - a.uniqueCards || b.legendaries - a.legendaries);
+      entries.sort((a: RankEntry, b: RankEntry) => b.uniqueCards - a.uniqueCards || b.legendaries - a.legendaries);
       setRanking(entries);
       setLoading(false);
     };
     load();
   }, [profile]);
 
-  const myRank = ranking.findIndex(e => e.userId === user?.id) + 1;
-  const total  = ALBUM_PLAYERS.length;
+  const myRank  = ranking.findIndex(e => e.userId === user?.id) + 1;
+  const total   = ALBUM_PLAYERS.length;
+  const champs  = ranking.filter(e => e.uniqueCards >= total);
 
   const medalIcon = (rank: number) => {
     if (rank === 1) return <Crown className="h-5 w-5 text-[#FBBA16]" />;
@@ -76,7 +82,6 @@ export default function RankingAlbumPage() {
     return <span className="font-black text-white/60 text-sm">{rank}º</span>;
   };
 
-  /* podium colors */
   const podiumBg: Record<number, string> = {
     1: 'border-[#FBBA16]/50 bg-[#FBBA16]/15',
     2: 'border-white/25 bg-white/10',
@@ -94,11 +99,36 @@ export default function RankingAlbumPage() {
           </Button>
         </Link>
 
+        {/* Album completion champions banner */}
+        {champs.length > 0 && (
+          <div className="mb-6 rounded-2xl border-2 border-[#FBBA16] bg-gradient-to-r from-[#FBBA16]/20 via-[#E57200]/15 to-[#FBBA16]/20 p-5 text-center animate-pulse-slow">
+            <div className="flex justify-center mb-2">
+              <Trophy className="h-10 w-10 text-[#FBBA16]" />
+            </div>
+            <h2 className="font-black text-2xl text-[#FBBA16] mb-1">🏆 Campeão do Álbum!</h2>
+            <p className="text-white/80 font-bold mb-3">
+              {champs.length === 1
+                ? `${champs[0].name} completou o álbum inteiro!`
+                : `${champs.map(c => c.name.split(' ')[0]).join(', ')} completaram o álbum!`}
+            </p>
+            <div className="flex justify-center gap-1">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <span key={i} className="text-2xl">⭐</span>
+              ))}
+            </div>
+            <p className="text-[#FBBA16]/70 text-xs mt-2 font-bold uppercase tracking-wider">
+              {total}/{total} figurinhas · Melhor da partida!
+            </p>
+          </div>
+        )}
+
         <div className="mb-8 text-center">
-          <h1 className="copa-hero-title font-black text-3xl text-white mb-1">🏆 Ranking da Escola</h1>
+          <h1 className="copa-hero-title font-black text-3xl text-white mb-1">🏆 Ranking da Turma</h1>
           <p className="text-white/60">Quem tem a coleção mais completa?</p>
           {myRank > 0 && (
-            <p className="mt-2 font-black text-[#FBBA16]">Você está em {myRank}º lugar!</p>
+            <p className="mt-2 font-black text-[#FBBA16]">
+              Você está em {myRank}º lugar!
+            </p>
           )}
         </div>
 
@@ -119,6 +149,7 @@ export default function RankingAlbumPage() {
                   if (!entry) return null;
                   const actualRank = rankIdx + 1;
                   const isFirst    = actualRank === 1;
+                  const isChamp    = entry.uniqueCards >= total;
                   return (
                     <div
                       key={entry.userId}
@@ -128,6 +159,7 @@ export default function RankingAlbumPage() {
                         isFirst  && 'col-start-2',
                         actualRank === 2 && 'col-start-1 row-start-1',
                         actualRank === 3 && 'col-start-3 row-start-1',
+                        isChamp  && 'border-[#FBBA16] shadow-[0_0_20px_rgba(251,186,22,0.4)]',
                       )}
                     >
                       <div className="mb-2">{medalIcon(actualRank)}</div>
@@ -142,7 +174,8 @@ export default function RankingAlbumPage() {
                       <p className={cn('font-black text-lg mt-1', isFirst ? 'text-[#FBBA16]' : 'text-white')}>
                         {entry.uniqueCards}
                       </p>
-                      <p className="text-[10px] text-white/40">figurinhas</p>
+                      <p className="text-[10px] text-white/40">/{total}</p>
+                      {isChamp && <span className="text-xs mt-1">🏆</span>}
                     </div>
                   );
                 })}
@@ -151,14 +184,17 @@ export default function RankingAlbumPage() {
 
             {/* Full list */}
             {ranking.map((entry, i) => {
-              const rank = i + 1;
-              const isMe = entry.userId === user?.id;
+              const rank   = i + 1;
+              const isMe   = entry.userId === user?.id;
+              const isChamp = entry.uniqueCards >= total;
+              const pct    = Math.round((entry.uniqueCards / total) * 100);
               return (
                 <div
                   key={entry.userId}
                   className={cn(
                     'copa-panel flex items-center gap-4 p-4',
-                    isMe && 'border-[#FBBA16]/40 bg-[#FBBA16]/10',
+                    isMe    && 'border-[#FBBA16]/40 bg-[#FBBA16]/10',
+                    isChamp && 'border-[#FBBA16]/70',
                   )}
                 >
                   <div className="w-8 flex justify-center flex-shrink-0">{medalIcon(rank)}</div>
@@ -167,13 +203,13 @@ export default function RankingAlbumPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className={cn('font-bold text-sm truncate', isMe ? 'text-[#FBBA16]' : 'text-white')}>
-                      {entry.name} {isMe && '(você)'}
+                      {entry.name} {isMe && '(você)'} {isChamp && '🏆'}
                     </p>
                     <p className="text-xs text-white/50">Turma {entry.className}</p>
                   </div>
                   <div className="text-right">
                     <p className="font-black text-white">{entry.uniqueCards}/{total}</p>
-                    <p className="text-xs text-white/50">figurinhas</p>
+                    <p className="text-xs text-white/50">{pct}%</p>
                   </div>
                   <div className="text-right hidden sm:block">
                     <p className="font-bold text-[#FBBA16]">{entry.legendaries}🔥</p>

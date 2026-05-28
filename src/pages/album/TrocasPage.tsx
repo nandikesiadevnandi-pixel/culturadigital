@@ -7,7 +7,7 @@ import { ClassChat } from '@/components/album/ClassChat';
 import { CardFigurina } from '@/components/album/CardFigurina';
 import { CopaBackground } from '@/components/album/CopaBackground';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Plus, Check, X, ArrowLeftRight } from 'lucide-react';
+import { ArrowLeft, Plus, Check, X, ArrowLeftRight, Zap } from 'lucide-react';
 import { getPlayerById } from '@/data/albumPlayers';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -59,6 +59,13 @@ export default function TrocasPage() {
           </Button>
         </Link>
 
+        <div className="mb-4 rounded-2xl border border-[#FBBA16]/20 bg-[#FBBA16]/5 px-4 py-3 flex items-center gap-3">
+          <Zap className="h-5 w-5 text-[#FBBA16] flex-shrink-0" />
+          <p className="text-sm text-[#FBBA16]/90 font-bold">
+            Vale quem pegar primeiro! Seja rápido para fechar a troca que você quer.
+          </p>
+        </div>
+
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h1 className="copa-hero-title font-black text-3xl text-white">🔄 Centro de Trocas</h1>
@@ -94,7 +101,6 @@ export default function TrocasPage() {
           ))}
         </div>
 
-        {/* Tab content */}
         {tab === 'active' && (
           <div className="space-y-4">
             {myTrades.filter(t => t.status === 'open').length > 0 && (
@@ -107,7 +113,9 @@ export default function TrocasPage() {
                 </div>
               </div>
             )}
-            <p className="text-xs font-black text-white/50 uppercase mb-3 tracking-wider">Trocas disponíveis ({openTrades.length})</p>
+            <p className="text-xs font-black text-white/50 uppercase mb-3 tracking-wider">
+              Trocas disponíveis ({openTrades.length})
+            </p>
             {openTrades.length === 0 ? (
               <div className="text-center py-16 text-white/40">
                 <ArrowLeftRight className="mx-auto h-12 w-12 mb-3 opacity-30" />
@@ -173,45 +181,76 @@ function TradeCard({ trade, isOwn, onAccept, onDecline, onCancel }: {
     declined: 'text-[#D43B2A]', cancelled: 'text-white/40',
   };
 
+  const isOpenOther = trade.status === 'open' && !isOwn;
+
   return (
     <div className="copa-panel p-4">
+      {/* Header row */}
       <div className="flex items-start justify-between gap-3 mb-3">
-        <div>
-          <p className="font-bold text-white text-sm">{isOwn ? 'Minha oferta' : trade.fromName}</p>
-          <p className="text-xs text-white/50">
-            {formatDistanceToNow(new Date(trade.createdAt), { addSuffix: true, locale: ptBR })}
-            {trade.fromClass && ` · Turma ${trade.fromClass}`}
-          </p>
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <div className="h-8 w-8 flex-shrink-0 rounded-full bg-gradient-to-br from-[#D43B2A] to-[#FBBA16] flex items-center justify-center font-black text-white text-sm">
+            {(isOwn ? 'Eu' : trade.fromName).charAt(0).toUpperCase()}
+          </div>
+          <div className="min-w-0">
+            <p className="font-bold text-white text-sm truncate">{isOwn ? 'Minha oferta' : trade.fromName}</p>
+            <p className="text-xs text-white/50">
+              {formatDistanceToNow(new Date(trade.createdAt), { addSuffix: true, locale: ptBR })}
+              {trade.fromClass && ` · Turma ${trade.fromClass}`}
+            </p>
+          </div>
         </div>
-        <span className={cn('text-xs font-black', statusColor[trade.status])}>
-          {statusLabel[trade.status]}
-        </span>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {isOpenOther && (
+            <span className="flex items-center gap-1 rounded-full bg-[#FBBA16]/20 border border-[#FBBA16]/40 text-[#FBBA16] text-[9px] font-black px-2 py-0.5 uppercase tracking-wide">
+              <Zap className="h-2.5 w-2.5" /> Pega primeiro!
+            </span>
+          )}
+          <span className={cn('text-xs font-black', statusColor[trade.status])}>
+            {statusLabel[trade.status]}
+          </span>
+        </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 mb-3">
-        <div>
-          <p className="text-[10px] font-black text-white/50 uppercase mb-1 tracking-wider">Oferece ({trade.offeredCards.length})</p>
+      {/* Offer / Want grid */}
+      <div className="grid grid-cols-2 gap-2 mb-3">
+        {/* OFERECE */}
+        <div className="rounded-xl border border-[#1E9B5F]/30 bg-[#1E9B5F]/8 p-2">
+          <div className="flex items-center gap-1 mb-2">
+            <span className="text-base">📦</span>
+            <p className="text-[10px] font-black text-[#1E9B5F] uppercase tracking-wider">
+              Oferece ({trade.offeredCards.length})
+            </p>
+          </div>
           <div className="flex flex-wrap gap-1">
             {trade.offeredCards.slice(0, 3).map(id => {
               const p = getPlayerById(id);
               return p ? <CardFigurina key={id} player={p} size="sm" /> : null;
             })}
-            {trade.offeredCards.length > 3 && <span className="text-xs text-white/60 self-end">+{trade.offeredCards.length - 3}</span>}
+            {trade.offeredCards.length > 3 && (
+              <span className="text-xs text-white/60 self-end">+{trade.offeredCards.length - 3}</span>
+            )}
           </div>
         </div>
-        <div>
-          <p className="text-[10px] font-black text-white/50 uppercase mb-1 tracking-wider">
-            {trade.requestedCards.length ? `Quer (${trade.requestedCards.length})` : 'Aceita qualquer'}
-          </p>
+
+        {/* QUER */}
+        <div className="rounded-xl border border-[#FBBA16]/30 bg-[#FBBA16]/8 p-2">
+          <div className="flex items-center gap-1 mb-2">
+            <span className="text-base">🎯</span>
+            <p className="text-[10px] font-black text-[#FBBA16] uppercase tracking-wider">
+              {trade.requestedCards.length ? `Quer (${trade.requestedCards.length})` : 'Aceita Qualquer'}
+            </p>
+          </div>
           <div className="flex flex-wrap gap-1">
             {trade.requestedCards.length === 0
-              ? <span className="text-xs text-[#38BDF8]/80">Proposta livre</span>
+              ? <span className="text-xs text-[#38BDF8]/80 font-bold">Proposta livre</span>
               : trade.requestedCards.slice(0, 3).map(id => {
                   const p = getPlayerById(id);
                   return p ? <CardFigurina key={id} player={p} size="sm" /> : null;
                 })
             }
-            {trade.requestedCards.length > 3 && <span className="text-xs text-white/60 self-end">+{trade.requestedCards.length - 3}</span>}
+            {trade.requestedCards.length > 3 && (
+              <span className="text-xs text-white/60 self-end">+{trade.requestedCards.length - 3}</span>
+            )}
           </div>
         </div>
       </div>
@@ -223,8 +262,18 @@ function TradeCard({ trade, isOwn, onAccept, onDecline, onCancel }: {
       {(onAccept || onDecline || onCancel) && !['accepted','declined','cancelled'].includes(trade.status) && (
         <div className="flex gap-2">
           {onAccept && (
-            <button type="button" onClick={onAccept} className="flex-1 flex items-center justify-center gap-1 rounded-xl bg-[#1E9B5F]/20 border border-[#1E9B5F]/40 text-[#1E9B5F] text-sm font-black py-2 hover:bg-[#1E9B5F]/30 transition-colors">
-              <Check className="h-3.5 w-3.5" /> Aceitar
+            <button
+              type="button"
+              onClick={onAccept}
+              className={cn(
+                'flex-1 flex items-center justify-center gap-1.5 rounded-xl text-sm font-black py-2.5 transition-all',
+                isOpenOther
+                  ? 'bg-gradient-to-r from-[#1E9B5F] to-[#38BDF8] text-white shadow-[0_0_16px_rgba(30,155,95,0.5)] hover:opacity-90'
+                  : 'bg-[#1E9B5F]/20 border border-[#1E9B5F]/40 text-[#1E9B5F] hover:bg-[#1E9B5F]/30',
+              )}
+            >
+              <Check className="h-4 w-4" />
+              {isOpenOther ? '⚡ Aceitar agora!' : 'Aceitar'}
             </button>
           )}
           {onDecline && (

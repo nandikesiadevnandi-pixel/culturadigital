@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PALETTES, paletteById } from "@/lib/themePalettes";
 import { toast } from "sonner";
-import { ArrowLeft, Camera, Upload, X, Sparkles } from "lucide-react";
+import { ArrowLeft, Camera, Upload, X, Sparkles, KeyRound, Eye, EyeOff } from "lucide-react";
 
 const RPM_URL = "https://readyplayer.me/avatar?frameApi&bodyType=halfbody";
 const BUCKET  = "avatars";
@@ -27,6 +27,9 @@ export default function EditProfilePage() {
   const [filter,     setFilter]     = useState("none");
   const [uploading,  setUploading]  = useState(false);
   const [saving,     setSaving]     = useState(false);
+  const [newPass,    setNewPass]    = useState("");
+  const [showNewPass,setShowNewPass]= useState(false);
+  const [savingPass, setSavingPass] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const videoRef  = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -118,6 +121,16 @@ export default function EditProfilePage() {
     const url = supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
     setPhotoUrl(url);
     toast.success("Foto carregada! Salve o perfil.");
+  };
+
+  // ── Change password ──
+  const changePassword = async () => {
+    if (newPass.length < 6) { toast.error("A senha deve ter pelo menos 6 caracteres"); return; }
+    setSavingPass(true);
+    const { error } = await supabase.auth.updateUser({ password: newPass });
+    setSavingPass(false);
+    if (error) toast.error(error.message);
+    else { toast.success("Senha alterada com sucesso!"); setNewPass(""); }
   };
 
   // ── Save ──
@@ -274,6 +287,40 @@ export default function EditProfilePage() {
               >
                 {saving ? "Salvando..." : "💾 Salvar perfil"}
               </Button>
+
+              {/* Change password */}
+              <div className="mt-4 pt-4 border-t border-violet-500/20">
+                <div className="flex items-center gap-2 mb-3">
+                  <KeyRound className="h-4 w-4 text-violet-300" />
+                  <Label className="text-violet-200 text-sm">Alterar senha</Label>
+                </div>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Input
+                      type={showNewPass ? "text" : "password"}
+                      className="border-violet-500/30 bg-[#0a0a1a] text-white pr-10"
+                      placeholder="Nova senha (mín. 6 caracteres)"
+                      value={newPass}
+                      onChange={e => setNewPass(e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPass(v => !v)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-violet-300/60 hover:text-violet-200"
+                    >
+                      {showNewPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                  <Button
+                    type="button"
+                    onClick={changePassword}
+                    disabled={savingPass || !newPass}
+                    className="bg-violet-500/20 border border-violet-500/40 text-violet-200 hover:bg-violet-500/30 font-bold"
+                  >
+                    {savingPass ? "..." : "Salvar"}
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
