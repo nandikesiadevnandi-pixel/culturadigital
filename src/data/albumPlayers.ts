@@ -48,7 +48,10 @@ export const ALBUM_PLAYERS: AlbumPlayer[] = [
     photoUrl: W('d/d0/Danilo_T%C3%BCrk_2014.jpg') },
   { id: 'br-marquinhos', name: 'Marquinhos',       country: 'Brasil',    flagCode: 'br', position: 'DEF', rarity: 'epic',      overall: 86, sofascoreId: 50801,  special: 'Capitão da Defesa',
     photoUrl: W('d/dc/FC_Salzburg_gegen_Paris_Saint-Germain_UEFA_Champions_League_49_%28cropped%29.jpg') },
-  { id: 'br-militao',   name: 'Éder Militão',     country: 'Brasil',    flagCode: 'br', position: 'DEF', rarity: 'rare',      overall: 83 },
+  { id: 'br-bento',     name: 'Bento',            country: 'Brasil',    flagCode: 'br', position: 'GK',  rarity: 'rare',      overall: 83 },
+  { id: 'br-ederson',   name: 'Ederson',          country: 'Brasil',    flagCode: 'br', position: 'GK',  rarity: 'rare',      overall: 84 },
+  { id: 'br-bremer',    name: 'Bremer',           country: 'Brasil',    flagCode: 'br', position: 'DEF', rarity: 'rare',      overall: 83 },
+  { id: 'br-andre',     name: 'André',            country: 'Brasil',    flagCode: 'br', position: 'MID', rarity: 'rare',      overall: 82 },
   { id: 'br-vinicius',  name: 'Vinicius Jr',      country: 'Brasil',    flagCode: 'br', position: 'ATK', rarity: 'legendary', overall: 95, sofascoreId: 903036, special: 'Drible Impossível 🔥',
     photoUrl: W('c/c6/2023_05_06_Final_de_la_Copa_del_Rey_-_52879242230_%28cropped%29.jpg') },
   { id: 'br-rodrygo',   name: 'Rodrygo',          country: 'Brasil',    flagCode: 'br', position: 'ATK', rarity: 'epic',      overall: 85, sofascoreId: 843901, special: 'Gênio do Drible',
@@ -76,9 +79,14 @@ export const ALBUM_PLAYERS: AlbumPlayer[] = [
   { id: 'ar-lmartinez', name: 'Lisandro Martínez',country: 'Argentina', flagCode: 'ar', position: 'DEF', rarity: 'rare',      overall: 83, sofascoreId: 836542 },
   { id: 'ar-lautaro',   name: 'Lautaro Martínez', country: 'Argentina', flagCode: 'ar', position: 'ATK', rarity: 'epic',      overall: 87, sofascoreId: 745102, special: 'El Toro',
     photoUrl: W('2/2e/Lautaro_Martinez_ARGENTINA_VS_VENEZUELA_2017.jpg') },
-  { id: 'ar-julian',    name: 'Julián Álvarez',   country: 'Argentina', flagCode: 'ar', position: 'ATK', rarity: 'rare',      overall: 84, sofascoreId: 863830 },
+  { id: 'ar-julian',    name: 'Julián Álvarez',   country: 'Argentina', flagCode: 'ar', position: 'ATK', rarity: 'epic',      overall: 86, sofascoreId: 863830, special: 'La Araña' },
   { id: 'ar-macallister',name: 'Mac Allister',    country: 'Argentina', flagCode: 'ar', position: 'MID', rarity: 'rare',      overall: 83, sofascoreId: 794503 },
   { id: 'ar-depaul',    name: 'Rodrigo De Paul',  country: 'Argentina', flagCode: 'ar', position: 'MID', rarity: 'rare',      overall: 82, sofascoreId: 358075 },
+  { id: 'ar-dimaria',   name: 'Ángel Di María',   country: 'Argentina', flagCode: 'ar', position: 'ATK', rarity: 'epic',      overall: 84, special: 'El Fideo',
+    photoUrl: W('8/8c/NIG-ARG_%285%29.jpg') },
+  { id: 'ar-enzo',      name: 'Enzo Fernández',   country: 'Argentina', flagCode: 'ar', position: 'MID', rarity: 'epic',      overall: 85, special: 'Maestro Campeão',
+    photoUrl: W('0/0a/Enzo_Fern%C3%A1ndez_2025_FIFA_Club_World_Cup_Final.jpg') },
+  { id: 'ar-romero',    name: 'Cristian Romero',  country: 'Argentina', flagCode: 'ar', position: 'DEF', rarity: 'rare',      overall: 84 },
   { id: 'ar-molina',    name: 'Nahuel Molina',    country: 'Argentina', flagCode: 'ar', position: 'DEF', rarity: 'common',    overall: 78 },
 
   // ───── FRANÇA ─────
@@ -87,8 +95,6 @@ export const ALBUM_PLAYERS: AlbumPlayer[] = [
   { id: 'fr-maignan',   name: 'Mike Maignan',     country: 'França',    flagCode: 'fr', position: 'GK',  rarity: 'rare',      overall: 85, sofascoreId: 131540,
     photoUrl: W('e/e1/Mike_Maignan_2022_Salzburg_vs_AC_Milan_2022-09-06.jpg') },
   { id: 'fr-saliba',    name: 'William Saliba',   country: 'França',    flagCode: 'fr', position: 'DEF', rarity: 'rare',      overall: 84, sofascoreId: 891526 },
-  { id: 'fr-griezmann', name: 'Antoine Griezmann',country: 'França',    flagCode: 'fr', position: 'ATK', rarity: 'epic',      overall: 86, sofascoreId: 82928,  special: 'Artista do Gol',
-    photoUrl: W('6/6e/FRA-ARG_%2810%29_%28cropped%29.jpg') },
   { id: 'fr-dembele',   name: 'Ousmane Dembélé',  country: 'França',    flagCode: 'fr', position: 'ATK', rarity: 'rare',      overall: 84, sofascoreId: 348063 },
   { id: 'fr-tchouameni',name: 'Tchouaméni',       country: 'França',    flagCode: 'fr', position: 'MID', rarity: 'rare',      overall: 83, sofascoreId: 882099 },
   { id: 'fr-camavinga', name: 'Camavinga',        country: 'França',    flagCode: 'fr', position: 'MID', rarity: 'rare',      overall: 83, sofascoreId: 934907 },
@@ -108,6 +114,8 @@ export const ALBUM_PLAYERS: AlbumPlayer[] = [
   { id: 'en-rice',      name: 'Declan Rice',      country: 'Inglaterra',flagCode: 'gb-eng', position: 'MID', rarity: 'rare',  overall: 84, sofascoreId: 793234 },
   { id: 'en-trent',     name: 'Trent A.-Arnold',  country: 'Inglaterra',flagCode: 'gb-eng', position: 'DEF', rarity: 'rare',  overall: 84, sofascoreId: 688756 },
   { id: 'en-walker',    name: 'Kyle Walker',      country: 'Inglaterra',flagCode: 'gb-eng', position: 'DEF', rarity: 'common',overall: 80 },
+  { id: 'en-palmer',    name: 'Cole Palmer',      country: 'Inglaterra',flagCode: 'gb-eng', position: 'MID', rarity: 'epic',  overall: 87, special: 'Gênio de Chelsea' },
+  { id: 'en-mainoo',    name: 'Kobbie Mainoo',    country: 'Inglaterra',flagCode: 'gb-eng', position: 'MID', rarity: 'rare',  overall: 80 },
 
   // ───── ESPANHA ─────
   { id: 'es-simon',     name: 'Unai Simón',       country: 'Espanha',   flagCode: 'es', position: 'GK',  rarity: 'rare',      overall: 83 },
@@ -118,7 +126,9 @@ export const ALBUM_PLAYERS: AlbumPlayer[] = [
   { id: 'es-morata',    name: 'Álvaro Morata',    country: 'Espanha',   flagCode: 'es', position: 'ATK', rarity: 'rare',      overall: 82,
     photoUrl: W('6/62/%C3%81lvaro_Morata_in_2025.jpg') },
   { id: 'es-fabian',    name: 'Fabián Ruiz',      country: 'Espanha',   flagCode: 'es', position: 'MID', rarity: 'rare',      overall: 82, sofascoreId: 474524 },
-  { id: 'es-cucurella', name: 'Marc Cucurella',   country: 'Espanha',   flagCode: 'es', position: 'DEF', rarity: 'common',    overall: 79 },
+  { id: 'es-nwilliams', name: 'Nico Williams',   country: 'Espanha',   flagCode: 'es', position: 'ATK', rarity: 'epic',      overall: 85, special: 'Velocidade Basca' },
+  { id: 'es-gavi',      name: 'Gavi',            country: 'Espanha',   flagCode: 'es', position: 'MID', rarity: 'epic',      overall: 85, special: 'Joia do Barça' },
+  { id: 'es-olmo',      name: 'Dani Olmo',       country: 'Espanha',   flagCode: 'es', position: 'MID', rarity: 'rare',      overall: 83 },
 
   // ───── PORTUGAL ─────
   { id: 'pt-ronaldo',   name: 'Cristiano Ronaldo',country: 'Portugal',  flagCode: 'pt', position: 'ATK', rarity: 'legendary', overall: 93, sofascoreId: 36569,  special: 'CR7 — A Lenda ⭐',
@@ -131,6 +141,9 @@ export const ALBUM_PLAYERS: AlbumPlayer[] = [
   { id: 'pt-jfelix',    name: 'João Félix',       country: 'Portugal',  flagCode: 'pt', position: 'ATK', rarity: 'rare',      overall: 83, sofascoreId: 905399 },
   { id: 'pt-rleao',     name: 'Rafael Leão',      country: 'Portugal',  flagCode: 'pt', position: 'ATK', rarity: 'rare',      overall: 83, sofascoreId: 829290 },
   { id: 'pt-cancelo',   name: 'João Cancelo',     country: 'Portugal',  flagCode: 'pt', position: 'DEF', rarity: 'rare',      overall: 83, sofascoreId: 187241 },
+  { id: 'pt-gramos',    name: 'Gonçalo Ramos',    country: 'Portugal',  flagCode: 'pt', position: 'ATK', rarity: 'rare',      overall: 83 },
+  { id: 'pt-vitinha',   name: 'Vitinha',          country: 'Portugal',  flagCode: 'pt', position: 'MID', rarity: 'rare',      overall: 83 },
+  { id: 'pt-jneves',    name: 'João Neves',       country: 'Portugal',  flagCode: 'pt', position: 'MID', rarity: 'rare',      overall: 82 },
 
   // ───── ALEMANHA ─────
   { id: 'de-neuer',     name: 'Manuel Neuer',     country: 'Alemanha',  flagCode: 'de', position: 'GK',  rarity: 'epic',      overall: 85, sofascoreId: 16484,  special: 'Sweep-Keeper Lendário' },
@@ -142,7 +155,6 @@ export const ALBUM_PLAYERS: AlbumPlayer[] = [
     photoUrl: W('e/e8/2019-06-11_Fu%C3%9Fball%2C_M%C3%A4nner%2C_L%C3%A4nderspiel%2C_Deutschland-Estland_StP_2059_LR10_by_Stepro.jpg') },
   { id: 'de-kimmich',   name: 'Joshua Kimmich',   country: 'Alemanha',  flagCode: 'de', position: 'MID', rarity: 'rare',      overall: 85, sofascoreId: 319765 },
   { id: 'de-sane',      name: 'Leroy Sané',       country: 'Alemanha',  flagCode: 'de', position: 'ATK', rarity: 'rare',      overall: 82, sofascoreId: 338721 },
-  { id: 'de-gnabry',    name: 'Serge Gnabry',     country: 'Alemanha',  flagCode: 'de', position: 'ATK', rarity: 'common',    overall: 79 },
 
   // ───── HOLANDA ─────
   { id: 'nl-vandijk',   name: 'Virgil van Dijk',  country: 'Holanda',   flagCode: 'nl', position: 'DEF', rarity: 'epic',      overall: 88, sofascoreId: 236501, special: 'Gigante da Defesa',
@@ -154,6 +166,8 @@ export const ALBUM_PLAYERS: AlbumPlayer[] = [
     photoUrl: W('6/6d/Xavi_Simons%2C_Nick_Verhagen_in_duel_met_Xavi_Simons.jpg') },
   { id: 'nl-reijnders', name: 'Tijjani Reijnders',country: 'Holanda',   flagCode: 'nl', position: 'MID', rarity: 'rare',      overall: 82 },
   { id: 'nl-ake',       name: 'Nathan Aké',       country: 'Holanda',   flagCode: 'nl', position: 'DEF', rarity: 'common',    overall: 80 },
+  { id: 'nl-dejong',    name: 'Frenkie de Jong',  country: 'Holanda',   flagCode: 'nl', position: 'MID', rarity: 'epic',      overall: 85, special: 'Maestro Laranja' },
+  { id: 'nl-depay',     name: 'Memphis Depay',    country: 'Holanda',   flagCode: 'nl', position: 'ATK', rarity: 'rare',      overall: 82 },
 
   // ───── NORUEGA (Haaland) ─────
   { id: 'no-haaland',   name: 'Erling Haaland',   country: 'Noruega',   flagCode: 'no', position: 'ATK', rarity: 'legendary', overall: 96, sofascoreId: 839956, special: 'Máquina de Gols 🚀',
@@ -213,10 +227,9 @@ export const ALBUM_PLAYERS: AlbumPlayer[] = [
   // ───── MÉXICO ─────
   { id: 'mx-ochoa',     name: 'Guillermo Ochoa',  country: 'México',    flagCode: 'mx', position: 'GK',  rarity: 'rare',      overall: 82 },
   { id: 'mx-lozano',    name: 'Hirving Lozano',   country: 'México',    flagCode: 'mx', position: 'ATK', rarity: 'epic',      overall: 82, sofascoreId: 397501, special: 'El Chucky' },
-  { id: 'mx-jimenez',   name: 'Raúl Jiménez',     country: 'México',    flagCode: 'mx', position: 'ATK', rarity: 'rare',      overall: 80, sofascoreId: 120419,
-    photoUrl: W('d/de/Ra%C3%BAl_Jim%C3%A9nez_04032026_%281%29.jpg') },
+  { id: 'mx-gimenez',   name: 'Santiago Giménez', country: 'México',    flagCode: 'mx', position: 'ATK', rarity: 'epic',      overall: 84, special: 'El Bebote',
+    photoUrl: W('d/d8/Santiago_Gim%C3%A9nez.png') },
   { id: 'mx-alvarez',   name: 'Edson Álvarez',    country: 'México',    flagCode: 'mx', position: 'MID', rarity: 'rare',      overall: 81, sofascoreId: 786699 },
-  { id: 'mx-guardado',  name: 'Andrés Guardado',  country: 'México',    flagCode: 'mx', position: 'MID', rarity: 'common',    overall: 75 },
 
   // ───── ITÁLIA ─────
   { id: 'it-donnarumma',name: 'G. Donnarumma',    country: 'Itália',    flagCode: 'it', position: 'GK',  rarity: 'epic',      overall: 87, sofascoreId: 401174, special: 'Il Gigante' },
@@ -240,6 +253,24 @@ export const ALBUM_PLAYERS: AlbumPlayer[] = [
   { id: 'au-hrustic',   name: 'Ajdin Hrustic',    country: 'Austrália', flagCode: 'au', position: 'MID', rarity: 'common',    overall: 75 },
   { id: 'au-duke',      name: 'Mitchell Duke',    country: 'Austrália', flagCode: 'au', position: 'ATK', rarity: 'common',    overall: 73 },
   { id: 'au-sainsbury', name: 'Trent Sainsbury',  country: 'Austrália', flagCode: 'au', position: 'DEF', rarity: 'common',    overall: 72 },
+
+  // ───── BÉLGICA ─────
+  { id: 'be-debruyne',  name: 'Kevin De Bruyne',  country: 'Bélgica',   flagCode: 'be', position: 'MID', rarity: 'legendary', overall: 92, special: 'Arquiteto do Campo 🎯',
+    photoUrl: W('4/40/Kevin_De_Bruyne_USMNT_v_Belgium_Mar_28_2026-64_%28cropped%29.jpg') },
+  { id: 'be-lukaku',    name: 'Romelu Lukaku',    country: 'Bélgica',   flagCode: 'be', position: 'ATK', rarity: 'epic',      overall: 87, special: 'Big Rom',
+    photoUrl: W('d/dc/Romelu_Lukaku_2021.jpg') },
+  { id: 'be-doku',      name: 'Jérémy Doku',      country: 'Bélgica',   flagCode: 'be', position: 'ATK', rarity: 'rare',      overall: 82 },
+  { id: 'be-tielemans', name: 'Youri Tielemans',  country: 'Bélgica',   flagCode: 'be', position: 'MID', rarity: 'rare',      overall: 81 },
+  { id: 'be-onana',     name: 'Amadou Onana',     country: 'Bélgica',   flagCode: 'be', position: 'MID', rarity: 'rare',      overall: 82 },
+
+  // ───── CROÁCIA ─────
+  { id: 'hr-modric',    name: 'Luka Modrić',      country: 'Croácia',   flagCode: 'hr', position: 'MID', rarity: 'legendary', overall: 91, special: 'O Eterno Maestro ⭐',
+    photoUrl: W('1/1b/Ofrenda_de_la_Liga_y_la_Champions-57-L.Mill%C3%A1n_%2852109310843%29_%28Luka_Modri%C4%87%29.jpg') },
+  { id: 'hr-gvardiol',  name: 'Joško Gvardiol',   country: 'Croácia',   flagCode: 'hr', position: 'DEF', rarity: 'epic',      overall: 86, special: 'Rocha da Croácia',
+    photoUrl: W('6/6a/2023-10-04_Fu%C3%9Fball%2C_M%C3%A4nner%2C_UEFA_Champions_League%2C_RB_Leipzig_-_Manchester_City_FC_1DX_2611_%28Jo%C5%A1ko_Gvardiol%29.jpg') },
+  { id: 'hr-kovacic',   name: 'Mateo Kovačić',    country: 'Croácia',   flagCode: 'hr', position: 'MID', rarity: 'epic',      overall: 84, special: 'Motor Croata' },
+  { id: 'hr-brozovic',  name: 'Marcelo Brozović', country: 'Croácia',   flagCode: 'hr', position: 'MID', rarity: 'rare',      overall: 83 },
+  { id: 'hr-perisic',   name: 'Ivan Perišić',     country: 'Croácia',   flagCode: 'hr', position: 'ATK', rarity: 'rare',      overall: 81 },
 ];
 
 export function getPlayerById(id: string): AlbumPlayer | undefined {
