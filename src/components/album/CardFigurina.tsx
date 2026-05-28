@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { AlbumPlayer, RARITY_CONFIG, getPlayerImageUrl, getFlagUrl } from '@/data/albumPlayers';
+import { useEffect, useRef, useState } from 'react';
+import { AlbumPlayer, RARITY_CONFIG, getFlagUrl } from '@/data/albumPlayers';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -16,30 +16,24 @@ interface Props {
 function PlayerSilhouette() {
   return (
     <svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg" className="h-full w-full" aria-hidden="true">
-      {/* Head */}
       <circle cx="50" cy="22" r="18" fill="rgba(255,255,255,0.22)" />
-      {/* Body / jersey */}
       <path d="M22 56 L31 42 L45 48 L50 66 L55 48 L69 42 L78 56 L73 96 L27 96 Z" fill="rgba(255,255,255,0.18)" />
-      {/* Left arm */}
       <path d="M27 60 L8 80 L16 82 L32 64" fill="rgba(255,255,255,0.15)" />
-      {/* Right arm */}
       <path d="M73 60 L92 80 L84 82 L68 64" fill="rgba(255,255,255,0.15)" />
-      {/* Shorts */}
       <rect x="29" y="93" width="42" height="18" rx="4" fill="rgba(255,255,255,0.25)" />
-      {/* Left leg */}
       <rect x="31" y="109" width="15" height="26" rx="6" fill="rgba(255,255,255,0.18)" />
-      {/* Right leg */}
       <rect x="54" y="109" width="15" height="26" rx="6" fill="rgba(255,255,255,0.18)" />
-      {/* Left boot */}
       <ellipse cx="38" cy="137" rx="12" ry="4" fill="rgba(255,255,255,0.28)" />
-      {/* Right boot */}
       <ellipse cx="61" cy="137" rx="12" ry="4" fill="rgba(255,255,255,0.28)" />
     </svg>
   );
 }
 
 export function CardFigurina({ player, quantity = 1, size = 'md', showQuantity, selected, onClick, glow = false, animate = false }: Props) {
-  const [imgState, setImgState] = useState<'loading' | 'ok' | 'error'>('loading');
+  const [photoOk, setPhotoOk] = useState(false);
+  const [photoError, setPhotoError] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+
   const cfg = RARITY_CONFIG[player.rarity];
 
   const sizeClass = {
@@ -56,8 +50,20 @@ export function CardFigurina({ player, quantity = 1, size = 'md', showQuantity, 
 
   const isLegendary = player.rarity === 'legendary';
   const isEpic      = player.rarity === 'epic';
-  const hasPhoto    = !!player.photoUrl;
-  const showPhoto   = hasPhoto && imgState !== 'error';
+
+  // Handle images already in browser cache — onLoad fires before React attaches handler
+  useEffect(() => {
+    setPhotoOk(false);
+    setPhotoError(false);
+    const img = imgRef.current;
+    if (img && img.complete) {
+      if (img.naturalWidth > 0) setPhotoOk(true);
+      else setPhotoError(true);
+    }
+  }, [player.photoUrl]);
+
+  const hasPhoto = !!player.photoUrl && !photoError;
+  const showSilhouette = !hasPhoto || !photoOk;
 
   return (
     <div
@@ -92,31 +98,29 @@ export function CardFigurina({ player, quantity = 1, size = 'md', showQuantity, 
         />
       </div>
 
-      {/* Player visual area */}
-      <div className="absolute inset-0 flex items-center justify-center pt-6">
-        {showPhoto ? (
-          <img
-            src={getPlayerImageUrl(player)}
-            alt={player.name}
-            onLoad={() => setImgState('ok')}
-            onError={() => setImgState('error')}
-            className={cn(
-              'card-photo-mask h-full w-full object-cover object-top transition-opacity duration-300',
-              imgState === 'ok' ? 'opacity-100' : 'opacity-0',
-            )}
-          />
-        ) : null}
+      {/* Player photo — fills card, fades in on load */}
+      {hasPhoto && (
+        <img
+          ref={imgRef}
+          src={player.photoUrl}
+          alt={player.name}
+          onLoad={() => setPhotoOk(true)}
+          onError={() => setPhotoError(true)}
+          className={cn(
+            'absolute inset-0 h-full w-full object-cover object-top card-photo-mask transition-opacity duration-500',
+            photoOk ? 'opacity-100' : 'opacity-0',
+          )}
+        />
+      )}
 
-        {/* Silhouette shown when: no sofascoreId, loading, or error */}
-        {(!showPhoto || imgState === 'loading') && (
-          <div className={cn(
-            'absolute inset-0 flex items-center justify-center pt-6 transition-opacity duration-300',
-            imgState === 'ok' ? 'opacity-0' : 'opacity-100',
-          )}>
+      {/* Silhouette — shown while loading or when no photo */}
+      {showSilhouette && (
+        <div className="absolute inset-0 flex items-end justify-center pb-10">
+          <div className="w-3/4 h-3/4">
             <PlayerSilhouette />
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Gradient overlay bottom */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent z-10" />
