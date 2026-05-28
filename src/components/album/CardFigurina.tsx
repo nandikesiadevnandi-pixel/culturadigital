@@ -98,7 +98,6 @@ export function CardFigurina({ player, quantity = 1, size = 'md', showQuantity, 
           <img
             src={getPlayerImageUrl(player)}
             alt={player.name}
-            referrerPolicy="no-referrer"
             onLoad={() => setImgState('ok')}
             onError={() => setImgState('error')}
             className={cn(

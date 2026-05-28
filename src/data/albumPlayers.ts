@@ -201,11 +201,10 @@ export function getPlayerById(id: string): AlbumPlayer | undefined {
 }
 
 export function getPlayerImageUrl(player: AlbumPlayer): string {
-  if (player.sofascoreId) {
-    // Use media CDN with no-referrer to bypass hotlink protection
-    return `https://media.sofascore.com/api/v1/player/${player.sofascoreId}/image`;
-  }
-  return '';
+  if (!player.sofascoreId) return '';
+  // weserv.nl fetches server-side, bypassing Sofascore's hotlink block
+  const src = `media.sofascore.com/api/v1/player/${player.sofascoreId}/image`;
+  return `https://images.weserv.nl/?url=${src}&w=256&h=256&fit=cover&output=webp`;
 }
 
 export function getFallbackAvatar(player: AlbumPlayer): string {
