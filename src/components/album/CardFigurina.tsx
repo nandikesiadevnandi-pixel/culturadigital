@@ -56,7 +56,7 @@ export function CardFigurina({ player, quantity = 1, size = 'md', showQuantity, 
 
   const isLegendary = player.rarity === 'legendary';
   const isEpic      = player.rarity === 'epic';
-  const hasPhoto    = !!player.sofascoreId;
+  const hasPhoto    = !!player.photoUrl;
   const showPhoto   = hasPhoto && imgState !== 'error';
 
   return (

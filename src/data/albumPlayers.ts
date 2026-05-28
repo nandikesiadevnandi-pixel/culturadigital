@@ -59,6 +59,14 @@ export const ALBUM_PLAYERS: AlbumPlayer[] = [
   { id: 'br-endrick',   name: 'Endrick',          country: 'Brasil',    flagCode: 'br', position: 'ATK', rarity: 'epic',      overall: 84, sofascoreId: 1196608,special: 'Joia da Próxima Era ⭐' },
   { id: 'br-savinho',   name: 'Savinho',          country: 'Brasil',    flagCode: 'br', position: 'ATK', rarity: 'rare',      overall: 80, sofascoreId: 1116726 },
   { id: 'br-gabriel',   name: 'Gabriel Magalhães',country: 'Brasil',    flagCode: 'br', position: 'DEF', rarity: 'common',    overall: 78 },
+  { id: 'br-neymar',    name: 'Neymar Jr',        country: 'Brasil',    flagCode: 'br', position: 'ATK', rarity: 'legendary', overall: 92, special: 'O Rei do Drible 👑',
+    photoUrl: W('b/bb/Neymar_Jr._with_Al_Hilal%2C_3_October_2023_-_03_%28cropped%29.jpg') },
+  { id: 'br-richarlison',name: 'Richarlison',     country: 'Brasil',    flagCode: 'br', position: 'ATK', rarity: 'rare',      overall: 82,
+    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/3d/Richarlison_%C3%A9_homenageado_na_ALES_%2810.July.2019%29_01_%28cropped%29.jpg' },
+  { id: 'br-martinelli', name: 'Gabriel Martinelli',country: 'Brasil',  flagCode: 'br', position: 'ATK', rarity: 'rare',      overall: 81,
+    photoUrl: W('d/df/1_Gabriel_Martinelli_arsenal_2025_%28cropped%29.jpg') },
+  { id: 'br-casemiro',  name: 'Casemiro',         country: 'Brasil',    flagCode: 'br', position: 'MID', rarity: 'epic',      overall: 85, special: 'Escudo do Brasil',
+    photoUrl: W('d/dc/Casemiro_Brazil_Austria_June_2018.jpg') },
 
   // ───── ARGENTINA ─────
   { id: 'ar-messi',     name: 'Lionel Messi',     country: 'Argentina', flagCode: 'ar', position: 'ATK', rarity: 'legendary', overall: 98, sofascoreId: 56186,  special: 'O GOAT 🐐',
