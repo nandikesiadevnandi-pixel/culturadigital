@@ -14,6 +14,186 @@ export type Database = {
   }
   public: {
     Tables: {
+      album_challenge_done: {
+        Row: {
+          challenge_id: string
+          completed_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          challenge_id: string
+          completed_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          challenge_id?: string
+          completed_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      album_chat: {
+        Row: {
+          class_name: string
+          created_at: string
+          id: string
+          message: string
+          school: string | null
+          user_id: string
+          user_name: string
+        }
+        Insert: {
+          class_name?: string
+          created_at?: string
+          id?: string
+          message: string
+          school?: string | null
+          user_id: string
+          user_name?: string
+        }
+        Update: {
+          class_name?: string
+          created_at?: string
+          id?: string
+          message?: string
+          school?: string | null
+          user_id?: string
+          user_name?: string
+        }
+        Relationships: []
+      }
+      album_feed: {
+        Row: {
+          class_name: string
+          created_at: string
+          event_type: string
+          id: string
+          payload: Json
+          school: string | null
+          user_id: string
+          user_name: string
+        }
+        Insert: {
+          class_name?: string
+          created_at?: string
+          event_type: string
+          id?: string
+          payload?: Json
+          school?: string | null
+          user_id: string
+          user_name?: string
+        }
+        Update: {
+          class_name?: string
+          created_at?: string
+          event_type?: string
+          id?: string
+          payload?: Json
+          school?: string | null
+          user_id?: string
+          user_name?: string
+        }
+        Relationships: []
+      }
+      album_inventory: {
+        Row: {
+          card_id: string
+          id: string
+          quantity: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          card_id: string
+          id?: string
+          quantity?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          card_id?: string
+          id?: string
+          quantity?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      album_trades: {
+        Row: {
+          created_at: string
+          from_class: string
+          from_name: string
+          from_user_id: string
+          id: string
+          message: string | null
+          offered_cards: Json
+          requested_cards: Json
+          status: string
+          to_name: string
+          to_user_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          from_class?: string
+          from_name?: string
+          from_user_id: string
+          id?: string
+          message?: string | null
+          offered_cards?: Json
+          requested_cards?: Json
+          status?: string
+          to_name?: string
+          to_user_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          from_class?: string
+          from_name?: string
+          from_user_id?: string
+          id?: string
+          message?: string | null
+          offered_cards?: Json
+          requested_cards?: Json
+          status?: string
+          to_name?: string
+          to_user_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      album_user_stats: {
+        Row: {
+          coins: number
+          legendaries: number
+          packs_avail: number
+          total_packs: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          coins?: number
+          legendaries?: number
+          packs_avail?: number
+          total_packs?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          coins?: number
+          legendaries?: number
+          packs_avail?: number
+          total_packs?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       answers: {
         Row: {
           answer_text: string
