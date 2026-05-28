@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { AlbumPlayer, RARITY_CONFIG, getFlagUrl } from '@/data/albumPlayers';
+import { usePlayerPhoto } from '@/hooks/usePlayerPhoto';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -33,6 +34,7 @@ export function CardFigurina({ player, quantity = 1, size = 'md', showQuantity, 
   const [photoOk, setPhotoOk] = useState(false);
   const [photoError, setPhotoError] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
+  const resolvedPhotoUrl = usePlayerPhoto(player);
 
   const cfg = RARITY_CONFIG[player.rarity];
 
@@ -51,7 +53,7 @@ export function CardFigurina({ player, quantity = 1, size = 'md', showQuantity, 
   const isLegendary = player.rarity === 'legendary';
   const isEpic      = player.rarity === 'epic';
 
-  // Handle images already in browser cache — onLoad fires before React attaches handler
+  // Reset photo state when the resolved URL changes
   useEffect(() => {
     setPhotoOk(false);
     setPhotoError(false);
@@ -60,9 +62,9 @@ export function CardFigurina({ player, quantity = 1, size = 'md', showQuantity, 
       if (img.naturalWidth > 0) setPhotoOk(true);
       else setPhotoError(true);
     }
-  }, [player.photoUrl]);
+  }, [resolvedPhotoUrl]);
 
-  const hasPhoto = !!player.photoUrl && !photoError;
+  const hasPhoto = !!resolvedPhotoUrl && !photoError;
   const showSilhouette = !hasPhoto || !photoOk;
 
   return (
@@ -102,7 +104,7 @@ export function CardFigurina({ player, quantity = 1, size = 'md', showQuantity, 
       {hasPhoto && (
         <img
           ref={imgRef}
-          src={player.photoUrl}
+          src={resolvedPhotoUrl!}
           alt={player.name}
           onLoad={() => setPhotoOk(true)}
           onError={() => setPhotoError(true)}
