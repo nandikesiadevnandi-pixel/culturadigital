@@ -107,7 +107,7 @@ export function useAlbum() {
     if (!user) return;
 
     const ch = supabase.channel(`album:${user.id}`)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'album_feed', filter: `school=eq.${school}` },
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'album_feed', filter: `class_name=eq.${className}` },
         (payload) => setFeed(prev => [mapFeedRow(payload.new as Record<string, unknown>), ...prev].slice(0, 50)))
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'album_chat', filter: `class_name=eq.${className}` },
         (payload) => setChat(prev => [...prev, mapChatRow(payload.new as Record<string, unknown>)].slice(-100)))
