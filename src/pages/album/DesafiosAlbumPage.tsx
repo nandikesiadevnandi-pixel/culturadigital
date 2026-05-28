@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAlbum } from '@/hooks/useAlbum';
 import { useAuth } from '@/hooks/useAuth';
@@ -15,8 +15,26 @@ import { supabase as supabaseTyped } from '@/integrations/supabase/client';
 const supabase = supabaseTyped as any;
 
 // ── Packs rewarded per attempt ──
-const PACKS_FIRST  = 3;
-const PACKS_SECOND = 1;
+const PACKS_FIRST   = 3;
+const PACKS_SECOND  = 1;
+const COOLDOWN_MS   = 5 * 60 * 1000; // 5 minutes
+
+const cdlKey = (userId: string, challengeId: string) => `cdl_${userId}_${challengeId}`;
+
+function saveCooldown(userId: string, challengeId: string, wrongIdx: number, until: number) {
+  localStorage.setItem(cdlKey(userId, challengeId), JSON.stringify({ wrongIdx, until }));
+}
+
+function loadCooldown(userId: string, challengeId: string): { wrongIdx: number; until: number } | null {
+  try {
+    const raw = localStorage.getItem(cdlKey(userId, challengeId));
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+
+function clearCooldown(userId: string, challengeId: string) {
+  localStorage.removeItem(cdlKey(userId, challengeId));
+}
 
 type GameState = 'playing' | 'wrong-first' | 'won' | 'lost';
 
@@ -37,6 +55,10 @@ export default function DesafiosAlbumPage() {
   const [finalChoice,   setFinalChoice]   = useState<number | null>(null);   // second pick (right or wrong)
   const [packsEarned,   setPacksEarned]   = useState(0);
 
+  // Cooldown state
+  const [remaining, setRemaining] = useState(0); // seconds
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   // Auto-select grade based on student profile
   useEffect(() => {
     const gy = (profile as any)?.grade_year as number | undefined;
@@ -54,15 +76,41 @@ export default function DesafiosAlbumPage() {
       });
   }, [user]);
 
+  const startCooldown = (until: number) => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    const tick = () => {
+      const secs = Math.max(0, Math.ceil((until - Date.now()) / 1000));
+      setRemaining(secs);
+      if (secs === 0 && timerRef.current) clearInterval(timerRef.current);
+    };
+    tick();
+    timerRef.current = setInterval(tick, 500);
+  };
+
+  // Clean up timer on unmount
+  useEffect(() => () => { if (timerRef.current) clearInterval(timerRef.current); }, []);
+
   const resetQuiz = () => {
+    if (timerRef.current) clearInterval(timerRef.current);
     setGameState('playing');
     setWrongChoice(null);
     setFinalChoice(null);
     setPacksEarned(0);
+    setRemaining(0);
   };
 
   const openChallenge = (ch: AlbumChallenge) => {
     resetQuiz();
+    // Restore cooldown if still active
+    if (user) {
+      const saved = loadCooldown(user.id, ch.id);
+      if (saved) {
+        const secs = Math.ceil((saved.until - Date.now()) / 1000);
+        setWrongChoice(saved.wrongIdx);
+        setGameState('wrong-first');
+        if (secs > 0) startCooldown(saved.until);
+      }
+    }
     setActive(ch);
   };
 
@@ -72,8 +120,9 @@ export default function DesafiosAlbumPage() {
   };
 
   const handleAnswer = async (idx: number) => {
-    if (!active) return;
+    if (!active || !user) return;
     if (gameState === 'won' || gameState === 'lost') return;
+    if (gameState === 'wrong-first' && remaining > 0) return; // cooldown active
     if (gameState === 'wrong-first' && idx === wrongChoice) return; // can't re-pick same wrong
 
     const isCorrect   = idx === active.correct;
@@ -84,6 +133,7 @@ export default function DesafiosAlbumPage() {
       const coins    = isFirstTry ? active.coinsReward : Math.ceil(active.coinsReward / 2);
       const xp       = isFirstTry ? active.xpReward    : Math.ceil(active.xpReward    / 2);
 
+      clearCooldown(user.id, active.id);
       const saved = await album.completeChallenge(active.id);
       if (saved) {
         setDone(prev => new Set([...prev, active.id]));
@@ -95,11 +145,15 @@ export default function DesafiosAlbumPage() {
       setGameState('won');
     } else {
       if (isFirstTry) {
-        // First wrong — give a hint, don't reveal answer
+        // First wrong — start cooldown, show hint
+        const until = Date.now() + COOLDOWN_MS;
+        saveCooldown(user.id, active.id, idx, until);
         setWrongChoice(idx);
         setGameState('wrong-first');
+        startCooldown(until);
       } else {
         // Second wrong — game over, reveal answer
+        clearCooldown(user.id, active.id);
         setFinalChoice(idx);
         setGameState('lost');
       }
@@ -127,6 +181,8 @@ export default function DesafiosAlbumPage() {
     return sum + (ch ? (PACKS_FIRST) : 0); // simplified estimate
   }, 0);
 
+  const fmtTime = (s: number) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+
   // ── Attempt indicator ──
   const attemptDots = (
     <div className="flex gap-1.5 items-center">
@@ -134,7 +190,8 @@ export default function DesafiosAlbumPage() {
       <div className={cn('h-3 w-3 rounded-full', gameState === 'lost' ? 'bg-[#D43B2A]' : gameState === 'won' ? 'bg-[#1E9B5F]' : gameState === 'wrong-first' ? 'bg-[#FBBA16]' : 'bg-white/20')} />
       <p className="text-xs text-white/50 ml-1">
         {gameState === 'playing'     && 'Tentativa 1 de 2'}
-        {gameState === 'wrong-first' && 'Tentativa 2 de 2 — última chance!'}
+        {gameState === 'wrong-first' && remaining > 0 && `Próxima tentativa em ${fmtTime(remaining)}`}
+        {gameState === 'wrong-first' && remaining === 0 && 'Tentativa 2 de 2 — última chance!'}
         {gameState === 'won'         && 'Correto! 🎉'}
         {gameState === 'lost'        && 'Esgotado 😅'}
       </p>
@@ -382,8 +439,18 @@ export default function DesafiosAlbumPage() {
                 {/* Attempt indicator */}
                 <div className="mb-5">{attemptDots}</div>
 
-                {/* "Wrong first" banner — hint only, no answer */}
-                {gameState === 'wrong-first' && (
+                {/* "Wrong first" banner — cooldown or hint */}
+                {gameState === 'wrong-first' && remaining > 0 && (
+                  <div className="mb-4 rounded-xl border border-[#D43B2A]/40 bg-[#D43B2A]/10 px-4 py-5 text-center">
+                    <p className="font-black text-[#D43B2A] text-sm mb-3">⏳ Resposta errada! Aguarde para tentar de novo.</p>
+                    <div className="font-mono text-4xl font-black text-white mb-2">{fmtTime(remaining)}</div>
+                    <p className="text-xs text-white/40">Sua segunda chance estará disponível em breve.</p>
+                    <div className="mt-3 rounded-lg bg-[#FBBA16]/10 border border-[#FBBA16]/20 px-3 py-2">
+                      <p className="text-sm text-white/70">💡 Dica: {active.hint}</p>
+                    </div>
+                  </div>
+                )}
+                {gameState === 'wrong-first' && remaining === 0 && (
                   <div className="mb-4 rounded-xl border border-[#FBBA16]/40 bg-[#FBBA16]/10 px-4 py-3">
                     <p className="font-black text-[#FBBA16] text-sm mb-1">⚠️ Opa! Não foi dessa vez.</p>
                     <p className="text-sm text-white/70">💡 Dica: {active.hint}</p>
@@ -397,8 +464,9 @@ export default function DesafiosAlbumPage() {
                 {/* Options */}
                 <div className="space-y-3 mb-6">
                   {active.options.map((opt, idx) => {
-                    const isFirstWrong   = idx === wrongChoice;
-                    const isDisabled     = isFirstWrong; // only disable the first wrong pick
+                    const isFirstWrong = idx === wrongChoice;
+                    const onCooldown   = gameState === 'wrong-first' && remaining > 0;
+                    const isDisabled   = isFirstWrong || onCooldown;
 
                     return (
                       <button
@@ -410,6 +478,7 @@ export default function DesafiosAlbumPage() {
                           'flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left text-sm font-semibold transition-all',
                           !isDisabled && 'border-white/20 bg-white/10 text-white hover:border-[#FBBA16]/60 hover:bg-white/15 cursor-pointer',
                           isFirstWrong && 'border-[#D43B2A]/60 bg-[#D43B2A]/15 text-white/50 cursor-not-allowed opacity-60',
+                          onCooldown && !isFirstWrong && 'border-white/10 bg-white/5 text-white/30 cursor-not-allowed',
                         )}
                       >
                         <span className="font-mono text-[#FBBA16] flex-shrink-0">

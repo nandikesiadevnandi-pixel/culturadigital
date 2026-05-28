@@ -81,8 +81,16 @@ export default function AuthPage() {
         return;
       }
       const newPass = genStudentPassword();
-      setGeneratedPass(newPass);
+      const { error } = await supabase.functions.invoke('reset-student-password', {
+        body: { name: resetName.trim(), class_name: resetClass.trim(), school: resetSchool.trim(), new_password: newPass },
+      });
       setResetLoading(false);
+      if (error) {
+        const msg = (error as { message?: string })?.message ?? '';
+        toast.error(msg.includes('não encontrada') ? msg : 'Conta não encontrada. Confira nome, turma e escola.');
+        return;
+      }
+      setGeneratedPass(newPass);
     }
   };
 
@@ -226,7 +234,7 @@ export default function AuthPage() {
               <div>
                 <h2 className="font-bold text-white">Redefinir senha</h2>
                 <p className="text-xs text-violet-200/60">
-                  {isTeacher ? "Enviaremos um link para seu email" : "Gere uma nova senha para mostrar à professora"}
+                  {isTeacher ? "Enviaremos um link para seu email" : "Gere uma nova senha para entrar na plataforma"}
                 </p>
               </div>
             </div>
@@ -246,8 +254,9 @@ export default function AuthPage() {
             {generatedPass ? (
               <div className="space-y-4">
                 <div className="rounded-2xl border border-[#1E9B5F]/40 bg-[#1E9B5F]/10 p-4 text-center">
-                  <p className="text-sm text-white/70 mb-2">Nova senha gerada:</p>
-                  <p className="font-black text-2xl text-white tracking-widest mb-3">{generatedPass}</p>
+                  <p className="text-xs text-[#1E9B5F] font-bold mb-1">✅ Senha atualizada!</p>
+                  <p className="text-sm text-white/70 mb-2">Sua nova senha é:</p>
+                  <p className="font-black text-2xl text-white tracking-widest font-mono mb-3">{generatedPass}</p>
                   <button
                     type="button"
                     onClick={copyPass}
@@ -257,26 +266,30 @@ export default function AuthPage() {
                     {copied ? "Copiado!" : "Copiar senha"}
                   </button>
                 </div>
-                <div className="rounded-xl border border-[#FBBA16]/20 bg-[#FBBA16]/5 p-3 text-xs text-[#FBBA16]/80">
-                  <strong>Próximos passos:</strong> Mostre esta senha para sua professora. Ela precisará atualizar no sistema para você conseguir entrar com a nova senha.
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    onClick={() => { setGeneratedPass(""); }}
-                    className="flex-1 text-violet-200 border border-violet-500/20"
-                  >
-                    Gerar outra
-                  </Button>
-                  <Button
-                    type="button"
-                    onClick={() => { setShowReset(false); setGeneratedPass(""); }}
-                    className="flex-1 bg-gradient-to-r from-violet-500 to-cyan-400 text-white font-bold"
-                  >
-                    Voltar ao login
-                  </Button>
-                </div>
+                <p className="text-xs text-white/50 text-center">Anote essa senha para não esquecer de novo.</p>
+                <Button
+                  type="button"
+                  onClick={async () => {
+                    const { studentLoginEmail: sle } = await import("@/lib/studentEmail");
+                    const loginEmail = sle(resetName, resetClass, resetSchool);
+                    setLoading(true);
+                    const { error } = await supabase.auth.signInWithPassword({ email: loginEmail, password: generatedPass });
+                    setLoading(false);
+                    if (error) toast.error("Erro ao entrar. Tente de novo.");
+                    else { setShowReset(false); setGeneratedPass(""); }
+                  }}
+                  className="w-full bg-gradient-to-r from-violet-500 to-cyan-400 text-white font-bold"
+                  disabled={loading}
+                >
+                  {loading ? "Entrando..." : "Entrar agora 🚀"}
+                </Button>
+                <button
+                  type="button"
+                  onClick={() => setGeneratedPass("")}
+                  className="w-full text-xs text-violet-300/50 hover:text-violet-200 text-center py-1"
+                >
+                  Gerar outra senha
+                </button>
               </div>
             ) : (
               <form onSubmit={handleReset} className="space-y-4">

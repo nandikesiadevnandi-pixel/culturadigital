@@ -31,7 +31,7 @@ export default function InventarioPage() {
   const album = useAlbum();
   const [search, setSearch] = useState('');
   const [subFilter, setSubFilter] = useState<SubFilter>('all');
-  const [country, setCountry] = useState('Brasil');
+  const [country, setCountry] = useState<string>('all');
   const [selected, setSelected] = useState<AlbumPlayer | null>(null);
 
   const invMap = useMemo(() => {
@@ -57,7 +57,7 @@ export default function InventarioPage() {
 
   const filtered = useMemo(() => {
     return ALBUM_PLAYERS.filter(p => {
-      if (p.country !== country) return false;
+      if (country !== 'all' && p.country !== country) return false;
       const qty = invMap.get(p.id) ?? 0;
       if (search && !p.name.toLowerCase().includes(search.toLowerCase())) return false;
       switch (subFilter) {
@@ -83,7 +83,10 @@ export default function InventarioPage() {
     { key: 'common',    label: '◾ Comuns' },
   ];
 
-  const prog = countryProgress[country] ?? { owned: 0, total: 0 };
+  const isAll = country === 'all';
+  const prog = isAll
+    ? { owned: totalOwned, total }
+    : (countryProgress[country] ?? { owned: 0, total: 0 });
 
   return (
     <div className="min-h-[calc(100vh-4rem)] relative overflow-x-hidden">
@@ -136,6 +139,26 @@ export default function InventarioPage() {
 
         {/* Country tabs */}
         <div className="mb-6 flex gap-2 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          {/* Todos tab */}
+          <button
+            type="button"
+            onClick={() => setCountry('all')}
+            className={cn(
+              'flex-shrink-0 flex flex-col items-center gap-0.5 rounded-2xl border px-3 py-2 min-w-[60px] transition-all',
+              isAll
+                ? 'border-[#FBBA16]/80 bg-[#FBBA16]/15 shadow-[0_0_12px_rgba(251,186,22,0.3)]'
+                : 'border-white/10 bg-white/5 hover:bg-white/10',
+            )}
+          >
+            <span className="text-lg leading-none">🌍</span>
+            <span className={cn('text-[9px] font-black whitespace-nowrap leading-none mt-0.5', isAll ? 'text-[#FBBA16]' : 'text-white/70')}>
+              Todos
+            </span>
+            <span className={cn('text-[8px] font-bold leading-none', totalOwned === total ? 'text-[#1E9B5F]' : totalOwned > 0 ? 'text-white/50' : 'text-white/25')}>
+              {totalOwned}/{total}
+            </span>
+          </button>
+
           {countries.map(c => {
             const p = countryProgress[c] ?? { owned: 0, total: 0 };
             const complete = p.owned === p.total && p.total > 0;
@@ -163,21 +186,36 @@ export default function InventarioPage() {
           })}
         </div>
 
-        {/* Country header */}
-        <div className="flex items-center gap-3 mb-4">
-          <span className="text-3xl">{FLAG[country] ?? '🏳️'}</span>
-          <div>
-            <h2 className="font-black text-xl text-white leading-none">{country}</h2>
-            <p className="text-sm text-white/50 mt-0.5">{prog.owned}/{prog.total} figurinhas</p>
+        {/* Section header */}
+        {isAll ? (
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-3xl">🌍</span>
+            <div>
+              <h2 className="font-black text-xl text-white leading-none">Todas as figurinhas</h2>
+              <p className="text-sm text-white/50 mt-0.5">{totalOwned}/{total} figurinhas de todos os países</p>
+            </div>
+            {totalOwned === total && (
+              <span className="ml-auto rounded-full bg-[#1E9B5F]/20 border border-[#1E9B5F]/40 text-[#1E9B5F] text-xs font-black px-3 py-1">
+                🏆 Álbum Completo!
+              </span>
+            )}
           </div>
-          {prog.owned === prog.total && prog.total > 0 && (
-            <span className="ml-auto rounded-full bg-[#1E9B5F]/20 border border-[#1E9B5F]/40 text-[#1E9B5F] text-xs font-black px-3 py-1">
-              🏆 Completo!
-            </span>
-          )}
-        </div>
+        ) : (
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-3xl">{FLAG[country] ?? '🏳️'}</span>
+            <div>
+              <h2 className="font-black text-xl text-white leading-none">{country}</h2>
+              <p className="text-sm text-white/50 mt-0.5">{prog.owned}/{prog.total} figurinhas</p>
+            </div>
+            {prog.owned === prog.total && prog.total > 0 && (
+              <span className="ml-auto rounded-full bg-[#1E9B5F]/20 border border-[#1E9B5F]/40 text-[#1E9B5F] text-xs font-black px-3 py-1">
+                🏆 Completo!
+              </span>
+            )}
+          </div>
+        )}
 
-        {/* Country progress bar */}
+        {/* Section progress bar */}
         <div className="mb-6 h-2 rounded-full bg-black/30 overflow-hidden border border-white/10">
           <div
             className="h-full rounded-full transition-all duration-700"
