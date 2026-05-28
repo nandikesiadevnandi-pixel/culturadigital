@@ -10,7 +10,7 @@ import { schools } from "@/data/schools";
 import { studentLoginEmail } from "@/lib/studentEmail";
 import { genStudentPassword } from "@/lib/passwordGen";
 import { toast } from "sonner";
-import { Sparkles, Copy, Printer } from "lucide-react";
+import { Sparkles, Copy, Printer, Eye, EyeOff } from "lucide-react";
 
 const ADMIN_EMAIL = "nandikesiadevnandi@gmail.com";
 
@@ -33,6 +33,7 @@ export default function CadastroPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [isTeacher, setIsTeacher] = useState(false);
+  const [showPass, setShowPass] = useState(false);
   const [creds, setCreds] = useState<CredsCard | null>(null);
   const [form, setForm] = useState({
     full_name: "",
@@ -255,16 +256,25 @@ export default function CadastroPage() {
               </div>
               <div>
                 <Label className="text-violet-200">Senha</Label>
-                <Input
-                  type="password"
-                  className="mt-1 border-violet-500/30 bg-[#0a0a1a] text-white placeholder:text-violet-300/30"
-                  placeholder="Mínimo 6 caracteres"
-                  value={form.password}
-                  onChange={(e) => set("password", e.target.value)}
-                  required
-                  minLength={6}
-                  maxLength={72}
-                />
+                <div className="relative mt-1">
+                  <Input
+                    type={showPass ? "text" : "password"}
+                    className="border-violet-500/30 bg-[#0a0a1a] text-white placeholder:text-violet-300/30 pr-10"
+                    placeholder="Mínimo 6 caracteres"
+                    value={form.password}
+                    onChange={(e) => set("password", e.target.value)}
+                    required
+                    minLength={6}
+                    maxLength={72}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPass(v => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-violet-300/60 hover:text-violet-200"
+                  >
+                    {showPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
               </div>
             </>
           )}
