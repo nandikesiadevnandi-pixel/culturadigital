@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase as supabaseTyped } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { AlbumPlayer, drawRandomPack, getPlayerById } from '@/data/albumPlayers';
+
+// Album tables aren't in the generated DB types yet — cast to loosen typing.
+const supabase = supabaseTyped as any;
 
 // ─── Types ────────────────────────────────────────────────
 

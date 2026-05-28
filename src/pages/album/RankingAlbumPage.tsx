@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase as supabaseTyped } from '@/integrations/supabase/client';
+const supabase = supabaseTyped as any;
 import { ALBUM_PLAYERS } from '@/data/albumPlayers';
 import { CopaBackground } from '@/components/album/CopaBackground';
 import { Button } from '@/components/ui/button';

@@ -62,7 +62,10 @@ export type Database = {
           class_name: string
           created_at: string
           id: string
+          profile_photo_url: string | null
+          reply_to_body: string | null
           reply_to_id: string | null
+          reply_to_name: string | null
           school: string | null
           user_id: string
         }
@@ -72,7 +75,10 @@ export type Database = {
           class_name: string
           created_at?: string
           id?: string
+          profile_photo_url?: string | null
+          reply_to_body?: string | null
           reply_to_id?: string | null
+          reply_to_name?: string | null
           school?: string | null
           user_id: string
         }
@@ -82,8 +88,41 @@ export type Database = {
           class_name?: string
           created_at?: string
           id?: string
+          profile_photo_url?: string | null
+          reply_to_body?: string | null
           reply_to_id?: string | null
+          reply_to_name?: string | null
           school?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      chat_reactions: {
+        Row: {
+          author_name: string
+          class_name: string
+          created_at: string
+          emoji: string
+          id: string
+          message_id: string
+          user_id: string
+        }
+        Insert: {
+          author_name?: string
+          class_name?: string
+          created_at?: string
+          emoji: string
+          id?: string
+          message_id: string
+          user_id: string
+        }
+        Update: {
+          author_name?: string
+          class_name?: string
+          created_at?: string
+          emoji?: string
+          id?: string
+          message_id?: string
           user_id?: string
         }
         Relationships: []
@@ -265,6 +304,7 @@ export type Database = {
       profiles: {
         Row: {
           avatar_3d_url: string | null
+          avatar_photo_url: string | null
           avatar_url: string | null
           chat_photo_url: string | null
           chat_wallpaper: string
@@ -284,6 +324,7 @@ export type Database = {
         }
         Insert: {
           avatar_3d_url?: string | null
+          avatar_photo_url?: string | null
           avatar_url?: string | null
           chat_photo_url?: string | null
           chat_wallpaper?: string
@@ -303,6 +344,7 @@ export type Database = {
         }
         Update: {
           avatar_3d_url?: string | null
+          avatar_photo_url?: string | null
           avatar_url?: string | null
           chat_photo_url?: string | null
           chat_wallpaper?: string
