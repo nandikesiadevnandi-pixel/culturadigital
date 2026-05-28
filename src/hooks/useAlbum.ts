@@ -77,7 +77,7 @@ export function useAlbum() {
       supabase.from('album_user_stats').select('*').eq('user_id', user.id).maybeSingle(),
       supabase.from('album_inventory').select('card_id,quantity').eq('user_id', user.id),
       supabase.from('album_trades').select('*').or(`from_user_id.eq.${user.id},to_user_id.eq.${user.id},status.eq.open`).order('created_at', { ascending: false }).limit(50),
-      supabase.from('album_feed').select('*').eq('school', school).order('created_at', { ascending: false }).limit(30),
+      supabase.from('album_feed').select('*').eq('class_name', className).order('created_at', { ascending: false }).limit(30),
       supabase.from('album_chat').select('*').eq('class_name', className).order('created_at', { ascending: false }).limit(50),
     ]);
 
