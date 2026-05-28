@@ -141,7 +141,7 @@ export default function AlbumHub() {
         <div className="rounded-2xl border border-white/20 bg-white/10 backdrop-blur-md overflow-hidden">
           <div className="px-5 py-4 border-b border-white/15 flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-[#1E9B5F] animate-pulse" />
-            <h2 className="font-black text-white text-sm">Feed da Escola — ao vivo</h2>
+            <h2 className="font-black text-white text-sm">Feed da Turma {profile?.class_name ?? ''} — ao vivo</h2>
           </div>
           <div className="p-5 max-h-72 overflow-y-auto">
             <AlbumFeed feed={album.feed} currentUserId={user?.id} />
