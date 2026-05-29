@@ -283,7 +283,7 @@ export const weeks: Week[] = [
       "Conversa final: 'isso aqui é tudo código que vocês vão aprender a escrever' — mostrei como cada mecânica se conecta com o que estamos vendo em HTML, CSS e JS",
     ],
     results:
-      "Foi uma das aulas mais emocionantes do ano. A sala explodiu quando viram o primeiro pacote sendo aberto na tela grande — o brilho dourado da lendária do Pelé virou grito. Em poucos minutos a turma 141 já tinha trocas rolando no centro de trocas e o feed da turma estava vivo. Vários alunos disseram que sempre tentaram completar o álbum da Copa de verdade, mas nunca conseguiram por falta de figurinhas e dinheiro. Aqui, todos começam do zero e todos podem completar. Isso mexeu com a turma.",
+      "Foi uma das aulas mais emocionantes do ano. A aula foi levada para várias escolas e em todas elas a sala explodiu quando viram o primeiro pacote sendo aberto na tela grande — o brilho dourado da lendária do Pelé virou grito. Em poucos minutos as turmas já tinham trocas rolando no centro de trocas e o feed da turma estava vivo. Vários alunos disseram que sempre tentaram completar o álbum da Copa de verdade, mas nunca conseguiram por falta de figurinhas e dinheiro. Aqui, todos começam do zero e todos podem completar. Isso mexeu com as turmas.",
     difficulties:
       "No primeiro momento alguns ficavam só abrindo pacote e esquecendo das trocas — o sistema fica mais divertido quando se troca. Resolvi parando a aula e mostrando como uma troca bem feita acelera a coleção. Também tive que explicar que figurinhas repetidas são ouro, não lixo: é exatamente o que outro colega está precisando.",
     reflection:
