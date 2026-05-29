@@ -25,6 +25,7 @@ import week7_5 from "@/assets/week7/aula-5.jpeg";
 import week7_6 from "@/assets/week7/aula-6.jpeg";
 import week7_7 from "@/assets/week7/aula-7.jpeg";
 import week7_8 from "@/assets/week7/aula-8.jpeg";
+import week8AlbumDemo from "@/assets/week8/album-copa-demo.mp4";
 
 export type MediaItem = {
   type: "image" | "video";
