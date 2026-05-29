@@ -262,4 +262,34 @@ export const weeks: Week[] = [
       { type: "image", src: week7_8, caption: "Os pequenos devs do Ernesto em ação 💙" },
     ],
   },
+  {
+    number: 8,
+    date: "28/05 — Quarta-feira",
+    title: "Ernesto Dorneles: Álbum Digital da Copa 2026 — programação que vira sonho realizado",
+    emoji: "⚽",
+    color: "green",
+    objective:
+      "Lançar para as turmas do 7º e 8º ano do Ernesto Dorneles o Álbum Digital da Copa 2026: uma atividade prática que une lógica de programação, trabalho em equipe e a magia de colecionar figurinhas — para que todo aluno que sempre sonhou em completar um álbum da Copa possa, dessa vez, conseguir.",
+    taught:
+      "Como uma aplicação web de verdade é construída por dentro: estrutura de dados (cada figurinha é um objeto com id, nome, seleção, posição e raridade), sistema de probabilidades (raridade comum/rara/épica/lendária com pesos diferentes no sorteio), persistência em banco de dados (inventário, trocas e ranking em tempo real), e mecânicas de jogo (pacotes, desafios diários, ranking da turma e centro de trocas). Os alunos viram, na prática, que cada clique no botão 'Abrir Pacote' é lógica de programação rodando: aleatoriedade controlada, atualização de estado, sincronização com o servidor e notificação para a turma toda.",
+    activities: [
+      "Lançamento oficial do Álbum Digital da Copa 2026 dentro da plataforma Cultura Digital — botão novo no painel do aluno",
+      "Demonstração ao vivo: abrir o primeiro pacote, ver as figurinhas surgindo com brilho e som conforme a raridade",
+      "Exploração das seleções: Brasil, Argentina, França, Portugal, Inglaterra, Alemanha, Espanha, Itália, Holanda, Uruguai — cada jogador com retrato, posição e nível",
+      "Centro de Trocas: alunos publicam figurinhas repetidas e negociam em tempo real com colegas da mesma turma",
+      "Feed da Turma ao vivo: cada pacote aberto, cada lendária conquistada e cada troca aceita aparece para todos",
+      "Desafios diários: completar uma seleção, conseguir 3 raras, fazer a primeira troca — cada missão dá moedas para comprar mais pacotes",
+      "Ranking da turma: quem tem mais lendárias, quem completou mais seleções, quem mais ajudou colegas com trocas",
+      "Conversa final: 'isso aqui é tudo código que vocês vão aprender a escrever' — mostrei como cada mecânica se conecta com o que estamos vendo em HTML, CSS e JS",
+    ],
+    results:
+      "Foi uma das aulas mais emocionantes do ano. A sala explodiu quando viram o primeiro pacote sendo aberto na tela grande — o brilho dourado da lendária do Pelé virou grito. Em poucos minutos a turma 141 já tinha trocas rolando no centro de trocas e o feed da turma estava vivo. Vários alunos disseram que sempre tentaram completar o álbum da Copa de verdade, mas nunca conseguiram por falta de figurinhas e dinheiro. Aqui, todos começam do zero e todos podem completar. Isso mexeu com a turma.",
+    difficulties:
+      "No primeiro momento alguns ficavam só abrindo pacote e esquecendo das trocas — o sistema fica mais divertido quando se troca. Resolvi parando a aula e mostrando como uma troca bem feita acelera a coleção. Também tive que explicar que figurinhas repetidas são ouro, não lixo: é exatamente o que outro colega está precisando.",
+    reflection:
+      "Esse projeto resume tudo que eu acredito como professora: tecnologia tem que servir para encurtar distâncias. Tem aluno meu que nunca pôde comprar pacote de figurinha na banca da esquina — e agora abre pacote todo dia, monta time, troca com colega, comemora lendária. E enquanto ele se diverte, está aprendendo lógica de programação, probabilidade, banco de dados, trabalho em equipe e negociação. Programar é isso: transformar sonho em algo que roda na tela. Viva o Brasil, viva o Hexa! 🇧🇷⚽✨",
+    media: [
+      { type: "video", src: week8AlbumDemo, caption: "Lançamento do Álbum da Copa 2026 — abrindo o primeiro pacote ao vivo ⚽✨" },
+    ],
+  },
 ];
