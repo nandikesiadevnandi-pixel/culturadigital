@@ -93,6 +93,7 @@ const App = () => (
                 <Route path="/aluno/album/trocas" element={<ProtectedRoute><TrocasPage /></ProtectedRoute>} />
                 <Route path="/aluno/album/desafios" element={<ProtectedRoute><DesafiosAlbumPage /></ProtectedRoute>} />
                 <Route path="/aluno/album/ranking" element={<ProtectedRoute><RankingAlbumPage /></ProtectedRoute>} />
+                <Route path="/aluno/album/craques" element={<ProtectedRoute><CraquesPage /></ProtectedRoute>} />
 
                 {/* Admin */}
                 <Route
