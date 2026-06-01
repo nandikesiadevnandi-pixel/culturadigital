@@ -116,6 +116,27 @@ export default function FeedPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile?.user_id]);
 
+  // Conecta a stream ao <video> assim que ambos estiverem prontos
+  useEffect(() => {
+    if (!stream || !videoRef.current) return;
+    const video = videoRef.current;
+    video.srcObject = stream;
+
+    const onReady = async () => {
+      try { await video.play(); } catch { /* ignorar erro de autoplay em contextos bloqueados */ }
+    };
+
+    if (video.readyState >= 1) {
+      onReady();
+    } else {
+      video.addEventListener("loadedmetadata", onReady, { once: true });
+    }
+
+    return () => {
+      video.removeEventListener("loadedmetadata", onReady);
+    };
+  }, [stream, camOpen]);
+
   // ── Webcam ──
   const openCam = async () => {
     setCamOpen(true);
@@ -123,7 +144,7 @@ export default function FeedPage() {
     try {
       const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
       setStream(s);
-      if (videoRef.current) { videoRef.current.srcObject = s; await videoRef.current.play(); }
+      // A stream será conectada ao <video> pelo useEffect acima
     } catch {
       toast.error("Não consegui acessar a webcam. Permita o acesso no navegador.");
       setCamOpen(false);
@@ -139,6 +160,13 @@ export default function FeedPage() {
   const captureCam = async () => {
     if (!videoRef.current || !canvasRef.current) return;
     const v = videoRef.current, c = canvasRef.current;
+
+    // Garantir que o vídeo tem dados reais (evita frame preto)
+    if (v.readyState < 2 || v.videoWidth === 0) {
+      toast.error("Câmera ainda carregando, aguarde um instante.");
+      return;
+    }
+
     c.width = v.videoWidth; c.height = v.videoHeight;
     const ctx = c.getContext("2d")!;
     ctx.filter = filter;
@@ -475,6 +503,7 @@ export default function FeedPage() {
                 <video
                   ref={videoRef}
                   className="w-full h-full object-cover"
+                  autoPlay
                   muted
                   playsInline
                 />
