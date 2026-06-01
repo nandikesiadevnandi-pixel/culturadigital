@@ -39,6 +39,7 @@ import TrocasPage from "./pages/album/TrocasPage.tsx";
 import DesafiosAlbumPage from "./pages/album/DesafiosAlbumPage.tsx";
 import RankingAlbumPage from "./pages/album/RankingAlbumPage.tsx";
 import CraquesPage from "./pages/album/CraquesPage.tsx";
+import MinhaSelecaoPage from "./pages/album/MinhaSelecaoPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -94,6 +95,7 @@ const App = () => (
                 <Route path="/aluno/album/desafios" element={<ProtectedRoute><DesafiosAlbumPage /></ProtectedRoute>} />
                 <Route path="/aluno/album/ranking" element={<ProtectedRoute><RankingAlbumPage /></ProtectedRoute>} />
                 <Route path="/aluno/album/craques" element={<ProtectedRoute><CraquesPage /></ProtectedRoute>} />
+                <Route path="/aluno/album/selecao" element={<ProtectedRoute><MinhaSelecaoPage /></ProtectedRoute>} />
 
                 {/* Admin */}
                 <Route

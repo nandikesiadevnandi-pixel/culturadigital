@@ -1,11 +1,116 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Sparkles, Heart, Flame, Star, Plus, Pencil, Trophy } from 'lucide-react';
+import { ArrowLeft, Sparkles, Heart, Flame, Star, Plus, Pencil, Trophy, MessageSquare, Send, Swords } from 'lucide-react';
 import { useStudentCards, StudentCard } from '@/hooks/useStudentCards';
 import { useAuth } from '@/hooks/useAuth';
 import { CopaBackground } from '@/components/album/CopaBackground';
 import { StudentCardView } from '@/components/album/StudentCardView';
 import { CreateCardWizard } from '@/components/album/CreateCardWizard';
+import { supabase as sb } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+
+const supabase = sb as any;
+
+const BLOCKED = ['feio','burro','idiota','chato','horrível','ruim','péssimo','odeio','odeia','estupido','lixo'];
+function isCommentSafe(t: string) { return !BLOCKED.some(w => t.toLowerCase().includes(w)); }
+
+type Comment = { id: string; card_id: string; user_id: string; author_name: string; body: string; created_at: string };
+
+function useComments(cardId: string | null) {
+  const [comments, setComments] = useState<Comment[]>([]);
+  const load = async () => {
+    if (!cardId) return;
+    const { data } = await supabase.from('student_card_comments').select('*').eq('card_id', cardId).order('created_at');
+    setComments(data ?? []);
+  };
+  useEffect(() => { load(); }, [cardId]);
+  return { comments, reload: load };
+}
+
+function CardModal({ card, user, onClose, onToggleReaction }: {
+  card: StudentCard; user: any; onClose: () => void;
+  onToggleReaction: (id: string, r: 'like'|'fire'|'star') => void;
+}) {
+  const { profile } = useAuth();
+  const { comments, reload } = useComments(card.id);
+  const [draft, setDraft] = useState('');
+  const [sending, setSending] = useState(false);
+  const [localCard, setLocalCard] = useState(card);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const sendComment = async () => {
+    const body = draft.trim();
+    if (!body || !profile) return;
+    if (!isCommentSafe(body)) { toast.error('Usa palavras legais! 😊 Nada de comentários negativos.'); return; }
+    setSending(true);
+    await supabase.from('student_card_comments').insert({ card_id: card.id, user_id: user.id, author_name: profile.full_name, body });
+    setSending(false);
+    setDraft('');
+    reload();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto" onClick={onClose}>
+      <div className="relative max-w-md w-full my-4" onClick={e => e.stopPropagation()}>
+        <div className="flex justify-center mb-4"><StudentCardView card={localCard} size="lg" /></div>
+        <div className="rounded-2xl bg-slate-900 border border-white/15 p-4 space-y-4">
+          <div className="text-center">
+            <p className="text-white font-black text-lg">{card.playerName}</p>
+            <p className="text-white/60 text-xs">{card.club || card.country} · {card.position} #{card.jerseyNumber}</p>
+          </div>
+
+          {/* reactions */}
+          <div className="grid grid-cols-3 gap-2">
+            {(['like','fire','star'] as const).map(r => {
+              const meta = r==='like' ? {icon:Heart,label:'Gostei',color:'text-pink-400'} : r==='fire' ? {icon:Flame,label:'Craque',color:'text-orange-400'} : {icon:Star,label:'Melhor',color:'text-[#FBBA16]'};
+              const Icon = meta.icon;
+              const mine = localCard.myReactions.has(r);
+              const isMine = localCard.userId === user?.id;
+              return (
+                <button key={r} type="button" disabled={isMine}
+                  onClick={async () => {
+                    await onToggleReaction(card.id, r);
+                    setLocalCard(c => { const s = new Set(c.myReactions); mine ? s.delete(r) : s.add(r); return {...c, myReactions: s, likes: {...c.likes, [r]: Math.max(0, c.likes[r]+(mine?-1:1))}}; });
+                  }}
+                  className={`py-3 rounded-xl font-bold text-xs flex flex-col items-center gap-1 transition-all ${mine ? 'bg-white/25 ring-2 ring-white/50' : 'bg-white/10 hover:bg-white/20'} disabled:opacity-40 disabled:cursor-not-allowed`}>
+                  <Icon className={`h-5 w-5 ${meta.color}`} />
+                  <span className="text-white">{meta.label}</span>
+                  <span className="text-white/60">{localCard.likes[r]}</span>
+                </button>
+              );
+            })}
+          </div>
+          {localCard.userId === user?.id && <p className="text-center text-white/40 text-[10px]">você não pode curtir a própria figurinha 😉</p>}
+
+          {/* comments */}
+          <div>
+            <p className="text-white/70 text-xs font-bold mb-2 flex items-center gap-1"><MessageSquare className="h-3 w-3" /> Comentários ({comments.length})</p>
+            <div className="space-y-1.5 max-h-32 overflow-y-auto mb-2">
+              {comments.length === 0 && <p className="text-white/30 text-[11px] italic">Seja o primeiro a comentar!</p>}
+              {comments.map(c => (
+                <div key={c.id} className="flex gap-2 text-xs">
+                  <span className="font-bold text-cyan-300 shrink-0">{c.author_name.split(' ')[0]}:</span>
+                  <span className="text-white/80">{c.body}</span>
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <input ref={inputRef} value={draft} onChange={e => setDraft(e.target.value.slice(0,100))}
+                onKeyDown={e => { if(e.key==='Enter') sendComment(); }}
+                placeholder="Diga algo positivo... 🌟" maxLength={100}
+                className="flex-1 px-3 py-1.5 rounded-lg bg-white/10 border border-white/20 text-white text-xs placeholder-white/30 outline-none focus:border-[#FBBA16]" />
+              <button type="button" onClick={sendComment} disabled={sending || !draft.trim()}
+                aria-label="Enviar comentário"
+                className="px-3 py-1.5 rounded-lg bg-[#FBBA16] text-gray-900 font-black text-xs disabled:opacity-40">
+                <Send className="h-3 w-3" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function CraquesPage() {
   const { user, profile } = useAuth();
@@ -24,11 +129,18 @@ export default function CraquesPage() {
       <CopaBackground />
 
       <div className="relative z-10 container py-8">
-        <Link to="/aluno/album">
-          <button type="button" className="mb-6 flex items-center gap-2 text-white/80 hover:text-white text-sm font-bold">
-            <ArrowLeft className="h-4 w-4" /> Voltar ao álbum
-          </button>
-        </Link>
+        <div className="flex items-center justify-between mb-6">
+          <Link to="/aluno/album">
+            <button type="button" className="flex items-center gap-2 text-white/80 hover:text-white text-sm font-bold">
+              <ArrowLeft className="h-4 w-4" /> Voltar ao álbum
+            </button>
+          </Link>
+          <Link to="/aluno/album/selecao">
+            <button type="button" className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#FBBA16] to-[#F59E0B] text-gray-900 text-sm font-black shadow-lg hover:opacity-90">
+              <Swords className="h-4 w-4" /> Minha Seleção
+            </button>
+          </Link>
+        </div>
 
         <div className="mb-8 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FBBA16]/20 border border-[#FBBA16]/40 mb-3">
@@ -141,35 +253,7 @@ export default function CraquesPage() {
       )}
 
       {openCard && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setOpenCard(null)}>
-          <div className="relative max-w-md w-full" onClick={(e) => e.stopPropagation()}>
-            <div className="flex justify-center mb-4"><StudentCardView card={openCard} size="lg" /></div>
-            <div className="rounded-2xl bg-slate-900 border border-white/15 p-4">
-              <p className="text-center text-white font-black text-lg">{openCard.playerName}</p>
-              <p className="text-center text-white/60 text-xs mb-3">{openCard.club || openCard.country} · {openCard.position} #{openCard.jerseyNumber}</p>
-              <div className="grid grid-cols-3 gap-2">
-                {(['like', 'fire', 'star'] as const).map(r => {
-                  const meta = r === 'like' ? { icon: Heart, label: 'Gostei', color: 'text-pink-400' }
-                    : r === 'fire' ? { icon: Flame, label: 'Craque', color: 'text-orange-400' }
-                    : { icon: Star, label: 'Melhor', color: 'text-[#FBBA16]' };
-                  const Icon = meta.icon;
-                  const mine = openCard.myReactions.has(r);
-                  const isMine = openCard.userId === user?.id;
-                  return (
-                    <button key={r} type="button" disabled={isMine}
-                      onClick={async () => { await toggleReaction(openCard.id, r); setOpenCard(c => c ? { ...c, myReactions: (() => { const s = new Set(c.myReactions); mine ? s.delete(r) : s.add(r); return s; })(), likes: { ...c.likes, [r]: Math.max(0, c.likes[r] + (mine ? -1 : 1)) } } : c); }}
-                      className={`py-3 rounded-xl font-bold text-xs flex flex-col items-center gap-1 transition-all ${mine ? 'bg-white/25 ring-2 ring-white/50' : 'bg-white/10 hover:bg-white/20'} disabled:opacity-40 disabled:cursor-not-allowed`}>
-                      <Icon className={`h-5 w-5 ${meta.color}`} />
-                      <span className="text-white">{meta.label}</span>
-                      <span className="text-white/60">{openCard.likes[r]}</span>
-                    </button>
-                  );
-                })}
-              </div>
-              {openCard.userId === user?.id && <p className="text-center text-white/40 text-[10px] mt-2">você não pode curtir a própria figurinha 😉</p>}
-            </div>
-          </div>
-        </div>
+        <CardModal card={openCard} user={user} onClose={() => setOpenCard(null)} onToggleReaction={toggleReaction} />
       )}
     </div>
   );
