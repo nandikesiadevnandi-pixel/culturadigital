@@ -54,16 +54,31 @@ export function CreateCardWizard({ onClose, onSave, initial }: Props) {
 
   useEffect(() => () => stopCam(), []);
 
+  // Conecta a stream ao <video> após o React renderizar o elemento (quando camOn vira true)
+  useEffect(() => {
+    if (!camOn || !streamRef.current || !videoRef.current) return;
+    const video = videoRef.current;
+    video.srcObject = streamRef.current;
+
+    const onReady = async () => {
+      try { await video.play(); } catch { }
+    };
+
+    if (video.readyState >= 1) {
+      onReady();
+    } else {
+      video.addEventListener('loadedmetadata', onReady, { once: true });
+    }
+
+    return () => { video.removeEventListener('loadedmetadata', onReady); };
+  }, [camOn]);
+
   async function startCam() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: 640, height: 640 } });
       streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-      }
-      setCamOn(true);
-    } catch (e: any) {
+      setCamOn(true); // renderiza o <video> → useEffect conecta a stream
+    } catch {
       toast.error('Não consegui acessar a câmera. Use o botão de upload.');
     }
   }
@@ -77,6 +92,13 @@ export function CreateCardWizard({ onClose, onSave, initial }: Props) {
   function capture() {
     const v = videoRef.current; const c = canvasRef.current;
     if (!v || !c) return;
+
+    // Evitar frame preto: só captura quando o vídeo tem dados reais
+    if (v.readyState < 2 || v.videoWidth === 0) {
+      toast.error('Câmera ainda carregando, tente novamente.');
+      return;
+    }
+
     const size = Math.min(v.videoWidth, v.videoHeight);
     const sx = (v.videoWidth - size) / 2;
     const sy = (v.videoHeight - size) / 2;
@@ -153,7 +175,7 @@ export function CreateCardWizard({ onClose, onSave, initial }: Props) {
                   {photoUrl ? (
                     <img src={photoUrl} alt="preview" className="h-full w-full object-cover" />
                   ) : camOn ? (
-                    <video ref={videoRef} className="h-full w-full object-cover" playsInline muted />
+                    <video ref={videoRef} className="h-full w-full object-cover" autoPlay playsInline muted />
                   ) : (
                     <div className="text-white/40 text-sm text-center px-6">
                       <Camera className="h-12 w-12 mx-auto mb-2 opacity-50" />
