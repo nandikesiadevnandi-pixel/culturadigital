@@ -226,23 +226,46 @@ export function useAlbum() {
         }
       }
 
-      // Swap cards: give offered cards to the acceptor
+      // ── ATOMIC CLAIM ──
+      // Só o PRIMEIRO aluno consegue marcar a troca como "accepted".
+      // Se outra criança já pegou, o update não casa nenhuma linha e abortamos.
+      const { data: claimed, error: claimErr } = await supabase
+        .from('album_trades')
+        .update({
+          status: 'accepted',
+          to_user_id: user.id,
+          to_name: userName,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', tradeId)
+        .eq('status', 'open')
+        .is('to_user_id', null)
+        .select('id');
+
+      if (claimErr) return { ok: false, error: claimErr.message };
+      if (!claimed || claimed.length === 0) {
+        return { ok: false, error: 'Essa troca já foi aceita por outro aluno 😢' };
+      }
+
+      // Só agora, com a troca travada em nosso nome, transferimos as cartas.
       for (const cardId of trade.offeredCards) {
         await supabase.from('album_inventory').upsert(
           { user_id: user.id, card_id: cardId, quantity: (inventory.find(e => e.cardId === cardId)?.quantity ?? 0) + 1 },
           { onConflict: 'user_id,card_id' },
         );
       }
-      // Remove requested cards from acceptor
       for (const cardId of trade.requestedCards) {
         const qty = inventory.find(e => e.cardId === cardId)?.quantity ?? 0;
         if (qty > 1) await supabase.from('album_inventory').update({ quantity: qty - 1 }).eq('user_id', user.id).eq('card_id', cardId);
         else await supabase.from('album_inventory').delete().eq('user_id', user.id).eq('card_id', cardId);
       }
       await postFeedEvent('trade_completed', { with: trade.fromName, offered: trade.offeredCards, received: trade.requestedCards });
+      return { ok: true };
     }
 
-    await supabase.from('album_trades').update({ status: accept ? 'accepted' : 'declined', updated_at: new Date().toISOString() }).eq('id', tradeId);
+    await supabase.from('album_trades').update({ status: 'declined', updated_at: new Date().toISOString() }).eq('id', tradeId);
+    return { ok: true };
+
     return { ok: true };
   }, [user, trades, inventory]);
 
