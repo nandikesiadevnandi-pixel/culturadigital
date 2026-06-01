@@ -119,7 +119,7 @@ export default function AlbumHub() {
         </div>
 
         {/* ── Navigation tiles ── */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
           {tiles.map(t => (
             <Link key={t.to} to={t.to} className="relative group block">
               {t.badge ? (
