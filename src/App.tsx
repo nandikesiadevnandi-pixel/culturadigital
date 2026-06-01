@@ -38,6 +38,7 @@ import InventarioPage from "./pages/album/InventarioPage.tsx";
 import TrocasPage from "./pages/album/TrocasPage.tsx";
 import DesafiosAlbumPage from "./pages/album/DesafiosAlbumPage.tsx";
 import RankingAlbumPage from "./pages/album/RankingAlbumPage.tsx";
+import CraquesPage from "./pages/album/CraquesPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
