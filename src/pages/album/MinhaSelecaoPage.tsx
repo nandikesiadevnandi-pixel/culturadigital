@@ -6,7 +6,7 @@ import { useSquad, FORMATIONS, Formation, Strategy, ShieldConfig, LineupSlot, ca
 import { useAuth } from '@/hooks/useAuth';
 import { CopaBackground } from '@/components/album/CopaBackground';
 import { ShieldSVG } from '@/components/album/ShieldSVG';
-import { ALBUM_PLAYERS } from '@/data/albumPlayers';
+import { ALBUM_PLAYERS, AlbumPlayer } from '@/data/albumPlayers';
 
 // ── Constants ─────────────────────────────────────────────────────────────
 
@@ -27,10 +27,53 @@ const DEFAULT_SHIELD: ShieldConfig = { shape: 'classic', primary: '#1E9B5F', sec
 
 // ── Sub-components ─────────────────────────────────────────────────────────
 
-function FieldView({ slots, lineup, onSlotClick }: {
+function flagEmoji(code: string) {
+  return code.toUpperCase().split('').map(c => String.fromCodePoint(c.charCodeAt(0) + 127397)).join('');
+}
+
+function MiniPlayerCard({ player }: { player: AlbumPlayer }) {
+  const rarityBorder = player.rarity === 'legendary' ? 'border-[#FBBA16]'
+    : player.rarity === 'epic' ? 'border-violet-400'
+    : player.rarity === 'rare' ? 'border-blue-400' : 'border-gray-500';
+  const rarityGlow = player.rarity === 'legendary' ? 'shadow-[0_0_8px_#FBBA16aa]'
+    : player.rarity === 'epic' ? 'shadow-[0_0_8px_#a78bfa99]'
+    : player.rarity === 'rare' ? 'shadow-[0_0_6px_#60a5fa88]' : '';
+  const rarityStrip = player.rarity === 'legendary' ? 'bg-[#FBBA16]'
+    : player.rarity === 'epic' ? 'bg-violet-500'
+    : player.rarity === 'rare' ? 'bg-blue-500' : 'bg-gray-600';
+
+  return (
+    <div className={`w-11 h-[58px] rounded-lg overflow-hidden border-2 ${rarityBorder} ${rarityGlow} flex flex-col bg-gray-950 shadow-xl`}>
+      {/* photo / flag */}
+      <div className="flex-1 relative overflow-hidden">
+        {player.photoUrl ? (
+          <img src={player.photoUrl} alt={player.name}
+            className="h-full w-full object-cover object-top"
+            loading="lazy" />
+        ) : (
+          <div className="h-full w-full flex items-center justify-center bg-gradient-to-b from-slate-700 to-slate-900 text-base">
+            {flagEmoji(player.flagCode)}
+          </div>
+        )}
+        <div className="absolute inset-x-0 bottom-0 h-4 bg-gradient-to-t from-black to-transparent" />
+        {/* rarity dot */}
+        <div className={`absolute top-1 right-1 w-1.5 h-1.5 rounded-full ${rarityStrip}`} />
+      </div>
+      {/* name strip */}
+      <div className="bg-black/90 px-0.5 py-[2px]">
+        <p className="text-[6.5px] font-black text-white text-center leading-tight truncate px-0.5 uppercase tracking-wide">
+          {player.name.split(' ').pop()}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function FieldView({ slots, lineup, onSlotClick, compact = false }: {
   slots: { key: string; label: string; top: number; left: number }[];
   lineup: LineupSlot[];
   onSlotClick?: (key: string) => void;
+  compact?: boolean;
 }) {
   return (
     <div className="relative w-full aspect-[2/3] rounded-2xl overflow-hidden border border-green-700/60"
@@ -49,14 +92,26 @@ function FieldView({ slots, lineup, onSlotClick }: {
             onClick={() => onSlotClick?.(slot.key)}
             className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-0.5 group"
             style={{ top: `${slot.top}%`, left: `${slot.left}%` }}>
-            <div className={`w-9 h-9 rounded-full border-2 flex items-center justify-center text-[9px] font-black transition-all
-              ${player ? 'bg-white/90 border-white text-gray-900' : 'bg-black/40 border-white/50 text-white group-hover:border-[#FBBA16]'}`}>
-              {player ? player.name.split(' ').pop()?.slice(0, 4) : slot.label}
-            </div>
-            {player && (
-              <span className="text-[8px] bg-black/70 text-white px-1 rounded font-bold leading-tight max-w-[52px] truncate">
-                {player.name.split(' ')[0]}
-              </span>
+            {player && !compact ? (
+              <>
+                <MiniPlayerCard player={player} />
+                <span className="text-[7px] bg-black/80 text-white px-1 rounded font-bold leading-tight max-w-[52px] truncate shadow">
+                  {player.name.split(' ')[0]}
+                </span>
+              </>
+            ) : (
+              <>
+                <div className={`rounded-full border-2 flex items-center justify-center font-black transition-all
+                  ${compact ? 'w-7 h-7 text-[8px]' : 'w-9 h-9 text-[9px]'}
+                  ${player ? 'bg-white/90 border-white text-gray-900' : 'bg-black/40 border-white/50 text-white group-hover:border-[#FBBA16]'}`}>
+                  {player ? player.name.split(' ').pop()?.slice(0, 4) : slot.label}
+                </div>
+                {player && (
+                  <span className="text-[7px] bg-black/70 text-white px-1 rounded font-bold leading-tight max-w-[44px] truncate">
+                    {player.name.split(' ')[0]}
+                  </span>
+                )}
+              </>
             )}
           </button>
         );
@@ -573,7 +628,7 @@ export default function MinhaSelecaoPage() {
                   </div>
                   {/* field preview */}
                   <div className="mt-4 max-w-[200px] mx-auto">
-                    <FieldView slots={FORMATIONS[mySquad.formation]} lineup={mySquad.lineup} />
+                    <FieldView slots={FORMATIONS[mySquad.formation]} lineup={mySquad.lineup} compact />
                   </div>
                 </div>
 
