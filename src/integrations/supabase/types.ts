@@ -638,6 +638,101 @@ export type Database = {
         }
         Relationships: []
       }
+      student_card_likes: {
+        Row: {
+          card_id: string
+          created_at: string
+          id: string
+          reaction: string
+          user_id: string
+        }
+        Insert: {
+          card_id: string
+          created_at?: string
+          id?: string
+          reaction?: string
+          user_id: string
+        }
+        Update: {
+          card_id?: string
+          created_at?: string
+          id?: string
+          reaction?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_card_likes_card_id_fkey"
+            columns: ["card_id"]
+            isOneToOne: false
+            referencedRelation: "student_cards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      student_cards: {
+        Row: {
+          class_name: string
+          club: string
+          country: string
+          country_flag: string
+          created_at: string
+          foot: string
+          frame: string
+          id: string
+          jersey_color: string
+          jersey_number: number
+          jersey_style: string
+          photo_url: string
+          player_name: string
+          position: string
+          school: string | null
+          updated_at: string
+          user_id: string
+          views: number
+        }
+        Insert: {
+          class_name?: string
+          club?: string
+          country?: string
+          country_flag?: string
+          created_at?: string
+          foot?: string
+          frame?: string
+          id?: string
+          jersey_color?: string
+          jersey_number?: number
+          jersey_style?: string
+          photo_url: string
+          player_name: string
+          position?: string
+          school?: string | null
+          updated_at?: string
+          user_id: string
+          views?: number
+        }
+        Update: {
+          class_name?: string
+          club?: string
+          country?: string
+          country_flag?: string
+          created_at?: string
+          foot?: string
+          frame?: string
+          id?: string
+          jersey_color?: string
+          jersey_number?: number
+          jersey_style?: string
+          photo_url?: string
+          player_name?: string
+          position?: string
+          school?: string | null
+          updated_at?: string
+          user_id?: string
+          views?: number
+        }
+        Relationships: []
+      }
       student_credentials: {
         Row: {
           class_name: string | null
