@@ -25,9 +25,10 @@ export default function AlbumHub() {
 
   const tiles = [
     { to: '/aluno/album/inventario', icon: BookOpen,       label: 'Inventário',  desc: `${album.uniqueCards}/${totalCards} figurinhas`, color: 'bg-[#6B21A8]' },
+    { to: '/aluno/album/craques',    icon: Sparkles,       label: 'Craques da Turma', desc: 'Crie sua figurinha lendária ⭐', color: 'bg-gradient-to-br from-[#FBBA16] to-[#F59E0B] text-gray-900' },
     { to: '/aluno/album/trocas',     icon: ArrowLeftRight, label: 'Trocas',       desc: album.pendingIncoming > 0 ? `${album.pendingIncoming} proposta(s)!` : 'Trocar repetidas', color: 'bg-[#00B4D8]', badge: album.pendingIncoming },
-    { to: '/aluno/album/desafios',   icon: Zap,            label: 'Desafios',     desc: 'Ganhe pacotes codando', color: 'bg-[#FBBA16] text-gray-900' },
-    { to: '/aluno/album/ranking',    icon: Trophy,         label: 'Ranking',      desc: 'Melhor coleção da turma', color: 'bg-[#D43B2A]' },
+    { to: '/aluno/album/desafios',   icon: Zap,            label: 'Desafios',     desc: 'Ganhe pacotes codando', color: 'bg-[#D43B2A]' },
+    { to: '/aluno/album/ranking',    icon: Trophy,         label: 'Ranking',      desc: 'Melhor coleção da turma', color: 'bg-[#1E9B5F]' },
   ];
 
   return (
