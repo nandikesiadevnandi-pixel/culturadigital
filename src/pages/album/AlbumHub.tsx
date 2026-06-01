@@ -6,7 +6,7 @@ import { PackOpeningModal } from '@/components/album/PackOpeningModal';
 import { AlbumFeed } from '@/components/album/AlbumFeed';
 import { CopaBackground } from '@/components/album/CopaBackground';
 import { AlbumPlayer, ALBUM_PLAYERS } from '@/data/albumPlayers';
-import { ArrowLeft, Package, BookOpen, ArrowLeftRight, Trophy, Zap } from 'lucide-react';
+import { ArrowLeft, Package, BookOpen, ArrowLeftRight, Trophy, Zap, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function AlbumHub() {
