@@ -6,7 +6,7 @@ import { PackOpeningModal } from '@/components/album/PackOpeningModal';
 import { AlbumFeed } from '@/components/album/AlbumFeed';
 import { CopaBackground } from '@/components/album/CopaBackground';
 import { AlbumPlayer, ALBUM_PLAYERS } from '@/data/albumPlayers';
-import { ArrowLeft, Package, BookOpen, ArrowLeftRight, Trophy, Zap, Sparkles, Swords } from 'lucide-react';
+import { ArrowLeft, Package, BookOpen, ArrowLeftRight, Trophy, Zap, Sparkles, Swords, Hand } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function AlbumHub() {
@@ -27,6 +27,7 @@ export default function AlbumHub() {
     { to: '/aluno/album/inventario', icon: BookOpen,       label: 'Inventário',  desc: `${album.uniqueCards}/${totalCards} figurinhas`, color: 'bg-[#6B21A8]' },
     { to: '/aluno/album/craques',    icon: Sparkles,       label: 'Craques da Turma', desc: 'Crie sua figurinha lendária ⭐', color: 'bg-gradient-to-br from-[#FBBA16] to-[#F59E0B] text-gray-900' },
     { to: '/aluno/album/selecao',   icon: Swords,         label: 'Minha Seleção',    desc: 'Monte seu time e desafie a turma ⚽', color: 'bg-gradient-to-br from-green-500 to-emerald-700' },
+    { to: '/aluno/album/bafo',       icon: Hand,           label: 'Arena do Bafo',    desc: 'Vire figurinhas dos colegas! 🖐️', color: 'bg-gradient-to-br from-orange-500 to-red-600' },
     { to: '/aluno/album/trocas',     icon: ArrowLeftRight, label: 'Trocas',       desc: album.pendingIncoming > 0 ? `${album.pendingIncoming} proposta(s)!` : 'Trocar repetidas', color: 'bg-[#00B4D8]', badge: album.pendingIncoming },
     { to: '/aluno/album/desafios',   icon: Zap,            label: 'Desafios',     desc: 'Ganhe pacotes codando', color: 'bg-[#D43B2A]' },
     { to: '/aluno/album/ranking',    icon: Trophy,         label: 'Ranking',      desc: 'Melhor coleção da turma', color: 'bg-[#1E9B5F]' },
@@ -120,7 +121,7 @@ export default function AlbumHub() {
         </div>
 
         {/* ── Navigation tiles ── */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-8">
           {tiles.map(t => (
             <Link key={t.to} to={t.to} className="relative group block">
               {t.badge ? (
