@@ -235,6 +235,105 @@ export type Database = {
           },
         ]
       }
+      bafo_matches: {
+        Row: {
+          challenged_cards: Json
+          challenged_id: string
+          challenged_name: string
+          challenged_power: number | null
+          challenger_cards: Json
+          challenger_id: string
+          challenger_name: string
+          challenger_power: number | null
+          class_name: string
+          created_at: string
+          id: string
+          status: string
+          updated_at: string
+          winner_id: string | null
+          winner_name: string | null
+        }
+        Insert: {
+          challenged_cards?: Json
+          challenged_id: string
+          challenged_name?: string
+          challenged_power?: number | null
+          challenger_cards?: Json
+          challenger_id: string
+          challenger_name?: string
+          challenger_power?: number | null
+          class_name: string
+          created_at?: string
+          id?: string
+          status?: string
+          updated_at?: string
+          winner_id?: string | null
+          winner_name?: string | null
+        }
+        Update: {
+          challenged_cards?: Json
+          challenged_id?: string
+          challenged_name?: string
+          challenged_power?: number | null
+          challenger_cards?: Json
+          challenger_id?: string
+          challenger_name?: string
+          challenger_power?: number | null
+          class_name?: string
+          created_at?: string
+          id?: string
+          status?: string
+          updated_at?: string
+          winner_id?: string | null
+          winner_name?: string | null
+        }
+        Relationships: []
+      }
+      bafo_rankings: {
+        Row: {
+          best_streak: number
+          cards_lost: number
+          cards_won: number
+          class_name: string
+          id: string
+          losses: number
+          player_name: string
+          streak: number
+          total_matches: number
+          updated_at: string
+          user_id: string
+          wins: number
+        }
+        Insert: {
+          best_streak?: number
+          cards_lost?: number
+          cards_won?: number
+          class_name: string
+          id?: string
+          losses?: number
+          player_name?: string
+          streak?: number
+          total_matches?: number
+          updated_at?: string
+          user_id: string
+          wins?: number
+        }
+        Update: {
+          best_streak?: number
+          cards_lost?: number
+          cards_won?: number
+          class_name?: string
+          id?: string
+          losses?: number
+          player_name?: string
+          streak?: number
+          total_matches?: number
+          updated_at?: string
+          user_id?: string
+          wins?: number
+        }
+        Relationships: []
+      }
       chat_messages: {
         Row: {
           author_name: string
