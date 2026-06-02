@@ -638,6 +638,41 @@ export type Database = {
         }
         Relationships: []
       }
+      student_card_comments: {
+        Row: {
+          author_name: string
+          body: string
+          card_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          author_name: string
+          body: string
+          card_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          author_name?: string
+          body?: string
+          card_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_card_comments_card_id_fkey"
+            columns: ["card_id"]
+            isOneToOne: false
+            referencedRelation: "student_cards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       student_card_likes: {
         Row: {
           card_id: string
@@ -761,6 +796,108 @@ export type Database = {
           login_email?: string
           plain_password?: string
           school?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      student_squad_matches: {
+        Row: {
+          away_goals: Json
+          away_score: number
+          away_squad_id: string
+          class_name: string
+          home_goals: Json
+          home_score: number
+          home_squad_id: string
+          id: string
+          played_at: string
+        }
+        Insert: {
+          away_goals?: Json
+          away_score?: number
+          away_squad_id: string
+          class_name: string
+          home_goals?: Json
+          home_score?: number
+          home_squad_id: string
+          id?: string
+          played_at?: string
+        }
+        Update: {
+          away_goals?: Json
+          away_score?: number
+          away_squad_id?: string
+          class_name?: string
+          home_goals?: Json
+          home_score?: number
+          home_squad_id?: string
+          id?: string
+          played_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_squad_matches_away_squad_id_fkey"
+            columns: ["away_squad_id"]
+            isOneToOne: false
+            referencedRelation: "student_squads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "student_squad_matches_home_squad_id_fkey"
+            columns: ["home_squad_id"]
+            isOneToOne: false
+            referencedRelation: "student_squads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      student_squads: {
+        Row: {
+          class_name: string
+          created_at: string
+          formation: string
+          id: string
+          jersey_color: string
+          jersey_style: string
+          lineup: Json
+          owner_name: string
+          power_score: number
+          shield_config: Json
+          strategy: string
+          team_name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          class_name: string
+          created_at?: string
+          formation?: string
+          id?: string
+          jersey_color?: string
+          jersey_style?: string
+          lineup?: Json
+          owner_name?: string
+          power_score?: number
+          shield_config?: Json
+          strategy?: string
+          team_name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          class_name?: string
+          created_at?: string
+          formation?: string
+          id?: string
+          jersey_color?: string
+          jersey_style?: string
+          lineup?: Json
+          owner_name?: string
+          power_score?: number
+          shield_config?: Json
+          strategy?: string
+          team_name?: string
           updated_at?: string
           user_id?: string
         }
