@@ -13,11 +13,18 @@ export default function AlbumHub() {
   const { user, profile } = useAuth();
   const album = useAlbum();
   const [openedCards, setOpenedCards] = useState<AlbumPlayer[] | null>(null);
+  const [isOpening, setIsOpening] = useState(false);
 
   const handleOpenPack = async () => {
     if (album.stats.packsAvail < 1) { toast.error('Sem pacotes! Complete desafios para ganhar mais.'); return; }
-    const cards = await album.openPack();
-    if (cards) setOpenedCards(cards);
+    if (isOpening) return;
+    setIsOpening(true);
+    try {
+      const cards = await album.openPack();
+      if (cards) setOpenedCards(cards);
+    } finally {
+      setIsOpening(false);
+    }
   };
 
   const totalCards = ALBUM_PLAYERS.length;
@@ -108,11 +115,14 @@ export default function AlbumHub() {
               <button
                 type="button"
                 onClick={handleOpenPack}
-                disabled={album.stats.packsAvail < 1 || album.loading}
+                disabled={album.stats.packsAvail < 1 || album.loading || isOpening}
                 className="copa-open-btn w-full sm:w-auto font-black text-gray-900 text-lg px-8 py-4 rounded-2xl"
               >
                 <span className="flex items-center gap-2 justify-center">
-                  <Package className="h-5 w-5" /> Abrir Pacote!
+                  {isOpening
+                    ? <><span className="animate-spin inline-block">⏳</span> Abrindo...</>
+                    : <><Package className="h-5 w-5" /> Abrir Pacote!</>
+                  }
                 </span>
               </button>
               <p className="text-center text-xs text-white/40">{album.stats.totalPacks} pacotes abertos</p>
