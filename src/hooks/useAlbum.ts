@@ -102,6 +102,7 @@ export function useAlbum() {
 
   // ── Realtime subscriptions ──
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const openingPackRef = useRef(false);
 
   useEffect(() => {
     if (!user) return;
@@ -132,41 +133,62 @@ export function useAlbum() {
   // ── Open pack ──
   const openPack = useCallback(async (goldGuaranteed = false): Promise<AlbumPlayer[] | null> => {
     if (!user) return null;
-    if (stats.packsAvail < 1) return null;
 
-    const cards = drawRandomPack(5, goldGuaranteed);
-    const newLegendaries = cards.filter(c => c.rarity === 'legendary').length;
+    // Guard: bloqueia cliques rápidos simultâneos
+    if (openingPackRef.current) return null;
+    openingPackRef.current = true;
 
-    // Upsert each card in inventory
-    for (const card of cards) {
-      const existing = inventory.find(e => e.cardId === card.id);
-      await supabase.from('album_inventory').upsert({
+    try {
+      // Lê valor real do banco para evitar race condition com React state stale
+      const { data: freshStats } = await supabase
+        .from('album_user_stats')
+        .select('packs_avail, total_packs, legendaries, coins')
+        .eq('user_id', user.id)
+        .single();
+
+      if (!freshStats || freshStats.packs_avail < 1) return null;
+
+      const cards = drawRandomPack(5, goldGuaranteed);
+      const newLegendaries = cards.filter(c => c.rarity === 'legendary').length;
+
+      // Upsert each card in inventory
+      for (const card of cards) {
+        const existing = inventory.find(e => e.cardId === card.id);
+        await supabase.from('album_inventory').upsert({
+          user_id: user.id,
+          card_id: card.id,
+          quantity: (existing?.quantity ?? 0) + 1,
+        }, { onConflict: 'user_id,card_id' });
+      }
+
+      // Usa valores reais do banco (nunca o closure stale)
+      const newStats = {
         user_id: user.id,
-        card_id: card.id,
-        quantity: (existing?.quantity ?? 0) + 1,
-      }, { onConflict: 'user_id,card_id' });
+        packs_avail:  freshStats.packs_avail  - 1,
+        total_packs:  freshStats.total_packs  + 1,
+        legendaries:  freshStats.legendaries  + newLegendaries,
+        coins:        freshStats.coins,
+      };
+      await supabase.from('album_user_stats').upsert(newStats);
+      setStats(s => ({
+        ...s,
+        packsAvail:  freshStats.packs_avail  - 1,
+        totalPacks:  freshStats.total_packs  + 1,
+        legendaries: freshStats.legendaries  + newLegendaries,
+      }));
+
+      // Post to feed
+      await postFeedEvent('pack_opened', {
+        cards: cards.map(c => c.id),
+        legendary: newLegendaries > 0,
+        legendaryCard: newLegendaries > 0 ? cards.find(c => c.rarity === 'legendary')?.name : null,
+      });
+
+      return cards;
+    } finally {
+      openingPackRef.current = false;
     }
-
-    // Update stats
-    const newStats = {
-      user_id: user.id,
-      packs_avail: stats.packsAvail - 1,
-      total_packs: stats.totalPacks + 1,
-      legendaries: stats.legendaries + newLegendaries,
-      coins: stats.coins,
-    };
-    await supabase.from('album_user_stats').upsert(newStats);
-    setStats(s => ({ ...s, packsAvail: s.packsAvail - 1, totalPacks: s.totalPacks + 1, legendaries: s.legendaries + newLegendaries }));
-
-    // Post to feed
-    await postFeedEvent('pack_opened', {
-      cards: cards.map(c => c.id),
-      legendary: newLegendaries > 0,
-      legendaryCard: newLegendaries > 0 ? cards.find(c => c.rarity === 'legendary')?.name : null,
-    });
-
-    return cards;
-  }, [user, stats, inventory]);
+  }, [user, inventory]);
 
   // ── Add coins + packs (from challenges) ──
   const addReward = useCallback(async (packs: number, coins: number, xp: number) => {
