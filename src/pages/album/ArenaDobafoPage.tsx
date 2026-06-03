@@ -159,7 +159,7 @@ export default function ArenaDobafoPage() {
   const { user, profile } = useAuth();
   const album = useAlbum();
 
-  const [screen, setScreen]                   = useState<Screen>('lobby');
+  const [screen, setScreenState]              = useState<Screen>('lobby');
   const [activeMatch, setActiveMatch]         = useState<BafoMatch | null>(null);
   const [onlineUsers, setOnlineUsers]         = useState<{ id: string; name: string }[]>([]);
   const [rankings, setRankings]               = useState<BafoRanking[]>([]);
@@ -177,6 +177,18 @@ export default function ArenaDobafoPage() {
   const powerRef    = useRef(50);
   const startTime   = useRef(0);
   const pollRef     = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // ── Guards to prevent duplicate state transitions ──
+  const screenRef            = useRef<Screen>('lobby');
+  const countdownFiredRef    = useRef(false);
+  const hasFinalizedRef      = useRef(false);
+  const bettingSubmittedRef  = useRef(false);
+
+  // Wrapper so all setScreen calls keep screenRef in sync
+  const setScreen = useCallback((s: Screen) => {
+    screenRef.current = s;
+    setScreenState(s);
+  }, []);
 
   const className = profile?.class_name ?? '';
   const userName  = profile?.full_name ?? '';
@@ -253,6 +265,51 @@ export default function ArenaDobafoPage() {
     return () => { ch.unsubscribe(); };
   }, [user, className, userName]);
 
+  // ── Power bar animation ──
+  const startPowerBar = useCallback(() => {
+    startTime.current = Date.now();
+    const tick = () => {
+      const t = (Date.now() - startTime.current) / 1000;
+      const speed = 1.3 + Math.min(t * 0.12, 0.7);
+      const v = 50 + 48 * Math.sin(t * Math.PI * speed);
+      powerRef.current = v;
+      setPowerDisplay(v);
+      animId.current = requestAnimationFrame(tick);
+    };
+    animId.current = requestAnimationFrame(tick);
+  }, []);
+
+  const stopPowerBar = useCallback(() => {
+    if (animId.current) { cancelAnimationFrame(animId.current); animId.current = null; }
+  }, []);
+
+  const clearPoll = useCallback(() => {
+    if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
+  }, []);
+
+  // ── Countdown then power bar — guarded against double-fire ──
+  const triggerCountdown = useCallback((m: BafoMatch) => {
+    // FIX: Prevent double countdown from poll + realtime both firing
+    if (countdownFiredRef.current) return;
+    countdownFiredRef.current = true;
+
+    setMyPower(null);
+    setScreen('countdown');
+    setCountdownNum(3);
+    let n = 3;
+    const iv = setInterval(() => {
+      n--;
+      if (n <= 0) {
+        clearInterval(iv);
+        setActiveMatch(m);
+        setScreen('playing');
+        startPowerBar();
+      } else {
+        setCountdownNum(n);
+      }
+    }, 900);
+  }, [startPowerBar, setScreen]);
+
   // ── Realtime: match updates ──
   useEffect(() => {
     if (!user || !className) return;
@@ -276,72 +333,43 @@ export default function ArenaDobafoPage() {
       .subscribe();
     matchCh.current = ch;
     return () => { ch.unsubscribe(); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, className]);
 
   // Handle external (opponent-driven) state transitions
   const handleExternalUpdate = useCallback((m: BafoMatch) => {
     if (m.status === 'betting') {
+      // FIX: Don't reset betting state if player is already in betting flow
+      // (challenger goes to 'waiting' first, so screenRef will be 'waiting' or 'lobby').
+      // Skip reset only if already on 'betting' screen OR already submitted bet ('waiting').
+      const cur = screenRef.current;
+      if (cur === 'betting' || (cur === 'waiting' && bettingSubmittedRef.current)) return;
       setScreen('betting');
       setBettingSubmitted(false);
+      bettingSubmittedRef.current = false;
       setSelectedCards([]);
     }
     if (m.status === 'playing') {
+      // FIX: Clear poll before triggering countdown; triggerCountdown itself guards against double-fire
+      clearPoll();
       triggerCountdown(m);
     }
     if (m.status === 'finished') {
       stopPowerBar();
       clearPoll();
-      setScreen('result');
-      loadLobbyData();
-      album.reload();
+      // FIX: Only transition to result once
+      if (screenRef.current !== 'result') {
+        setScreen('result');
+        loadLobbyData();
+        album.reload();
+      }
     }
     if (m.status === 'declined' || m.status === 'cancelled') {
       toast.error('O desafio foi recusado.');
       setScreen('lobby');
       setActiveMatch(null);
     }
-  }, []);
-
-  // ── Power bar animation ──
-  const startPowerBar = useCallback(() => {
-    startTime.current = Date.now();
-    const tick = () => {
-      const t = (Date.now() - startTime.current) / 1000;
-      const speed = 1.3 + Math.min(t * 0.12, 0.7);
-      const v = 50 + 48 * Math.sin(t * Math.PI * speed);
-      powerRef.current = v;
-      setPowerDisplay(v);
-      animId.current = requestAnimationFrame(tick);
-    };
-    animId.current = requestAnimationFrame(tick);
-  }, []);
-
-  const stopPowerBar = useCallback(() => {
-    if (animId.current) { cancelAnimationFrame(animId.current); animId.current = null; }
-  }, []);
-
-  const clearPoll = useCallback(() => {
-    if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
-  }, []);
-
-  // ── Countdown then power bar ──
-  const triggerCountdown = useCallback((m: BafoMatch) => {
-    setMyPower(null);
-    setScreen('countdown');
-    setCountdownNum(3);
-    let n = 3;
-    const iv = setInterval(() => {
-      n--;
-      if (n <= 0) {
-        clearInterval(iv);
-        setActiveMatch(m);
-        setScreen('playing');
-        startPowerBar();
-      } else {
-        setCountdownNum(n);
-      }
-    }, 900);
-  }, [startPowerBar]);
+  }, [clearPoll, stopPowerBar, triggerCountdown, loadLobbyData, album, setScreen]);
 
   // ── Challenge a player ──
   const challengePlayer = useCallback(async (targetId: string, targetName: string) => {
@@ -362,10 +390,23 @@ export default function ArenaDobafoPage() {
     const m = mapMatch(data as Record<string, unknown>);
     setActiveMatch(m);
     setBettingSubmitted(false);
+    bettingSubmittedRef.current = false;
     setSelectedCards([]);
-    setScreen('betting');
-    toast.success(`Desafio enviado para ${targetName}! Escolha suas figurinhas.`);
-  }, [user, className, userName, myDuplicates]);
+    countdownFiredRef.current = false;
+    hasFinalizedRef.current = false;
+    // FIX: Wait for opponent to accept before showing betting screen
+    setScreen('waiting');
+    toast.success(`Desafio enviado para ${targetName}! Aguardando resposta...`);
+  }, [user, className, userName, myDuplicates, setScreen]);
+
+  // ── Cancel a pending challenge (challenger only) ──
+  const cancelChallenge = useCallback(async () => {
+    if (!activeMatch) return;
+    await supabase.from('bafo_matches').update({ status: 'cancelled' }).eq('id', activeMatch.id);
+    setScreen('lobby');
+    setActiveMatch(null);
+    toast('Desafio cancelado.');
+  }, [activeMatch, setScreen]);
 
   // ── Accept or decline incoming challenge ──
   const respondChallenge = useCallback(async (m: BafoMatch, accept: boolean) => {
@@ -382,10 +423,13 @@ export default function ArenaDobafoPage() {
       setActiveMatch(updated);
       setIncomingChallenge(null);
       setBettingSubmitted(false);
+      bettingSubmittedRef.current = false;
       setSelectedCards([]);
+      countdownFiredRef.current = false;
+      hasFinalizedRef.current = false;
       setScreen('betting');
     }
-  }, []);
+  }, [setScreen]);
 
   // ── Submit bet cards ──
   const submitBet = useCallback(async () => {
@@ -407,33 +451,34 @@ export default function ArenaDobafoPage() {
     const updated = mapMatch(data as Record<string, unknown>);
     setActiveMatch(updated);
     setBettingSubmitted(true);
+    bettingSubmittedRef.current = true;
 
     // If both sides have cards → start game
     const bothReady = updated.challengerCards.length > 0 && updated.challengedCards.length > 0;
     if (bothReady) {
       await supabase.from('bafo_matches').update({ status: 'playing' }).eq('id', activeMatch.id);
+      // triggerCountdown is guarded; realtime will also fire but won't double-trigger
       triggerCountdown(updated);
     } else {
       setScreen('waiting');
       toast.success('Aposta confirmada! Aguardando adversário escolher...');
-      // Poll for the opponent's cards
+      // Poll as backup in case realtime update is missed
       pollRef.current = setInterval(async () => {
         const { data: d } = await supabase.from('bafo_matches').select('*').eq('id', activeMatch.id).single();
         if (!d) return;
         const m2 = mapMatch(d as Record<string, unknown>);
-        if (m2.status === 'playing' || (m2.challengerCards.length > 0 && m2.challengedCards.length > 0)) {
+        if (m2.status === 'playing') {
           clearPoll();
-          // Trigger playing
-          if (m2.status !== 'playing') {
-            await supabase.from('bafo_matches').update({ status: 'playing' }).eq('id', activeMatch.id);
-          }
+          triggerCountdown(m2);
+        } else if (m2.challengerCards.length > 0 && m2.challengedCards.length > 0) {
+          clearPoll();
+          await supabase.from('bafo_matches').update({ status: 'playing' }).eq('id', activeMatch.id);
           triggerCountdown(m2);
         }
       }, 2000);
-      // Auto-cancel poll after 3 minutes
       setTimeout(() => clearPoll(), 180_000);
     }
-  }, [activeMatch, user, selectedCards, triggerCountdown, clearPoll]);
+  }, [activeMatch, user, selectedCards, triggerCountdown, clearPoll, setScreen]);
 
   // ── Click the power bar ──
   const handleBafo = useCallback(async () => {
@@ -456,20 +501,34 @@ export default function ArenaDobafoPage() {
       await finalizeMatch(updated);
     } else {
       setScreen('waiting');
-      // Poll until opponent plays
+      // Poll until opponent plays (backup for missed realtime)
       pollRef.current = setInterval(async () => {
         const { data: d } = await supabase.from('bafo_matches').select('*').eq('id', activeMatch.id).single();
         if (!d) return;
         const m2 = mapMatch(d as Record<string, unknown>);
-        if (m2.status === 'finished') { clearPoll(); setActiveMatch(m2); setScreen('result'); loadLobbyData(); album.reload(); }
-        else if (m2.challengerPower !== null && m2.challengedPower !== null) { clearPoll(); finalizeMatch(m2); }
+        if (m2.status === 'finished') {
+          clearPoll();
+          setActiveMatch(m2);
+          if (screenRef.current !== 'result') {
+            setScreen('result');
+            loadLobbyData();
+            album.reload();
+          }
+        } else if (m2.challengerPower !== null && m2.challengedPower !== null) {
+          clearPoll();
+          finalizeMatch(m2);
+        }
       }, 1500);
       setTimeout(() => clearPoll(), 60_000);
     }
-  }, [myPower, activeMatch, user, stopPowerBar, clearPoll, loadLobbyData]);
+  }, [myPower, activeMatch, user, stopPowerBar, clearPoll, loadLobbyData, setScreen]);
 
-  // ── Determine winner + transfer cards ──
+  // ── Determine winner + transfer cards — guarded against double-finalize ──
   const finalizeMatch = useCallback(async (m: BafoMatch) => {
+    // FIX: Prevent double-finalization from poll + realtime
+    if (hasFinalizedRef.current) return;
+    hasFinalizedRef.current = true;
+
     if (m.challengerPower === null || m.challengedPower === null) return;
     const challengerWins = m.challengerPower >= m.challengedPower;
     const winnerId   = challengerWins ? m.challengerId   : m.challengedId;
@@ -478,7 +537,7 @@ export default function ArenaDobafoPage() {
     const allCards   = [...m.challengerCards, ...m.challengedCards];
     const loserCards = challengerWins ? m.challengedCards : m.challengerCards;
 
-    // Mark finished (challenger is responsible; avoid double-write via status check)
+    // Only challenger writes 'finished' (prevents double-write with .eq status guard)
     if (user?.id === m.challengerId) {
       await supabase.from('bafo_matches')
         .update({ status: 'finished', winner_id: winnerId, winner_name: winnerName })
@@ -512,7 +571,7 @@ export default function ArenaDobafoPage() {
       }
     }
 
-    // Update my ranking row (upsert increments — client-side for simplicity)
+    // Update my ranking row
     if (user) {
       const myOldRank = rankings.find(r => r.userId === user.id);
       const newWins  = (myOldRank?.wins  ?? 0) + (iAmWinner ? 1 : 0);
@@ -536,19 +595,23 @@ export default function ArenaDobafoPage() {
     setScreen('result');
     loadLobbyData();
     album.reload();
-  }, [user, className, userName, album, rankings, loadLobbyData]);
+  }, [user, className, userName, album, rankings, loadLobbyData, setScreen]);
 
   // ── Return to lobby ──
   const returnToLobby = useCallback(() => {
     stopPowerBar();
     clearPoll();
+    // Reset all guards for next match
+    countdownFiredRef.current = false;
+    hasFinalizedRef.current = false;
+    bettingSubmittedRef.current = false;
     setScreen('lobby');
     setActiveMatch(null);
     setSelectedCards([]);
     setMyPower(null);
     setBettingSubmitted(false);
     setIncomingChallenge(null);
-  }, [stopPowerBar, clearPoll]);
+  }, [stopPowerBar, clearPoll, setScreen]);
 
   // ── Derived ──
   const iWon     = activeMatch?.winnerId === user?.id;
@@ -563,6 +626,15 @@ export default function ArenaDobafoPage() {
     : user.id === activeMatch.challengerId ? activeMatch.challengedPower : activeMatch.challengerPower;
 
   const pColor = powerColor(powerDisplay);
+
+  // ── Waiting screen context ──
+  const waitingTitle = activeMatch?.status === 'pending'
+    ? `Aguardando ${oppName} aceitar...`
+    : `Aguardando ${oppName}...`;
+  const waitingSubtitle = activeMatch?.status === 'pending'
+    ? 'O adversário precisa aceitar seu desafio para a partida começar.'
+    : 'O jogo começa quando o adversário estiver pronto!';
+  const isChallenger = user?.id === activeMatch?.challengerId;
 
   // ─── Render ───────────────────────────────────────────────────
 
@@ -739,7 +811,11 @@ export default function ArenaDobafoPage() {
                 <div className="text-3xl mb-1">💰</div>
                 <h2 className="text-xl font-black text-white">Escolha sua Aposta</h2>
                 <p className="text-white/50 text-sm mt-1">
-                  vs <span className="text-white font-bold">{oppName}</span>
+                  {isChallenger ? (
+                    <>Você desafiou <span className="text-white font-bold">{oppName}</span></>
+                  ) : (
+                    <>Desafio de <span className="text-white font-bold">{oppName}</span></>
+                  )}
                   {' '}· Até 3 figurinhas repetidas
                 </p>
               </div>
@@ -816,14 +892,23 @@ export default function ArenaDobafoPage() {
           <div className="max-w-sm mx-auto text-center">
             <div className="rounded-2xl border border-white/20 bg-white/10 backdrop-blur-md p-12">
               <div className="text-5xl mb-4">⏳</div>
-              <h2 className="text-xl font-black text-white mb-2">Aguardando {oppName}...</h2>
-              <p className="text-white/40 text-sm">O jogo começa quando o adversário estiver pronto!</p>
+              <h2 className="text-xl font-black text-white mb-2">{waitingTitle}</h2>
+              <p className="text-white/40 text-sm">{waitingSubtitle}</p>
               <div className="mt-5 flex justify-center gap-1.5">
                 {[0, 1, 2, 3].map(i => (
                   <div key={i} className="w-2.5 h-2.5 rounded-full bg-white/30 animate-pulse"
                     style={{ animationDelay: `${i * 0.15}s` }} />
                 ))}
               </div>
+              {/* FIX: Allow challenger to cancel a pending challenge */}
+              {activeMatch?.status === 'pending' && isChallenger && (
+                <button
+                  onClick={cancelChallenge}
+                  className="mt-6 text-sm text-white/30 hover:text-white/60 underline transition-colors"
+                >
+                  Cancelar desafio
+                </button>
+              )}
             </div>
           </div>
         )}
