@@ -107,15 +107,19 @@ export function useStudentCards() {
 
   useEffect(() => { load(); }, [load]);
 
-  // Realtime updates for the class
+  // Realtime updates for the class — debounced to avoid reload storms on rapid likes
   useEffect(() => {
     if (!user || !className) return;
+    let t: ReturnType<typeof setTimeout> | null = null;
+    const schedule = () => { if (t) clearTimeout(t); t = setTimeout(() => load(), 250); };
     const ch = supabase.channel(`student_cards:${className}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'student_cards', filter: `class_name=eq.${className}` }, () => load())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'student_card_likes' }, () => load())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'student_cards', filter: `class_name=eq.${className}` }, schedule)
+      // Likes have no class_name column; we filter client-side via the cards list, but at least debounce.
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'student_card_likes' }, schedule)
       .subscribe();
-    return () => { ch.unsubscribe(); };
+    return () => { if (t) clearTimeout(t); ch.unsubscribe(); };
   }, [user, className, load]);
+
 
   const createOrUpdate = useCallback(async (input: CreateCardInput): Promise<{ ok: boolean; error?: string }> => {
     if (!user) return { ok: false, error: 'Não autenticado' };
