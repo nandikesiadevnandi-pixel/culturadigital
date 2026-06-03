@@ -361,9 +361,10 @@ export default function ArenaDobafoPage() {
       // The challenger flips status to 'finished' which fires this UPDATE on the loser
       // before their own poll catches bothPlayed — without this, the loser keeps their cards.
       if (!hasFinalizedRef.current && m.challengerPower !== null && m.challengedPower !== null) {
-        finalizeMatch(m);
+        finalizeMatchRef.current?.(m);
         return;
       }
+
       if (screenRef.current !== 'result') {
         setScreen('result');
         loadLobbyData();
