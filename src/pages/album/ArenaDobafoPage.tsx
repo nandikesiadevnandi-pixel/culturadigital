@@ -357,7 +357,13 @@ export default function ArenaDobafoPage() {
     if (m.status === 'finished') {
       stopPowerBar();
       clearPoll();
-      // FIX: Only transition to result once
+      // FIX: Run finalizeMatch on the OTHER side too (loser) so inventory + ranking sync.
+      // The challenger flips status to 'finished' which fires this UPDATE on the loser
+      // before their own poll catches bothPlayed — without this, the loser keeps their cards.
+      if (!hasFinalizedRef.current && m.challengerPower !== null && m.challengedPower !== null) {
+        finalizeMatch(m);
+        return;
+      }
       if (screenRef.current !== 'result') {
         setScreen('result');
         loadLobbyData();
@@ -370,6 +376,7 @@ export default function ArenaDobafoPage() {
       setActiveMatch(null);
     }
   }, [clearPoll, stopPowerBar, triggerCountdown, loadLobbyData, album, setScreen]);
+
 
   // ── Challenge a player ──
   const challengePlayer = useCallback(async (targetId: string, targetName: string) => {
