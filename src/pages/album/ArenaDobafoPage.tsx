@@ -183,6 +183,8 @@ export default function ArenaDobafoPage() {
   const countdownFiredRef    = useRef(false);
   const hasFinalizedRef      = useRef(false);
   const bettingSubmittedRef  = useRef(false);
+  const finalizeMatchRef     = useRef<((m: BafoMatch) => void) | null>(null);
+
 
   // Wrapper so all setScreen calls keep screenRef in sync
   const setScreen = useCallback((s: Screen) => {
