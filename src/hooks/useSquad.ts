@@ -130,7 +130,7 @@ export const FORMATIONS: Record<Formation, { key: string; label: string; top: nu
 // ── Power calculation ──────────────────────────────────────────────────────
 
 const RARITY_BONUS: Record<string, number> = { legendary: 4, epic: 2, rare: 1, common: 0 };
-const STRATEGY_BONUS: Record<string, Record<string, number>> = {
+export const STRATEGY_BONUS: Record<string, Record<string, number>> = {
   ofensiva:  { defensiva: 5, posse: 3, contra: -3, pressao: 0, ofensiva: 0 },
   defensiva: { contra: 5, ofensiva: -3, posse: 0, pressao: 3, defensiva: 0 },
   posse:     { pressao: 5, contra: 3, ofensiva: 0, defensiva: -2, posse: 0 },
@@ -272,12 +272,13 @@ export function useSquad() {
     return { ok: true };
   }, [user, profile, className, load]);
 
-  const playMatch = useCallback(async (opponentSquadId: string): Promise<MatchResult | null> => {
+  const playMatch = useCallback(async (opponentSquadId: string, matchStrategy?: Strategy): Promise<MatchResult | null> => {
     if (!mySquad) return null;
     const opponent = classSquads.find(s => s.id === opponentSquadId);
     if (!opponent) return null;
 
-    const sim = simulateMatch(mySquad, opponent);
+    const squadForMatch = matchStrategy ? { ...mySquad, strategy: matchStrategy } : mySquad;
+    const sim = simulateMatch(squadForMatch, opponent);
     const row = {
       class_name: className,
       home_squad_id: mySquad.id,
