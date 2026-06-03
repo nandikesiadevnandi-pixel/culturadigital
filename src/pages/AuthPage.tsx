@@ -139,7 +139,15 @@ export default function AuthPage() {
                     className="mt-1 border-violet-500/30 bg-[#0a0a1a] text-white"
                     placeholder="Ex: Maria da Silva"
                     value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      if (v.includes("@")) {
+                        setIsTeacher(true);
+                        setEmail(v);
+                      } else {
+                        setFullName(v);
+                      }
+                    }}
                     required
                   />
                 </div>
@@ -149,7 +157,15 @@ export default function AuthPage() {
                     className="mt-1 border-violet-500/30 bg-[#0a0a1a] text-white"
                     placeholder="Ex: 7A, 142"
                     value={className}
-                    onChange={(e) => setClassName(e.target.value)}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      if (v.includes("@")) {
+                        setIsTeacher(true);
+                        setEmail(v);
+                      } else {
+                        setClassName(v);
+                      }
+                    }}
                     required
                   />
                 </div>
