@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Swords, Trophy, Shield, Zap, Medal, ChevronRight, X, Check } from 'lucide-react';
 import { toast } from 'sonner';
-import { useSquad, FORMATIONS, Formation, Strategy, ShieldConfig, LineupSlot, calcPower, powerBadge, MatchResult } from '@/hooks/useSquad';
+import { useSquad, FORMATIONS, Formation, Strategy, ShieldConfig, LineupSlot, calcPower, powerBadge, MatchResult, STRATEGY_BONUS, Squad } from '@/hooks/useSquad';
 import { useAuth } from '@/hooks/useAuth';
 import { CopaBackground } from '@/components/album/CopaBackground';
 import { ShieldSVG } from '@/components/album/ShieldSVG';
@@ -197,6 +197,143 @@ function MatchAnim({ result, homeTeam, awayTeam, onClose }: {
   );
 }
 
+// ── Strategy helpers ───────────────────────────────────────────────────────
+
+function stratAdvantage(myStrat: Strategy, oppStrat: Strategy) {
+  const bonus = STRATEGY_BONUS[myStrat]?.[oppStrat] ?? 0;
+  if (bonus >= 5)  return { label: 'GRANDE VANTAGEM', color: 'text-green-400',  border: 'border-green-400/50 bg-green-500/15',  tip: 'Tática perfeita contra essa!' };
+  if (bonus >= 3)  return { label: 'Vantagem',        color: 'text-green-300',  border: 'border-green-400/40 bg-green-500/10',  tip: 'Boa escolha tática!' };
+  if (bonus > 0)   return { label: 'Leve vantagem',   color: 'text-lime-300',   border: 'border-lime-400/30 bg-lime-500/10',    tip: 'Pequena vantagem tática.' };
+  if (bonus === 0) return { label: 'Neutro',           color: 'text-white/50',   border: 'border-white/20 bg-white/5',           tip: 'Vence quem tiver mais talento.' };
+  if (bonus >= -3) return { label: 'Desvantagem',     color: 'text-yellow-400', border: 'border-yellow-400/40 bg-yellow-500/10',tip: 'Cuidado — tente outra tática!' };
+  return               { label: 'DESVANTAGEM GRAVE',  color: 'text-red-400',    border: 'border-red-400/50 bg-red-500/15',      tip: 'Muda de tática antes de jogar!' };
+}
+
+// ── PreMatchModal ──────────────────────────────────────────────────────────
+
+function PreMatchModal({ mySquad, opponent, simulating, onClose, onPlay }: {
+  mySquad: Squad; opponent: Squad; simulating: boolean;
+  onClose: () => void; onPlay: (strat: Strategy) => void;
+}) {
+  const [matchStrat, setMatchStrat] = useState<Strategy>(mySquad.strategy);
+  const bonus    = STRATEGY_BONUS[matchStrat]?.[opponent.strategy] ?? 0;
+  const myPow    = Math.min(100, mySquad.powerScore + bonus);
+  const adv      = stratAdvantage(matchStrat, opponent.strategy);
+  const myBadge  = powerBadge(myPow);
+  const oppBadge = powerBadge(opponent.powerScore);
+  const oppInfo  = STRATEGIES.find(s => s.id === opponent.strategy);
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4 overflow-y-auto">
+      <div className="w-full max-w-lg bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl border border-white/15 shadow-2xl my-4">
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
+          <div className="flex items-center gap-2">
+            <Swords className="h-5 w-5 text-[#FBBA16]" />
+            <h2 className="font-black text-white text-lg">⚔️ Pré-Jogo</h2>
+          </div>
+          <button type="button" onClick={onClose} className="text-white/60 hover:text-white"><X className="h-5 w-5" /></button>
+        </div>
+
+        <div className="p-5 space-y-4">
+
+          {/* Face-off */}
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex-1 text-center space-y-1.5">
+              <ShieldSVG config={mySquad.shield} size={56} letter={mySquad.teamName[0]} />
+              <p className="text-white font-black text-sm truncate">{mySquad.teamName}</p>
+              <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-xs font-black ${myBadge.border} ${myBadge.bg} ${myBadge.color}`}>
+                ⚡ {myPow}
+              </div>
+            </div>
+            <div className="flex flex-col items-center gap-1">
+              <span className="text-[#FBBA16] font-black text-2xl">VS</span>
+              <div className={`text-[11px] font-black px-2 py-1 rounded-lg border ${bonus > 0 ? 'border-green-400/40 text-green-300' : bonus < 0 ? 'border-red-400/40 text-red-300' : 'border-white/20 text-white/50'}`}>
+                {bonus > 0 ? `+${bonus}` : bonus === 0 ? '±0' : `${bonus}`}
+              </div>
+            </div>
+            <div className="flex-1 text-center space-y-1.5">
+              <ShieldSVG config={opponent.shield} size={56} letter={opponent.teamName[0]} />
+              <p className="text-white font-black text-sm truncate">{opponent.teamName}</p>
+              <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-xs font-black ${oppBadge.border} ${oppBadge.bg} ${oppBadge.color}`}>
+                ⚡ {opponent.powerScore}
+              </div>
+            </div>
+          </div>
+
+          {/* Opponent strategy reveal */}
+          <div className="rounded-xl bg-white/5 border border-white/15 p-3 text-center">
+            <p className="text-white/40 text-[10px] font-bold uppercase tracking-wider mb-1">Tática do adversário</p>
+            <p className="text-white font-black text-sm">{oppInfo?.icon} {oppInfo?.label}</p>
+            <p className="text-white/50 text-[10px] mt-0.5">{oppInfo?.desc}</p>
+          </div>
+
+          {/* Advantage banner */}
+          <div className={`rounded-2xl p-3 text-center border ${adv.border}`}>
+            <p className={`font-black text-base ${adv.color}`}>{adv.label}</p>
+            <p className="text-white/60 text-xs mt-0.5">{adv.tip}</p>
+          </div>
+
+          {/* Strategy picker */}
+          <div>
+            <p className="text-white/60 text-xs font-bold mb-2">🎮 Sua tática para este jogo:</p>
+            <div className="space-y-1.5">
+              {STRATEGIES.map(s => {
+                const b   = STRATEGY_BONUS[s.id]?.[opponent.strategy] ?? 0;
+                const a   = stratAdvantage(s.id, opponent.strategy);
+                const sel = matchStrat === s.id;
+                return (
+                  <button key={s.id} type="button" onClick={() => setMatchStrat(s.id)}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border-2 text-left transition-all ${sel ? 'border-[#FBBA16] bg-[#FBBA16]/10' : 'border-white/15 hover:border-white/30'}`}>
+                    <span className="text-xl">{s.icon}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-xs font-black ${sel ? 'text-[#FBBA16]' : 'text-white'}`}>{s.label}</p>
+                      <p className="text-[10px] text-white/50">{s.desc}</p>
+                    </div>
+                    <div className={`text-[10px] font-black px-2 py-0.5 rounded-full shrink-0 ${b >= 3 ? 'bg-green-500/20 text-green-400' : b <= -3 ? 'bg-red-500/20 text-red-400' : 'bg-white/10 text-white/50'}`}>
+                      {b > 0 ? `+${b}` : b < 0 ? `${b}` : '—'}
+                    </div>
+                    <p className={`text-[9px] font-bold w-[72px] text-right shrink-0 ${a.color}`}>{a.label}</p>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Cycle legend */}
+          <div className="rounded-xl bg-white/5 border border-white/10 p-2.5 text-center">
+            <p className="text-white/40 text-[10px] font-bold mb-1.5">🔄 Quem bate em quem</p>
+            <div className="flex items-center justify-center flex-wrap gap-1 text-[9px] text-white/60 font-bold">
+              {[['⚡','Ofensiva'],['🛡️','Defensiva'],['💪','Pressão'],['🎯','Posse'],['🚀','Contra']].map(([ic, lb], i, arr) => (
+                <span key={lb} className="flex items-center gap-0.5">
+                  <span>{ic} {lb}</span>
+                  {i < arr.length - 1 && <span className="text-green-400 mx-0.5">→</span>}
+                </span>
+              ))}
+              <span className="text-green-400 mx-0.5">→ ⚡</span>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-3 pt-1">
+            <button type="button" onClick={onClose}
+              className="flex-1 py-3 rounded-xl border border-white/20 text-white/70 font-bold text-sm hover:bg-white/5">
+              Cancelar
+            </button>
+            <button type="button" onClick={() => onPlay(matchStrat)} disabled={simulating}
+              className="flex-1 py-3 rounded-xl bg-gradient-to-r from-[#FBBA16] to-[#F59E0B] text-gray-900 font-black text-sm flex items-center justify-center gap-2 disabled:opacity-50 shadow-lg">
+              {simulating
+                ? <><span className="animate-spin">⏳</span> Simulando…</>
+                : <><Swords className="h-4 w-4" /> Começar Partida!</>}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Main Page ──────────────────────────────────────────────────────────────
 
 type Tab = 'time' | 'campeonato' | 'rankings';
@@ -223,6 +360,7 @@ export default function MinhaSelecaoPage() {
   const [matchResult, setMatchResult] = useState<MatchResult | null>(null);
   const [matchOpp, setMatchOpp] = useState<{ home: string; away: string } | null>(null);
   const [newAchievement, setNewAchievement] = useState<string | null>(null);
+  const [preMatchOpp, setPreMatchOpp] = useState<Squad | null>(null);
 
   const slots = FORMATIONS[formation];
 
@@ -277,18 +415,24 @@ export default function MinhaSelecaoPage() {
     } else { toast.error(res.error ?? 'Erro ao salvar'); }
   };
 
-  const handlePlayMatch = async (oppId: string) => {
+  const handlePreMatch = (oppId: string) => {
     const opp = classSquads.find(s => s.id === oppId);
-    if (!opp || !mySquad) return;
+    if (opp && mySquad) setPreMatchOpp(opp);
+  };
+
+  const handlePlayMatch = async (matchStrategy: Strategy) => {
+    if (!preMatchOpp || !mySquad) return;
+    const opp = preMatchOpp;
+    setPreMatchOpp(null);
     setSimulating(true);
-    const result = await playMatch(oppId);
+    const result = await playMatch(opp.id, matchStrategy);
     setSimulating(false);
     if (result) {
       setMatchResult(result);
       setMatchOpp({ home: mySquad.teamName, away: opp.teamName });
       if (result.homeScore > result.awayScore) {
         const myMatches = matches.filter(m => m.homeSquadId === mySquad.id || m.awaySquadId === mySquad.id);
-        if (myMatches.length === 0) { setNewAchievement('Primeiro Apito'); setTimeout(() => setNewAchievement(null), 4000); }
+        if (myMatches.length === 1) { setNewAchievement('Primeiro Apito'); setTimeout(() => setNewAchievement(null), 4000); }
       }
     }
   };
@@ -651,6 +795,19 @@ export default function MinhaSelecaoPage() {
     );
   }
 
+  // ── PRE-MATCH MODAL ──────────────────────────────────────────────────────
+  if (preMatchOpp && mySquad) {
+    return (
+      <PreMatchModal
+        mySquad={mySquad}
+        opponent={preMatchOpp}
+        simulating={simulating}
+        onClose={() => setPreMatchOpp(null)}
+        onPlay={handlePlayMatch}
+      />
+    );
+  }
+
   // ── MATCH ANIMATION ──────────────────────────────────────────────────────
   if (matchResult && matchOpp) {
     return <MatchAnim result={matchResult} homeTeam={matchOpp.home} awayTeam={matchOpp.away}
@@ -758,9 +915,9 @@ export default function MinhaSelecaoPage() {
                               <p className="text-white/50 text-[10px]">Técnico: {opp.ownerName}</p>
                             </div>
                             <span className={`text-[10px] font-black ${b.color}`}>⚡ {opp.powerScore}</span>
-                            <button type="button" onClick={() => handlePlayMatch(opp.id)} disabled={simulating}
+                            <button type="button" onClick={() => handlePreMatch(opp.id)} disabled={simulating}
                               className="px-3 py-1.5 rounded-lg bg-[#FBBA16] text-gray-900 font-black text-xs disabled:opacity-50 flex items-center gap-1">
-                              <Swords className="h-3 w-3" /> {simulating ? '…' : 'Desafiar'}
+                              <Swords className="h-3 w-3" /> Desafiar
                             </button>
                           </div>
                         );
@@ -799,41 +956,152 @@ export default function MinhaSelecaoPage() {
 
         {/* ── TAB: CAMPEONATO ── */}
         {tab === 'campeonato' && (
-          <div>
-            <h2 className="text-white font-black text-lg mb-4 flex items-center gap-2">
-              <Trophy className="h-5 w-5 text-[#FBBA16]" /> Tabela da Turma {profile?.class_name}
-            </h2>
-            {table.length === 0 ? (
-              <p className="text-white/40 text-sm italic text-center py-12">Nenhum time na turma ainda. Crie o seu!</p>
-            ) : (
-              <div className="rounded-2xl border border-white/15 overflow-hidden">
-                <div className="grid grid-cols-[2rem_1fr_auto_auto_auto_auto_auto_auto_auto] text-[10px] font-black text-white/50 uppercase px-3 py-2 bg-white/5 border-b border-white/10">
-                  <span>#</span><span>Time</span>
-                  {['J','V','E','D','GF','GC','PTS'].map(h => <span key={h} className="text-center px-2">{h}</span>)}
-                </div>
-                {table.map((row, i) => {
-                  const isMe = row.squad.userId === profile?.user_id;
-                  return (
-                    <div key={row.squad.id}
-                      className={`grid grid-cols-[2rem_1fr_auto_auto_auto_auto_auto_auto_auto] items-center px-3 py-3 border-b border-white/5 last:border-0 ${isMe ? 'bg-[#FBBA16]/10' : 'hover:bg-white/5'}`}>
-                      <span className={`font-black text-sm ${i === 0 ? 'text-[#FBBA16]' : i === 1 ? 'text-gray-300' : i === 2 ? 'text-amber-600' : 'text-white/40'}`}>
-                        {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`}
-                      </span>
-                      <div className="flex items-center gap-2 min-w-0">
-                        <ShieldSVG config={row.squad.shield} size={24} letter={row.squad.teamName[0]} />
-                        <div className="min-w-0">
-                          <p className={`font-black text-xs truncate ${isMe ? 'text-[#FBBA16]' : 'text-white'}`}>{row.squad.teamName}</p>
-                          <p className="text-[9px] text-white/40 truncate">{row.squad.ownerName}</p>
+          <div className="space-y-6">
+
+            {/* ── Tabela com forma recente ── */}
+            <div>
+              <h2 className="text-white font-black text-lg mb-4 flex items-center gap-2">
+                <Trophy className="h-5 w-5 text-[#FBBA16]" /> Tabela da Turma {profile?.class_name}
+              </h2>
+              {table.length === 0 ? (
+                <p className="text-white/40 text-sm italic text-center py-8">Nenhum time na turma ainda. Crie o seu!</p>
+              ) : (
+                <div className="rounded-2xl border border-white/15 overflow-hidden">
+                  <div className="grid grid-cols-[2rem_1fr_auto_auto_auto_auto_auto_auto_auto] text-[10px] font-black text-white/50 uppercase px-3 py-2 bg-white/5 border-b border-white/10">
+                    <span>#</span><span>Time</span>
+                    {['J','V','E','D','GF','GC','PTS'].map(h => <span key={h} className="text-center px-2">{h}</span>)}
+                  </div>
+                  {table.map((row, i) => {
+                    const isMe = row.squad.userId === profile?.user_id;
+                    const teamMatches = matches
+                      .filter(m => m.homeSquadId === row.squad.id || m.awaySquadId === row.squad.id)
+                      .slice(0, 5);
+                    const form = teamMatches.map(m => {
+                      const isHome = m.homeSquadId === row.squad.id;
+                      const ms = isHome ? m.homeScore : m.awayScore;
+                      const os = isHome ? m.awayScore : m.homeScore;
+                      return ms > os ? 'V' : ms === os ? 'E' : 'D';
+                    });
+                    return (
+                      <div key={row.squad.id}
+                        className={`grid grid-cols-[2rem_1fr_auto_auto_auto_auto_auto_auto_auto] items-center px-3 py-2.5 border-b border-white/5 last:border-0 ${isMe ? 'bg-[#FBBA16]/10' : 'hover:bg-white/5'}`}>
+                        <span className={`font-black text-sm ${i === 0 ? 'text-[#FBBA16]' : i === 1 ? 'text-gray-300' : i === 2 ? 'text-amber-600' : 'text-white/40'}`}>
+                          {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`}
+                        </span>
+                        <div className="flex flex-col min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <ShieldSVG config={row.squad.shield} size={20} letter={row.squad.teamName[0]} />
+                            <p className={`font-black text-xs truncate ${isMe ? 'text-[#FBBA16]' : 'text-white'}`}>{row.squad.teamName}</p>
+                          </div>
+                          {form.length > 0 && (
+                            <div className="flex gap-0.5 mt-0.5 pl-6">
+                              {form.map((r, fi) => (
+                                <span key={fi} className={`text-[7px] font-black w-3 h-3 rounded-sm flex items-center justify-center ${r === 'V' ? 'bg-green-500 text-white' : r === 'E' ? 'bg-cyan-600 text-white' : 'bg-red-600 text-white'}`}>{r}</span>
+                              ))}
+                            </div>
+                          )}
                         </div>
+                        {[row.J, row.W, row.D, row.L, row.GF, row.GA, row.pts].map((v, vi) => (
+                          <span key={vi} className={`text-center px-2 text-xs font-bold ${vi === 6 ? 'text-[#FBBA16] font-black' : 'text-white/70'}`}>{v}</span>
+                        ))}
                       </div>
-                      {[row.J, row.W, row.D, row.L, row.GF, row.GA, row.pts].map((v, vi) => (
-                        <span key={vi} className={`text-center px-2 text-xs font-bold ${vi === 6 ? 'text-[#FBBA16] font-black' : 'text-white/70'}`}>{v}</span>
-                      ))}
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* ── Desafiar com pré-visualização tática ── */}
+            {mySquad && (
+              <div>
+                <h2 className="text-white font-black text-lg mb-1 flex items-center gap-2">
+                  <Swords className="h-5 w-5 text-[#FBBA16]" /> Desafiar Adversários
+                </h2>
+                <p className="text-white/50 text-xs mb-4">Analise as táticas e escolha a estratégia certa antes de jogar!</p>
+                {classSquads.filter(s => s.userId !== mySquad.userId).length === 0 ? (
+                  <p className="text-white/40 text-sm italic text-center py-8">Nenhum adversário na turma ainda.</p>
+                ) : (
+                  <div className="space-y-3">
+                    {classSquads.filter(s => s.userId !== mySquad.userId).map(opp => {
+                      const oppBadge   = powerBadge(opp.powerScore);
+                      const bonus      = STRATEGY_BONUS[mySquad.strategy]?.[opp.strategy] ?? 0;
+                      const adv        = stratAdvantage(mySquad.strategy, opp.strategy);
+                      const oppStrat   = STRATEGIES.find(s => s.id === opp.strategy);
+                      const myStrat    = STRATEGIES.find(s => s.id === mySquad.strategy);
+                      const h2h        = matches.filter(m =>
+                        (m.homeSquadId === mySquad.id && m.awaySquadId === opp.id) ||
+                        (m.homeSquadId === opp.id && m.awaySquadId === mySquad.id));
+                      const h2hW = h2h.filter(m => (m.homeSquadId === mySquad.id ? m.homeScore : m.awayScore) > (m.homeSquadId === mySquad.id ? m.awayScore : m.homeScore)).length;
+                      const h2hL = h2h.filter(m => (m.homeSquadId === mySquad.id ? m.homeScore : m.awayScore) < (m.homeSquadId === mySquad.id ? m.awayScore : m.homeScore)).length;
+                      return (
+                        <div key={opp.id} className="rounded-2xl border border-white/15 bg-white/5 backdrop-blur-sm overflow-hidden">
+                          <div className="flex items-center gap-3 p-4">
+                            <ShieldSVG config={opp.shield} size={44} letter={opp.teamName[0]} />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-white font-black text-sm truncate">{opp.teamName}</p>
+                              <p className="text-white/50 text-[10px]">Técnico: {opp.ownerName}</p>
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className="text-[10px] text-white/40">Tática:</span>
+                                <span className="text-[10px] font-bold text-white/80">{oppStrat?.icon} {oppStrat?.label}</span>
+                                <span className="text-[9px] text-white/30">· {opp.formation}</span>
+                              </div>
+                            </div>
+                            <div className="flex flex-col items-end gap-1">
+                              <div className={`flex items-center gap-1 px-2 py-1 rounded-lg border text-xs font-black ${oppBadge.border} ${oppBadge.bg} ${oppBadge.color}`}>
+                                ⚡ {opp.powerScore}
+                              </div>
+                              {h2h.length > 0 && (
+                                <span className="text-[9px] text-white/40">H2H: {h2hW}V {h2h.length-h2hW-h2hL}E {h2hL}D</span>
+                              )}
+                            </div>
+                          </div>
+                          {/* Tactical matchup strip */}
+                          <div className={`flex items-center justify-between px-4 py-2.5 border-t border-white/10 ${bonus >= 3 ? 'bg-green-500/10' : bonus <= -3 ? 'bg-red-500/10' : 'bg-black/20'}`}>
+                            <div className="flex items-center gap-2 text-[10px] text-white/60">
+                              <span>{myStrat?.icon} {myStrat?.label}</span>
+                              <span className="text-white/30">→</span>
+                              <span className={`font-black ${adv.color}`}>{bonus > 0 ? `▲ ${adv.label}` : bonus < 0 ? `▼ ${adv.label}` : `⚖ ${adv.label}`}</span>
+                            </div>
+                            <button type="button" onClick={() => handlePreMatch(opp.id)} disabled={simulating}
+                              className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#FBBA16] to-[#F59E0B] text-gray-900 font-black text-xs flex items-center gap-1.5 disabled:opacity-50 shadow-md">
+                              <Swords className="h-3.5 w-3.5" /> Desafiar
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ── Guia de estratégias ── */}
+            <div className="rounded-2xl border border-white/15 bg-white/5 p-4">
+              <h3 className="text-white font-black text-sm mb-3 flex items-center gap-2">
+                <Zap className="h-4 w-4 text-[#FBBA16]" /> Guia de Estratégias
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {([
+                  { id: 'ofensiva',  beats: ['Defensiva', 'Posse'],       loses: ['Contra-ataque'] },
+                  { id: 'defensiva', beats: ['Contra-ataque', 'Pressão'], loses: ['Ofensiva'] },
+                  { id: 'posse',     beats: ['Pressão', 'Contra-ataque'], loses: ['Ofensiva'] },
+                  { id: 'contra',    beats: ['Ofensiva', 'Pressão'],      loses: ['Defensiva'] },
+                  { id: 'pressao',   beats: ['Ofensiva'],                 loses: ['Posse', 'Contra-ataque'] },
+                ] as const).map(({ id, beats, loses }) => {
+                  const info = STRATEGIES.find(s => s.id === id)!;
+                  return (
+                    <div key={id} className={`flex items-start gap-2 rounded-xl p-2.5 border ${mySquad?.strategy === id ? 'border-[#FBBA16]/40 bg-[#FBBA16]/10' : 'border-white/10 bg-white/5'}`}>
+                      <span className="text-xl shrink-0">{info.icon}</span>
+                      <div className="min-w-0">
+                        <p className={`font-black text-[11px] ${mySquad?.strategy === id ? 'text-[#FBBA16]' : 'text-white'}`}>{info.label} {mySquad?.strategy === id && '← sua tática'}</p>
+                        <p className="text-green-400 text-[10px]">✅ Bate: {beats.join(', ')}</p>
+                        <p className="text-red-400 text-[10px]">❌ Perde: {loses.join(', ')}</p>
+                      </div>
                     </div>
                   );
                 })}
               </div>
-            )}
+            </div>
           </div>
         )}
 
