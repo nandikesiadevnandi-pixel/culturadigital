@@ -183,6 +183,8 @@ export default function ArenaDobafoPage() {
   const countdownFiredRef    = useRef(false);
   const hasFinalizedRef      = useRef(false);
   const bettingSubmittedRef  = useRef(false);
+  const finalizeMatchRef     = useRef<((m: BafoMatch) => void) | null>(null);
+
 
   // Wrapper so all setScreen calls keep screenRef in sync
   const setScreen = useCallback((s: Screen) => {
@@ -357,7 +359,14 @@ export default function ArenaDobafoPage() {
     if (m.status === 'finished') {
       stopPowerBar();
       clearPoll();
-      // FIX: Only transition to result once
+      // FIX: Run finalizeMatch on the OTHER side too (loser) so inventory + ranking sync.
+      // The challenger flips status to 'finished' which fires this UPDATE on the loser
+      // before their own poll catches bothPlayed — without this, the loser keeps their cards.
+      if (!hasFinalizedRef.current && m.challengerPower !== null && m.challengedPower !== null) {
+        finalizeMatchRef.current?.(m);
+        return;
+      }
+
       if (screenRef.current !== 'result') {
         setScreen('result');
         loadLobbyData();
@@ -370,6 +379,7 @@ export default function ArenaDobafoPage() {
       setActiveMatch(null);
     }
   }, [clearPoll, stopPowerBar, triggerCountdown, loadLobbyData, album, setScreen]);
+
 
   // ── Challenge a player ──
   const challengePlayer = useCallback(async (targetId: string, targetName: string) => {
@@ -574,20 +584,26 @@ export default function ArenaDobafoPage() {
     // Update my ranking row
     if (user) {
       const myOldRank = rankings.find(r => r.userId === user.id);
-      const newWins  = (myOldRank?.wins  ?? 0) + (iAmWinner ? 1 : 0);
-      const newLoss  = (myOldRank?.losses ?? 0) + (iAmLoser  ? 1 : 0);
-      const newStreak = iAmWinner ? (myOldRank?.streak ?? 0) + 1 : 0;
+      const oldWins   = myOldRank?.wins ?? 0;
+      const oldLoss   = myOldRank?.losses ?? 0;
+      const oldCardsW = myOldRank?.cardsWon ?? 0;
+      const oldStreak = myOldRank?.streak ?? 0;
+      const oldBest   = (myOldRank as unknown as { best_streak?: number } | undefined)?.best_streak ?? oldStreak;
+      const newWins   = oldWins + (iAmWinner ? 1 : 0);
+      const newLoss   = oldLoss + (iAmLoser  ? 1 : 0);
+      const newStreak = iAmWinner ? oldStreak + 1 : 0;
       await supabase.from('bafo_rankings').upsert({
         user_id: user.id,
         class_name: className,
         player_name: userName,
         wins: newWins,
         losses: newLoss,
-        cards_won: (allCards.length) + (iAmWinner ? allCards.length : 0),
-        cards_lost: iAmLoser ? loserCards.length : 0,
+        // FIX: accumulate properly — winner gains allCards.length once; loser gains 0
+        cards_won: oldCardsW + (iAmWinner ? allCards.length : 0),
+        cards_lost: ((myOldRank as unknown as { cards_lost?: number } | undefined)?.cards_lost ?? 0) + (iAmLoser ? loserCards.length : 0),
         streak: newStreak,
-        best_streak: Math.max(newStreak, myOldRank?.streak ?? 0),
-        total_matches: (myOldRank?.wins ?? 0) + (myOldRank?.losses ?? 0) + 1,
+        best_streak: Math.max(newStreak, oldBest),
+        total_matches: newWins + newLoss,
       }, { onConflict: 'user_id' });
     }
 
@@ -596,6 +612,10 @@ export default function ArenaDobafoPage() {
     loadLobbyData();
     album.reload();
   }, [user, className, userName, album, rankings, loadLobbyData, setScreen]);
+
+  // Keep ref in sync so handleExternalUpdate can call finalizeMatch (declared after it).
+  useEffect(() => { finalizeMatchRef.current = finalizeMatch; }, [finalizeMatch]);
+
 
   // ── Return to lobby ──
   const returnToLobby = useCallback(() => {
