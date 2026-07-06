@@ -15,6 +15,7 @@ import {
   TurmaRow,
   emptyRelatorio,
   abril2026,
+  junho2026,
 } from "@/data/relatorio";
 
 const EditableInput = ({ value, onChange, className = "" }: { value: string; onChange: (v: string) => void; className?: string }) => (
@@ -65,6 +66,8 @@ export default function FolhaRegistroPage() {
         setR(row.data as unknown as Relatorio);
       } else if (periodKey === "2026-04") {
         setR(abril2026);
+      } else if (periodKey === "2026-06") {
+        setR(junho2026);
       } else {
         setR(emptyRelatorio(periodKey));
       }

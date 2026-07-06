@@ -138,3 +138,80 @@ export const abril2026: Relatorio = {
   cidadeData: "Canela/RS, 03 de maio de 2026",
   assinanteNome: "KESIA WEIGE NANDI",
 };
+
+export const junho2026: Relatorio = {
+  titulo: "RELATÓRIO DE ATIVIDADES\nOFICINAS DE CULTURA DIGITAL – JUNHO/2026",
+  periodo: "Junho de 2026",
+  escolasAtendidas: "Escolas atendidas: EMEF Ernesto Dorneles e EMEF Dante Bertoluci",
+  credenciada: "Interação Comunicação e Marketing Ltda",
+  cnpj: "40.949.328/0001-73",
+  contrato: "4397",
+  oficina: "22535",
+  oficineira: "Késia Weige Nandi",
+  cargaTema:
+    "20 horas – Introdução ao desenvolvimento web: HTML, CSS e JavaScript, com criação do primeiro site pelos estudantes.",
+  introducao:
+    "O presente relatório sistematiza as atividades desenvolvidas nas Oficinas de Cultura Digital realizadas no contraturno escolar, ao longo do mês de junho de 2026, nas escolas municipais Ernesto Dorneles e Dante Bertoluci, no município de Canela/RS. No período, o trabalho concentrou-se em uma imersão introdutória no desenvolvimento web, apresentando aos estudantes as linguagens HTML, CSS e JavaScript, e conduzindo cada turma à construção do seu primeiro site próprio, com estrutura, estilo e um primeiro elemento de interatividade.",
+  objetivos:
+    "As atividades tiveram como foco desmistificar o funcionamento das páginas da internet e permitir que os estudantes percebessem, na prática, que também podem produzir tecnologia — e não apenas consumi-la. Trabalhou-se a estrutura de uma página com HTML (títulos, parágrafos, listas, imagens e links), a personalização visual com CSS (cores, fontes, fundos, espaçamentos) e as primeiras noções de interatividade com JavaScript (botões, alertas, mudanças simples na página), consolidando o percurso em um pequeno site pessoal criado pelos próprios alunos.",
+  schools: [
+    {
+      nome: "EMEF Ernesto Dorneles",
+      diaSemana: "Terça-feira",
+      observacao:
+        "Turmas atendidas em sistema de rodízio, com aulas conduzidas no laboratório de informática da escola. As oficinas do mês foram integralmente dedicadas à criação do primeiro site dos estudantes, com uso combinado de HTML, CSS e JavaScript.",
+      turmas: [
+        { turma: "6º ano", alunos: "" },
+        { turma: "7º ano", alunos: "" },
+      ],
+    },
+    {
+      nome: "EMEF Dante Bertoluci",
+      diaSemana: "Sexta-feira",
+      observacao:
+        "Continuidade do trabalho de alfabetização digital iniciado nos meses anteriores, agora com introdução ao desenvolvimento web adaptada ao nível das turmas de 4º e 5º anos.",
+      turmas: [
+        { turma: "141", alunos: "" },
+        { turma: "142", alunos: "" },
+        { turma: "151", alunos: "" },
+        { turma: "152", alunos: "" },
+      ],
+    },
+  ],
+  activities: [
+    {
+      data: "02/06",
+      escola: "EMEF Ernesto Dorneles",
+      turmas: "Turmas do rodízio",
+      atividades:
+        "Introdução ao desenvolvimento web: apresentação do que é HTML, para que serve e como o navegador interpreta o código. Criação da primeira página em HTML com título, parágrafos, listas e imagens. Discussão sobre a diferença entre consumir e produzir conteúdo na internet.",
+    },
+    {
+      data: "12/06",
+      escola: "EMEF Dante Bertoluci",
+      turmas: "141, 142, 151 e 152",
+      atividades:
+        "Oficina de introdução ao HTML e CSS adaptada às turmas de 4º e 5º anos: construção coletiva de uma página simples com informações da turma, aplicação de cores e fontes com CSS e primeiros experimentos com um botão interativo em JavaScript. Reforço do bom uso dos equipamentos e do protocolo de laboratório.",
+    },
+    {
+      data: "16/06",
+      escola: "EMEF Ernesto Dorneles",
+      turmas: "Turmas do rodízio",
+      atividades:
+        "Aprofundamento em CSS: cores, fontes, fundos, bordas e espaçamentos. Os estudantes personalizaram a página criada na semana anterior, transformando-a em um site pessoal com identidade visual própria. Introdução ao conceito de estilo separado da estrutura.",
+    },
+    {
+      data: "30/06",
+      escola: "EMEF Ernesto Dorneles",
+      turmas: "Turmas do rodízio",
+      atividades:
+        "Primeiro contato com JavaScript: criação de botões que exibem mensagens, alteram textos e mudam cores da página. Finalização do primeiro site dos estudantes reunindo HTML, CSS e JavaScript, com apresentação dos projetos para a turma e conversa sobre próximos passos no desenvolvimento web.",
+    },
+  ],
+  consideracoes:
+    "O mês de junho representou um marco importante no percurso da oficina, pois os estudantes deixaram de apenas utilizar ferramentas prontas e passaram a construir suas próprias páginas na internet. A resposta das turmas foi bastante positiva, com forte engajamento durante as etapas práticas de personalização com CSS e de criação dos primeiros botões interativos em JavaScript. A carga horária de 20 horas permitiu contemplar as três linguagens de forma articulada, garantindo que cada turma finalizasse o mês com um site próprio publicado no computador da escola.",
+  encaminhamentos:
+    "Recomenda-se a continuidade do trabalho com desenvolvimento web nos próximos meses, aprofundando o uso de CSS (layouts simples, imagens de fundo, responsividade básica) e ampliando as práticas de JavaScript (interações com formulários, mudanças dinâmicas na página, pequenos jogos). Sugere-se também organizar uma mostra dos sites criados pelos estudantes ao final do próximo ciclo, valorizando a produção autoral e fortalecendo a cultura digital nas escolas atendidas.",
+  cidadeData: "Canela/RS, 03 de julho de 2026",
+  assinanteNome: "KESIA WEIGE NANDI",
+};
