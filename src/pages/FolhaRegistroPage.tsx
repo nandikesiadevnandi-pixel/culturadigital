@@ -66,6 +66,8 @@ export default function FolhaRegistroPage() {
         setR(row.data as unknown as Relatorio);
       } else if (periodKey === "2026-04") {
         setR(abril2026);
+      } else if (periodKey === "2026-06") {
+        setR(junho2026);
       } else {
         setR(emptyRelatorio(periodKey));
       }
