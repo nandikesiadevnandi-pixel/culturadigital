@@ -15,6 +15,7 @@ import {
   TurmaRow,
   emptyRelatorio,
   abril2026,
+  junho2026,
 } from "@/data/relatorio";
 
 const EditableInput = ({ value, onChange, className = "" }: { value: string; onChange: (v: string) => void; className?: string }) => (
